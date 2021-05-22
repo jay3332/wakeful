@@ -7,6 +7,9 @@ from discord.flags import Intents
 bot = commands.Bot(command_prefix=when_mentioned_or(","), intents=discord.Intents.all())
 bot.remove_command("help")
 bot.uptime = datetime.datetime.utcnow()
+bot.greenTick="✓"
+bot.redTick="x"
+bot.error="!"
 os.environ["JISHAKU_NO_UNDERSCORE"] = "True"
 os.environ["JISHAKU_NO_DM_TRACEBACK"] = "True" 
 os.environ["JISHAKU_HIDE"] = "True"
