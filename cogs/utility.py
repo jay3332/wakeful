@@ -212,6 +212,12 @@ class utility(commands.Cog):
         )
         await ctx.send(embed=em)
 
+    @commands.command()
+    @commands.cooldown(1,5,commands.BucketType.user)
+    async def source(self, ctx):
+        em=discord.Embed(description=f"my source code can be found [here](https://github.com/pvffyn/wakeful)", color=color())
+        await ctx.send(embed=em)
+
     @commands.command(aliases=["icon", "av"])
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def avatar(self, ctx, member : discord.Member = None):
@@ -262,7 +268,7 @@ class utility(commands.Cog):
         minutes, seconds = divmod(remainder, 60)
         days, hours = divmod(hours, 24)
         embed.add_field(name="system", value=f"- **os**: `{operating_system}`\n- **cpu**: `{process.cpu_percent()}`%\n- **memory**: `{humanize.naturalsize(process.memory_full_info().rss).lower()}`\n- **process**: `{process.pid}`\n- **threads**: `{process.num_threads()}`\n- **language**: `python`\n- **python version**: `{version[0]}.{version[1]}.{version[2]}`\n- **discord.py version**: `{discord.__version__}`", inline=True)
-        embed.add_field(name="bot", value=f"- **guilds**: `{len(self.bot.guilds)}`\n- **users**: `{len(self.bot.users)}`\n- **commands**: `{len(self.bot.commands)}`\n- **cogs**: `{len(self.bot.cogs)}`\n- **uptime**: `{days}d {hours}h {minutes}m {seconds}s`", inline=True)
+        embed.add_field(name="bot", value=f"- **guilds**: `{len(self.bot.guilds)}`\n- **users**: `{len(self.bot.users)}`\n- **commands**: `{len(self.bot.commands)}`\n- **cogs**: `{len(self.bot.cogs)}`\n- **uptime**: `{days}d {hours}h {minutes}m {seconds}s`\n- [**source**](https://github.com/pvffyn/wakeful)", inline=True)
         embed.set_thumbnail(url=self.bot.user.avatar_url)
         msg = await ctx.send(embed=embed)
 
