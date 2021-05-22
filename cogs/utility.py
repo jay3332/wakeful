@@ -1,8 +1,6 @@
-import discord, datetime, async_cse, psutil, humanize
+import discord, datetime, async_cse, psutil, humanize, os, sys
 from discord.ext import commands
 from utils.configs import color
-from moviepy.editor import *
-from jishaku.functools import executor_function
 
 google = async_cse.Search(os.getenv("GOOGLE"))
 
@@ -68,9 +66,8 @@ class utility(commands.Cog):
         hours, remainder = divmod(int(delta_uptime.total_seconds()), 3600)
         minutes, seconds = divmod(remainder, 60)
         days, hours = divmod(hours, 24)
+        embed.add_field(name="system", value=f"- **os**: `{operating_system}`\n- **cpu**: `{process.cpu_percent()}`%\n- **memory**: `{humanize.naturalsize(process.memory_full_info().rss).lower()}`\n- **process**: `{process.pid}`\n- **threads**: `{process.num_threads()}`\n- **language**: `python`\n- **python version**: `{version[0]}.{version[1]}.{version[2]}`\n- **discord.py version**: `{discord.__version__}`", inline=True)
         embed.add_field(name="bot", value=f"- **guilds**: `{len(self.bot.guilds)}`\n- **users**: `{len(self.bot.users)}`\n- **commands**: `{len(self.bot.commands)}`\n- **cogs**: `{len(self.bot.cogs)}`\n- **uptime**: `{days}d {hours}h {minutes}m {seconds}s`", inline=True)
-        embed.add_field(name="system", value=f"- **os**: `{operating_system}`\n- **cpu**: `{process.cpu_percent()}`%\n- **memory**: `{humanize.naturalsize(process.memory_full_info().rss).lower()}`\n- **process**: `{process.pid}`\n- **threads**: `{process.num_threads()}`", inline=True)
-        embed.add_field(name="code", value=f"- **language**: `python`\n- **python version**: `{version[0]}.{version[1]}.{version[2]}`\n- **discord.py version**: `{discord.__version__}`", inline=False)
         embed.set_thumbnail(url=self.bot.user.avatar_url)
         msg = await ctx.send(embed=embed)
 
