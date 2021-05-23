@@ -1,4 +1,4 @@
-import discord, datetime, async_cse, psutil, humanize, os, sys, inspect, mystbin, googletrans, asyncio, aiohttp
+import discord, datetime, async_cse, psutil, humanize, os, sys, inspect, mystbin, googletrans, asyncio, aiohttp, random
 from discord.ext import commands
 from discord import Webhook, AsyncWebhookAdapter
 from utils.configs import color
@@ -20,6 +20,16 @@ class utility(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
+
+    @commands.Cog.listener()
+    async def on_message(self, message):
+        mem=[]
+        for m in message.guild.members:
+            if not m.bot:
+                mem.append(m)
+        if "@someone" in message.content:
+            if message.author.guild_permissions.mention_everyone:
+                await message.channel.send(random.choice(mem).mention)
 
     @commands.command()
     @commands.cooldown(1, 5, commands.BucketType.user)
