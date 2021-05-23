@@ -6,20 +6,21 @@ from discord.flags import Intents
 from utils.configs import color
 
 async def get_prefix(bot, message):
+    await bot.wait_until_ready()
     if message.guild is None:
         return when_mentioned_or("!")
     else:
         with open("prefixes.json", "r") as f:
-            prefixes = json.load(f)
+            prefixees = json.load(f)
         try:
-            prefix = prefixes[str(message.guild.id)]
+            prefix = prefixees[str(message.guild.id)]
         except KeyError:
-            prefixes[str(message.guild.id)] = "w,"
+            prefixees[str(message.guild.id)] = "w,"
             with open("prefixes.json", "w") as f:
-                json.dump(prefixes, f, indent=4)
-        return prefixes[str(message.guild.id)]
+                json.dump(prefixees, f, indent=4)
+        return prefixees[str(message.guild.id)]
 
-bot = commands.Bot(command_prefix=get_prefix, intents=discord.Intents.all())
+bot = commands.AutoShardedBot(command_prefix=get_prefix, case_insensitive=True, ShardCount=10, intents=discord.Intents.all())
 bot.remove_command("help")
 
 with open('config.json') as f:
@@ -52,6 +53,8 @@ async def on_message(msg):
         else:
             em=discord.Embed(description=f"the prefix for dms is `{await get_prefix(bot, msg)}`", color=color())
             await msg.channel.send(embed=em)
+    else:
+        await bot.process_commands(msg)
 
 @bot.event
 async def on_ready():

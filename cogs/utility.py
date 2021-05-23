@@ -24,12 +24,13 @@ class utility(commands.Cog):
     @commands.Cog.listener()
     async def on_message(self, message):
         mem=[]
-        for m in message.guild.members:
-            if not m.bot:
-                mem.append(m)
-        if "@someone" in message.content:
-            if message.author.guild_permissions.mention_everyone:
-                await message.channel.send(random.choice(mem).mention)
+        if message.guild:
+            for m in message.guild.members:
+                if not m.bot:
+                    mem.append(m)
+            if "@someone" in message.content:
+                if message.author.guild_permissions.mention_everyone:
+                    await message.channel.send(random.choice(mem).mention)
 
     @commands.command()
     @commands.cooldown(1, 5, commands.BucketType.user)
