@@ -1,5 +1,4 @@
-import aiohttp
-import discord, datetime, async_cse, psutil, humanize, os, sys, inspect, mystbin, googletrans
+import discord, datetime, async_cse, psutil, humanize, os, sys, inspect, mystbin, googletrans, asyncio, aiohttp
 from discord.ext import commands
 from discord import Webhook, AsyncWebhookAdapter
 from utils.configs import color
@@ -21,6 +20,40 @@ class utility(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
+
+    @commands.command()
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    async def pypi(self, ctx, package):
+        try:
+            async with aiohttp.ClientSession() as cs:
+                async with cs.get(f"https://pypi.org/pypi/{package}/json") as res:
+                    json = await res.json()
+                    name = json["info"]["name"] + " " + json["info"]["version"]
+                    author = json["info"]["author"] or "None"
+                    author_email = json["info"]["author_email"] or "None"
+                    url = json["info"]["project_url"] or "None"
+                    description = json["info"]["summary"] or "None"
+                    author = json["info"]["author"] or "None"
+                    license_ = json["info"]["license"] or "None"
+                    try:
+                        documentation = json["info"]["project_urls"]["Documentation"] or "None"
+                    except:
+                        documentation = "None"
+                    try:
+                        website = json["info"]["project_urls"]["Homepage"] or "None"
+                    except:
+                        website = "None"
+                    keywords = json["info"]["keywords"] or "None"
+                    em=discord.Embed(
+                        title=name,
+                        description=f"{description}\n**author**: {author}\n**author email**: {author_email}\n\n**website**: {website}\n**documentation**: {documentation}\n**keywords**: {keywords}\n**license**: {license_}",
+                        url=url,
+                        color=color()
+                    ).set_thumbnail(url="https://cdn.discordapp.com/attachments/381963689470984203/814267252437942272/pypi.png")
+                    await ctx.send(embed=em)
+        except aiohttp.ContentTypeError:
+            em=discord.Embed(description=f"{self.bot.error} this package wasn't found", color=color())
+            await ctx.send(embed=em)
 
     @commands.command(aliases=["g"])
     @commands.cooldown(1, 5, commands.BucketType.user)
@@ -234,7 +267,12 @@ class utility(commands.Cog):
             em=discord.Embed(description=f"please now enter your suggestion below:", color=color())
             em.set_footer(text=f"requested by {ctx.author}", icon_url=ctx.author.avatar_url)
             msg = await ctx.send(embed=em)
-            suggestion = await self.bot.wait_for("message", check=lambda msg: msg.channel == ctx.channel and msg.author == ctx.author, timeout=30)
+            try:
+                suggestion = await self.bot.wait_for("message", check=lambda msg: msg.channel == ctx.channel and msg.author == ctx.author, timeout=30)
+            except asyncio.TimeoutError:
+                em=discord.Embed(description="you took too long to respond, now ignoring next messages", color=color())
+                em.set_footer(text=f"requested by {ctx.author}", icon_url=ctx.author.avatar_url)
+                await msg.edit(embed=em)
             if suggestion.content.lower() != "cancel":
                 webhook = Webhook.from_url(str(self.bot.suggestions), adapter=AsyncWebhookAdapter(cs))
 
