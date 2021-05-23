@@ -118,8 +118,10 @@ class moderation(commands.Cog):
         if channel != None:
             await channel.set_permissions(ctx.guild.default_role, send_messages=False)
             em=discord.Embed(description=f"successfully locked {channel.mention}", color=color())
+            em.set_footer(text=f"requested by {ctx.author}", icon_url=ctx.author.avatar_url)
             await ctx.send(embed=em)
             em=discord.Embed(description=f"this channel has been locked", color=color())
+            em.set_footer(text=f"locked by {ctx.author}", icon_url=ctx.author.avatar_url)
             await channel.send(embed=em)
         else:
             await ctx.channel.set_permissions(ctx.guild.default_role, send_messages=False)
@@ -133,8 +135,10 @@ class moderation(commands.Cog):
         if channel != None:
             await channel.set_permissions(ctx.guild.default_role, send_messages=True)
             em=discord.Embed(description=f"successfully unlocked {channel.mention}", color=color())
+            em.set_footer(text=f"requested by {ctx.author}", icon_url=ctx.author.avatar_url)
             await ctx.send(embed=em)
             em=discord.Embed(description=f"this channel has been unlocked", color=color())
+            em.set_footer(text=f"unlocked by {ctx.author}", icon_url=ctx.author.avatar_url)
             await channel.send(embed=em)
         else:
             await ctx.channel.set_permissions(ctx.guild.default_role, send_messages=True)
