@@ -286,17 +286,17 @@ class utility(commands.Cog):
             operating_system = "windows"
         elif os.name == "posix":
             operating_system = "linux"
-        await ctx.trigger_typing()
-        process = psutil.Process()
-        version = sys.version_info
-        embed = discord.Embed(color=color())
-        delta_uptime = datetime.datetime.utcnow() - self.bot.uptime
-        hours, remainder = divmod(int(delta_uptime.total_seconds()), 3600)
-        minutes, seconds = divmod(remainder, 60)
-        days, hours = divmod(hours, 24)
-        embed.add_field(name="system", value=f"- **os**: `{operating_system}`\n- **cpu**: `{process.cpu_percent()}`%\n- **memory**: `{humanize.naturalsize(process.memory_full_info().rss).lower()}`\n- **process**: `{process.pid}`\n- **threads**: `{process.num_threads()}`\n- **language**: `python`\n- **python version**: `{version[0]}.{version[1]}.{version[2]}`\n- **discord.py version**: `{discord.__version__}`", inline=True)
-        embed.add_field(name="bot", value=f"- **guilds**: `{len(self.bot.guilds)}`\n- **users**: `{len(self.bot.users)}`\n- **commands**: `{len(self.bot.commands)}`\n- **cogs**: `{len(self.bot.cogs)}`\n- **uptime**: `{days}d {hours}h {minutes}m {seconds}s`\n- [**source**](https://github.com/pvffyn/wakeful)", inline=True)
-        embed.set_thumbnail(url=self.bot.user.avatar_url)
+        async with ctx.typing():
+            process = psutil.Process()
+            version = sys.version_info
+            embed = discord.Embed(color=color())
+            delta_uptime = datetime.datetime.utcnow() - self.bot.uptime
+            hours, remainder = divmod(int(delta_uptime.total_seconds()), 3600)
+            minutes, seconds = divmod(remainder, 60)
+            days, hours = divmod(hours, 24)
+            embed.add_field(name="system", value=f"- **os**: `{operating_system}`\n- **cpu**: `{process.cpu_percent()}`%\n- **memory**: `{humanize.naturalsize(process.memory_full_info().rss).lower()}`\n- **process**: `{process.pid}`\n- **threads**: `{process.num_threads()}`\n- **language**: `python`\n- **python version**: `{version[0]}.{version[1]}.{version[2]}`\n- **discord.py version**: `{discord.__version__}`", inline=True)
+            embed.add_field(name="bot", value=f"- **guilds**: `{len(self.bot.guilds)}`\n- **users**: `{len(self.bot.users)}`\n- **commands**: `{len(self.bot.commands)}`\n- **cogs**: `{len(self.bot.cogs)}`\n- **uptime**: `{days}d {hours}h {minutes}m {seconds}s`\n- [**source**](https://github.com/pvffyn/wakeful)", inline=True)
+            embed.set_thumbnail(url=self.bot.user.avatar_url)
         msg = await ctx.send(embed=embed)
 
 class MyNewHelp(commands.MinimalHelpCommand):
