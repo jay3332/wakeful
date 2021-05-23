@@ -1,6 +1,16 @@
-import discord, datetime, async_cse, psutil, humanize, os, sys, inspect, mystbin
+import discord, datetime, async_cse, psutil, humanize, os, sys, inspect, mystbin, googletrans
 from discord.ext import commands
 from utils.configs import color
+from jishaku.functools import executor_function
+
+@executor_function
+def do_translate(output, text):
+    """
+    You have to install googletrans==3.1.0a0 for it to work, as the dev somehow broke it and it doesn't work else
+    """
+    translator = googletrans.Translator()
+    translation = translator.translate(str(text), dest=str(output), src=translator.detect(text).lang)
+    return translation
 
 google = async_cse.Search(os.getenv("GOOGLE"))
 mystbinn = mystbin.Client()
@@ -36,6 +46,17 @@ class utility(commands.Cog):
                         inline=False
                     )
                     value+=1
+        await ctx.send(embed=em)
+
+    @commands.command(aliases=["trans", "tr"])
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    async def translate(self, ctx, output : str, *, text : str):
+        async with ctx.typing():
+            translation = await do_translate(output, text)
+            em = discord.Embed(color=color())
+            em.add_field(name=f"input [{translation.src.upper()}]", value=f"```{text}```", inline=False)
+            em.add_field(name=f"output [{translation.dest.upper()}]", value=f"```{translation.text}```", inline=False)
+            em.set_author(name=ctx.author, icon_url=ctx.author.avatar_url)
         await ctx.send(embed=em)
 
     @commands.command(aliases=["guildav", "servericon", "serverav"])
