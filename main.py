@@ -6,7 +6,14 @@ from discord.flags import Intents
 
 bot = commands.Bot(command_prefix=when_mentioned_or(","), intents=discord.Intents.all())
 bot.remove_command("help")
+
+with open('config.json') as f:
+    data = json.load(f)
+
 bot.uptime = datetime.datetime.utcnow()
+token = data["TOKEN"]
+bot.github = "https://github.com/pvffyn/wakeful" # the github the bot is hosted on
+bot.suggestions = data["SUGGESTIONS"] # this will be used as a webhook for suggestions
 bot.greenTick="✓"
 bot.redTick="x"
 bot.error="!"
@@ -16,7 +23,7 @@ os.environ["JISHAKU_HIDE"] = "True"
 
 @tasks.loop(seconds=10)
 async def presence():
-    await asyncio.sleep(1)
+    await asyncio.sleep(2)
     await bot.change_presence(status=discord.Status.dnd, activity=discord.Game(f",help | {len(bot.guilds)} guilds & {len(bot.users)} users"))
 
 
@@ -33,11 +40,6 @@ for filename in os.listdir("./cogs"):
                 print(f"{Fore.GREEN}cogs.{filename[:-3]} has been succesfully loaded{Fore.RESET}")
             except:
                 print(f"{Fore.RED}An error occured while loading cogs.{filename[:-3]}{Fore.RESET}")
-                
-
-with open('config.json') as f:
-    data = json.load(f)
-    token = data["TOKEN"]
 
 bot.load_extension("jishaku")
 presence.start()

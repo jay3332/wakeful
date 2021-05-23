@@ -31,6 +31,9 @@ class errors(commands.Cog):
             else:
                 embed=discord.Embed(description=f"`{cmd}` is not a valid command", color=color())
                 await ctx.send(embed=embed)
+        elif isinstance(error, commands.MemberNotFound):
+            embed=discord.Embed(description=f"could not find member `{error.argument}`", color=color())
+            await ctx.send(embed=embed)
         else:
             embed=discord.Embed(description=f"```{error}```", color=color())
             await ctx.send(embed=embed)

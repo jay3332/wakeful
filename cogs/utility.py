@@ -1,5 +1,7 @@
+import aiohttp
 import discord, datetime, async_cse, psutil, humanize, os, sys, inspect, mystbin, googletrans
 from discord.ext import commands
+from discord import Webhook, AsyncWebhookAdapter
 from utils.configs import color
 from jishaku.functools import executor_function
 
@@ -234,11 +236,32 @@ class utility(commands.Cog):
         )
         await ctx.send(embed=em)
 
+    @commands.command()
+    @commands.cooldown(1,5,commands.BucketType.user)
+    async def suggest(self, ctx):
+        async with aiohttp.ClientSession() as cs:
+            em=discord.Embed(description=f"please now enter your suggestion below:", color=color())
+            em.set_footer(text=f"requested by {ctx.author}", icon_url=ctx.author.avatar_url)
+            msg = await ctx.send(embed=em)
+            suggestion = await self.bot.wait_for("message", check=lambda msg: msg.channel == ctx.channel and msg.author == ctx.author, timeout=30)
+            if suggestion.content.lower() != "cancel":
+                webhook = Webhook.from_url(str(self.bot.suggestions), adapter=AsyncWebhookAdapter(cs))
+
+                em=discord.Embed(description=f"```{suggestion.content}```", color=color())
+                em.set_footer(text=f"suggestion by {ctx.author} ({ctx.author.id})", icon_url=ctx.author.avatar_url)
+                await webhook.send(embed=em)
+                await suggestion.add_reaction("✅")
+                em=discord.Embed(description="your suggestion has been sent to the admins\nnote: abuse may get you blacklisted", color=color())
+                em.set_footer(text=f"requested by {ctx.author}", icon_url=ctx.author.avatar_url)
+                await msg.edit(embed=em)
+
+
+
     @commands.command(aliases=["src"])
     @commands.cooldown(1,5,commands.BucketType.user)
     async def source(self, ctx, command_name : str = None):
         if command_name == None:
-            em=discord.Embed(description=f"my source code can be found [here](https://github.com/pvffyn/wakeful)", color=color())
+            em=discord.Embed(description=f"my source code can be found [here]({self.bot.github})", color=color())
             await ctx.send(embed=em)
         else:
             command = self.bot.get_command(command_name)
@@ -254,7 +277,7 @@ class utility(commands.Cog):
                 else:
                     source_lines = ''.join(source_lines).split('\n')
                     src = "\n".join(line for line in source_lines).replace("`", "'")
-                    em=discord.Embed(title=f"{command.name} source", description=f"note: most of the \" ' \" stand for a \" ` \"\n```py\n{src}```", color=color(), timestamp=datetime.datetime.utcnow())
+                    em=discord.Embed(title=f"{command.name} source", description=f"note: most of the \" ' \" stand for a \" ` \"\n\n```py\n{src}```", color=color(), timestamp=datetime.datetime.utcnow())
                     em.set_footer(text=f"requested by {ctx.author}", icon_url=ctx.author.avatar_url)
                     try:
                         await ctx.author.send(embed=em)
@@ -316,7 +339,7 @@ class utility(commands.Cog):
             minutes, seconds = divmod(remainder, 60)
             days, hours = divmod(hours, 24)
             embed.add_field(name="system", value=f"- **os**: `{operating_system}`\n- **cpu**: `{process.cpu_percent()}`%\n- **memory**: `{humanize.naturalsize(process.memory_full_info().rss).lower()}`\n- **process**: `{process.pid}`\n- **threads**: `{process.num_threads()}`\n- **language**: `python`\n- **python version**: `{version[0]}.{version[1]}.{version[2]}`\n- **discord.py version**: `{discord.__version__}`", inline=True)
-            embed.add_field(name="bot", value=f"- **guilds**: `{len(self.bot.guilds)}`\n- **users**: `{len(self.bot.users)}`\n- **commands**: `{len(self.bot.commands)}`\n- **cogs**: `{len(self.bot.cogs)}`\n- **uptime**: `{days}d {hours}h {minutes}m {seconds}s`\n- [source](https://github.com/pvffyn/wakeful)\n- [invite](https://discord.com/api/oauth2/authorize?client_id={self.bot.user.id}&permissions=8&scope=bot)", inline=True)
+            embed.add_field(name="bot", value=f"- **guilds**: `{len(self.bot.guilds)}`\n- **users**: `{len(self.bot.users)}`\n- **commands**: `{len(self.bot.commands)}`\n- **cogs**: `{len(self.bot.cogs)}`\n- **uptime**: `{days}d {hours}h {minutes}m {seconds}s`\n- [source]({self.bot.github})\n- [invite](https://discord.com/api/oauth2/authorize?client_id={self.bot.user.id}&permissions=8&scope=bot)", inline=True)
             embed.set_thumbnail(url=self.bot.user.avatar_url)
         msg = await ctx.send(embed=embed)
 
