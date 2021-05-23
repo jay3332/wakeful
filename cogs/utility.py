@@ -177,15 +177,6 @@ class utility(commands.Cog):
             member_bot = self.bot.greenTick
         else:
             member_bot = self.bot.redTick
-        #-----------------------------------------------------------
-        if member.raw_status == "online":
-            member_status = "online"
-        elif member.raw_status == "dnd":
-            member_status = "dnd"
-        elif member.raw_status == "offline":
-            member_status = "offline"
-        elif member.raw_status == "idle":
-            member_status = "idle"
         #-----------------------------------------------------------    
         created_at = member.created_at.strftime("20%y/%m/%d at %H:%M:%S")
         joined_at = member.joined_at.strftime("20%y/%m/%d at %H:%M:%S")
@@ -196,7 +187,7 @@ class utility(commands.Cog):
         )
         em.add_field(
             name="info",
-            value=f"- name: `{member.name}`\n- tag: `{member.discriminator}`\n- nickname: `{member.display_name}`\n- mention: {member.mention}\n- id: `{member.id}`\n- status: `{member_status}`\n- bot: {member_bot}\n- mobile: {mobile_status}\n- web: {web_status}\n- desktop: {desktop_status}\n- created at: `{created_at}` ({humanize.naturaltime(member.created_at)})\n- avatar: [click here]({member.avatar_url})",
+            value=f"- name: `{member.name}`\n- tag: `{member.discriminator}`\n- nickname: `{member.display_name}`\n- mention: {member.mention}\n- id: `{member.id}`\n- status: `{member.raw_status}`\n- bot: {member_bot}\n- mobile: {mobile_status}\n- web: {web_status}\n- desktop: {desktop_status}\n- created at: `{created_at}` ({humanize.naturaltime(member.created_at)})\n- avatar: [click here]({member.avatar_url})",
             inline=True
         )
         if member.top_role.name == "@everyone":
