@@ -11,7 +11,7 @@ def do_translate(output, text):
     You have to install googletrans==3.1.0a0 for it to work, as the dev somehow broke it and it doesn't work else
     """
     translator = googletrans.Translator()
-    translation = translator.translate(str(text), dest=str(output), src=translator.detect(text).lang)
+    translation = translator.translate(str(text), dest=str(output))
     return translation
 
 google = async_cse.Search(os.getenv("GOOGLE"))
