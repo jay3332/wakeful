@@ -101,8 +101,15 @@ class moderation(commands.Cog):
     @commands.cooldown(1,5,commands.BucketType.user)
     async def moderatenickname(self, ctx, member : discord.Member):
         if ctx.author.top_role.position > member.top_role.position:
-            nickname = "moderated nickname "+"".join(random.choice(string.ascii_letters+string.digits) for x in range(5))
-            await member.edit(nick=nickname)
+            nicks = []
+            for m in ctx.guild.members:
+                if m.nick:
+                    nicks.append(m.nick.lower())
+            while True:
+                nickname = "moderated nickname "+"".join(random.choice(string.ascii_letters+string.digits) for x in range(5))
+                if not nickname in nicks:
+                    await member.edit(nick=nickname)
+                    break
             em=discord.Embed(description=f"successfully changed {member}'s nickname to `{nickname}`", color=color())
             em.set_footer(text=f"requested by {ctx.author}", icon_url=ctx.author.avatar_url)
             await ctx.send(embed=em)
