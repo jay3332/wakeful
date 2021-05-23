@@ -1,8 +1,9 @@
-import discord, datetime, async_cse, psutil, humanize, os, sys
+import discord, datetime, async_cse, psutil, humanize, os, sys, inspect, mystbin
 from discord.ext import commands
 from utils.configs import color
 
 google = async_cse.Search(os.getenv("GOOGLE"))
+mystbinn = mystbin.Client()
 
 class utility(commands.Cog):
 
@@ -212,11 +213,37 @@ class utility(commands.Cog):
         )
         await ctx.send(embed=em)
 
-    @commands.command()
+    @commands.command(aliases=["src"])
     @commands.cooldown(1,5,commands.BucketType.user)
-    async def source(self, ctx):
-        em=discord.Embed(description=f"my source code can be found [here](https://github.com/pvffyn/wakeful)", color=color())
-        await ctx.send(embed=em)
+    async def source(self, ctx, command_name : str = None):
+        if command_name == None:
+            em=discord.Embed(description=f"my source code can be found [here](https://github.com/pvffyn/wakeful)", color=color())
+            await ctx.send(embed=em)
+        else:
+            command = self.bot.get_command(command_name)
+            if not command:
+                em=discord.Embed(description=f"could not find command `{command_name}`", color=color())
+                await ctx.send(embed=em)
+            else:
+                try:
+                    source_lines, _ = inspect.getsourcelines(command.callback)
+                except (TypeError, OSError):
+                    em=discord.Embed(description=f"could retrieve source for `{command_name}`", color=color())
+                    await ctx.send(embed=em)
+                else:
+                    source_lines = ''.join(source_lines).split('\n')
+                    src = "\n".join(line for line in source_lines).replace("`", "'")
+                    em=discord.Embed(title=f"{command.name} source", description=f"note: most of the \" ' \" stand for a \" ` \"\n```py\n{src}```", color=color(), timestamp=datetime.datetime.utcnow())
+                    em.set_footer(text=f"requested by {ctx.author}", icon_url=ctx.author.avatar_url)
+                    try:
+                        await ctx.author.send(embed=em)
+                    except discord.HTTPException:
+                        async with ctx.author.typing():
+                            post = await mystbinn.post(src)
+                            em=discord.Embed(description=f"note: most of the \" ' \" stand for a \" ` \"\nthe output was too long so it got uploaded to [mystbin]({post})", color=color(), timestamp=datetime.datetime.utcnow())
+                            em.set_footer(text=f"requested by {ctx.author}", icon_url=ctx.author.avatar_url)
+                        await ctx.author.send(embed=em)
+                    await ctx.message.add_reaction("✅")
 
     @commands.command(aliases=["icon", "av"])
     @commands.cooldown(1, 5, commands.BucketType.user)
