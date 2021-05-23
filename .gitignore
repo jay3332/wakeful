@@ -1,3 +1,4 @@
-.env
+.config.json
 cogs/__pycache__
 utils/__pycache__
+config.json

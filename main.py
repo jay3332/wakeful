@@ -1,4 +1,4 @@
-import discord, os, random, hashlib, datetime
+import discord, os, random, hashlib, datetime, json
 from discord.ext import commands
 from colorama import Fore
 from discord.ext.commands.bot import when_mentioned_or
@@ -33,5 +33,9 @@ for filename in os.listdir("./cogs"):
                 print(f"{Fore.RED}An error occured while loading cogs.{filename[:-3]}{Fore.RESET}")
                 
 
+with open('config.json') as f:
+    data = json.load(f)
+    token = data["TOKEN"]
+
 bot.load_extension("jishaku")
-bot.run(os.getenv("TOKEN"))
+bot.run(token)
