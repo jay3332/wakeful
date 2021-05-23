@@ -16,14 +16,13 @@ os.environ["JISHAKU_HIDE"] = "True"
 
 @tasks.loop(seconds=10)
 async def presence():
-    await bot.change_presence(activity=discord.Game(f",help | {len(bot.guilds)} guilds & {len(bot.users)} users"))
+    await bot.change_presence(status=discord.Status.dnd, activity=discord.Game(f",help | {len(bot.guilds)} guilds & {len(bot.users)} users"))
 
 
 @bot.event
 async def on_ready():
     os.system("clear")
     print(f"Logged in as: {bot.user.name}#{bot.user.discriminator} ({bot.user.id})")
-    await bot.change_presence(status=discord.Status.dnd)
 
 for filename in os.listdir("./cogs"):
     if filename.endswith(".py"):
@@ -40,5 +39,5 @@ with open('config.json') as f:
     token = data["TOKEN"]
 
 bot.load_extension("jishaku")
-await presence.start()
+presence.start()
 bot.run(token)
