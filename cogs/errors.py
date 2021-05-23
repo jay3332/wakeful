@@ -34,6 +34,24 @@ class errors(commands.Cog):
         elif isinstance(error, commands.MemberNotFound):
             embed=discord.Embed(description=f"could not find member `{error.argument}`", color=color())
             await ctx.send(embed=embed)
+        elif isinstance(error, commands.BotMissingPermissions):
+            embed=discord.Embed(description=f"i do not have permission to do this", color=color())
+            await ctx.send(embed=embed)
+        elif isinstance(error, commands.MissingPermissions):
+            embed=discord.Embed(description=f"you do not have permission to do this", color=color())
+            await ctx.send(embed=embed)
+        elif isinstance(error, commands.MissingAnyRole):
+            embed=discord.Embed(description=f"you do not have permission to do this", color=color())
+            await ctx.send(embed=embed)
+        elif isinstance(error, commands.CommandInvokeError):
+            error = error.original
+            if isinstance(error, discord.Forbidden):
+                embed=discord.Embed(description=f"i do not have permission to do this", color=color())
+                await ctx.send(embed=embed)
+            else:
+                embed=discord.Embed(description=f"```{error}```", color=color())
+                await ctx.send(embed=embed)
+                raise error
         else:
             embed=discord.Embed(description=f"```{error}```", color=color())
             await ctx.send(embed=embed)
