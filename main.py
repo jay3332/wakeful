@@ -15,7 +15,7 @@ os.environ["JISHAKU_NO_DM_TRACEBACK"] = "True"
 os.environ["JISHAKU_HIDE"] = "True"
 
 
-presences=["yo momma fat", "me when the", "amogus SUS!!!!", "impoter", "trUmp fWon eLecetin!!!"]
+presences=["yo momma fat", "me when the", "amogus SUS!!!!", "impoter"]
 @bot.event
 async def on_ready():
     os.system("clear")
