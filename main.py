@@ -1,4 +1,4 @@
-import discord, os, random, hashlib, datetime, json
+import discord, os, datetime, json, asyncio
 from discord.ext import commands, tasks
 from colorama import Fore
 from discord.ext.commands.bot import when_mentioned_or
@@ -16,6 +16,7 @@ os.environ["JISHAKU_HIDE"] = "True"
 
 @tasks.loop(seconds=10)
 async def presence():
+    await asyncio.sleep(1)
     await bot.change_presence(status=discord.Status.dnd, activity=discord.Game(f",help | {len(bot.guilds)} guilds & {len(bot.users)} users"))
 
 
