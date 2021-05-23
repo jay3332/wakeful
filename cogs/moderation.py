@@ -1,4 +1,4 @@
-import discord, string, random, asyncio
+import discord, string, random, asyncio, json
 from discord.ext import commands
 from gtts import gTTS
 from utils.configs import color
@@ -151,6 +151,18 @@ class moderation(commands.Cog):
             await ctx.channel.set_permissions(ctx.guild.default_role, send_messages=True)
             em=discord.Embed(description=f"successfully unlocked {ctx.channel.mention}", color=color())
             await ctx.send(embed=em)
+
+    @commands.command()
+    @commands.guild_only()
+    @commands.has_guild_permissions(manage_guild=True)
+    async def setprefix(self, ctx, prefix : str = "w,"):
+        with open("prefixes.json", "r") as f:
+            prefixes = json.load(f)
+        
+        prefixes[str(ctx.guild.id)] = prefix
+
+        with open("prefixes.json", "w") as f:
+            json.dump(prefixes,f, indent=4)
 
 def setup(bot):
     bot.add_cog(moderation(bot))
