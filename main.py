@@ -4,6 +4,7 @@ from colorama import Fore
 from discord.ext.commands.bot import when_mentioned_or
 from discord.flags import Intents
 from utils.configs import color
+from utils.checks import is_blacklisted, is_mod
 
 async def get_prefix(bot, message):
     await bot.wait_until_ready()
@@ -20,19 +21,27 @@ async def get_prefix(bot, message):
                 json.dump(prefixees, f, indent=4)
         return prefixees[str(message.guild.id)]
 
-bot = commands.AutoShardedBot(command_prefix=get_prefix, case_insensitive=True, ShardCount=10, intents=discord.Intents.all())
+devprefix = "." # the prefix for the development version
+
+if os.getlogin() == "pi":
+    bot = commands.AutoShardedBot(command_prefix=get_prefix, case_insensitive=True, ShardCount=10, intents=discord.Intents.all())
+else:
+    bot = commands.AutoShardedBot(command_prefix=devprefix, case_insensitive=True, ShardCount=10, intents=discord.Intents.all())
 bot.remove_command("help")
 
 with open('config.json') as f:
-    data = json.load(f)
+    conf = json.load(f)
 
 bot.uptime = datetime.datetime.utcnow()
-token = data["TOKEN"]
+token = conf["TOKEN"]
+devtoken = conf["DEVTOKEN"]
 bot.github = "https://github.com/pvffyn/wakeful" # the github the bot is hosted on
-bot.suggestions = data["SUGGESTIONS"] # this will be used as a webhook for suggestions
+bot.suggestions = conf["SUGGESTIONS"] # this will be used as a webhook for suggestions
 bot.greenTick="✓"
 bot.redTick="x"
 bot.error="!"
+bot.guild = int(conf["GUILD"]) # your bots support server
+bot.mod_role = int(conf["MODROLE"]) # moderator role on your bots support server
 os.environ["JISHAKU_NO_UNDERSCORE"] = "True"
 os.environ["JISHAKU_NO_DM_TRACEBACK"] = "True" 
 os.environ["JISHAKU_HIDE"] = "True"
@@ -40,21 +49,31 @@ os.environ["JISHAKU_HIDE"] = "True"
 @tasks.loop(seconds=10)
 async def presence():
     await asyncio.sleep(2)
-    await bot.change_presence(status=discord.Status.dnd, activity=discord.Game(f"@wakeful for prefix | {len(bot.guilds)} guilds & {len(bot.users)} users"))
+    await bot.change_presence(activity=discord.Game(f"@wakeful for prefix | {len(bot.guilds)} guilds & {len(bot.users)} users"))
 
 @bot.event
 async def on_message(msg):
     if msg.author.bot:
         return
+    if is_blacklisted(msg.author):
+        return
+    elif os.getlogin() == "pi":
+        if msg.content.startswith(await get_prefix(bot, msg)):
+            await bot.process_commands(msg)
+        elif msg.content == f"<@!{bot.user.id}>" or msg.content == f"<@{bot.user.id}>":
+            if msg.guild:
+                em=discord.Embed(description=f"the prefix for `{msg.guild.name}` is `{await get_prefix(bot, msg)}`", color=color())
+                await msg.channel.send(embed=em)
+            else:
+                em=discord.Embed(description=f"the prefix for dms is `{await get_prefix(bot, msg)}`", color=color())
+                await msg.channel.send(embed=em)
     elif msg.content == f"<@!{bot.user.id}>" or msg.content == f"<@{bot.user.id}>":
-        if msg.guild:
-            em=discord.Embed(description=f"the prefix for `{msg.guild.name}` is `{await get_prefix(bot, msg)}`", color=color())
+        if is_mod(bot, msg.author):
+            em=discord.Embed(description=f"my prefix is `{devprefix}`", color=color())
             await msg.channel.send(embed=em)
-        else:
-            em=discord.Embed(description=f"the prefix for dms is `{await get_prefix(bot, msg)}`", color=color())
-            await msg.channel.send(embed=em)
-    else:
-        await bot.process_commands(msg)
+    elif msg.content.startswith(devprefix):
+        if is_mod(bot, msg.author):
+            await bot.process_commands(msg)
 
 @bot.event
 async def on_ready():
@@ -72,4 +91,7 @@ for filename in os.listdir("./cogs"):
 
 bot.load_extension("jishaku")
 presence.start()
-bot.run(token)
+if os.getlogin() == "pi": # check if username is pi
+    bot.run(token) # run stable
+else:
+    bot.run(devtoken) # run development version

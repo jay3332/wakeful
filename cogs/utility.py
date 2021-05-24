@@ -284,16 +284,17 @@ class utility(commands.Cog):
                 em=discord.Embed(description="you took too long to respond, now ignoring next messages", color=color())
                 em.set_footer(text=f"requested by {ctx.author}", icon_url=ctx.author.avatar_url)
                 await msg.edit(embed=em)
-            if suggestion.content.lower() != "cancel":
-                webhook = Webhook.from_url(str(self.bot.suggestions), adapter=AsyncWebhookAdapter(cs))
+            else:
+                if suggestion.content.lower() != "cancel":
+                    webhook = Webhook.from_url(str(self.bot.suggestions), adapter=AsyncWebhookAdapter(cs))
 
-                em=discord.Embed(description=f"```{suggestion.content}```", color=color())
-                em.set_footer(text=f"suggestion by {ctx.author} ({ctx.author.id})", icon_url=ctx.author.avatar_url)
-                await webhook.send(embed=em)
-                await suggestion.add_reaction("✅")
-                em=discord.Embed(description="your suggestion has been sent to the admins\nnote: abuse may get you blacklisted", color=color())
-                em.set_footer(text=f"requested by {ctx.author}", icon_url=ctx.author.avatar_url)
-                await msg.edit(embed=em)
+                    em=discord.Embed(description=f"```{suggestion.content}```", color=color())
+                    em.set_footer(text=f"suggestion by {ctx.author} ({ctx.author.id})", icon_url=ctx.author.avatar_url)
+                    await webhook.send(embed=em)
+                    await suggestion.add_reaction("✅")
+                    em=discord.Embed(description="your suggestion has been sent to the admins\nnote: abuse may get you blacklisted", color=color())
+                    em.set_footer(text=f"requested by {ctx.author}", icon_url=ctx.author.avatar_url)
+                    await msg.edit(embed=em)
 
 
 

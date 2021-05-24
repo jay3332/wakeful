@@ -164,5 +164,9 @@ class moderation(commands.Cog):
         with open("prefixes.json", "w") as f:
             json.dump(prefixes,f, indent=4)
 
+        em=discord.Embed(description=f"sucessfully set the prefix for `{ctx.guild.name}` to `{prefix}`", color=color())
+        em.set_footer(text=f"requested by {ctx.author}", icon_url=ctx.author.avatar_url)
+        await ctx.send(embed=em)
+
 def setup(bot):
     bot.add_cog(moderation(bot))

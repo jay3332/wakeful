@@ -1,0 +1,86 @@
+import discord, json
+from discord.ext import commands
+from utils.configs import color
+from utils.checks import is_mod
+
+status_types = {
+    "dnd": discord.Status.dnd,
+    "online": discord.Status.online,
+    "invis": discord.Status.offline,
+    "invisible": discord.Status.offline,
+    "offline": discord.Status.offline,
+    "sleep": discord.Status.idle,
+    "sleeping": discord.Status.idle,
+    "idle": discord.Status.idle
+}
+
+class fun(commands.Cog):
+
+    def __init__(self, bot):
+        self.bot = bot
+
+    @commands.group(invoke_without_command=True)
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    async def blacklist(self, ctx):
+        return
+
+    @blacklist.command()
+    @commands.cooldown(1,5,commands.BucketType.user)
+    async def add(self, ctx, user : discord.User):
+        if is_mod(self.bot, user):
+            with open("blacklist.json", "r") as f:
+                blacklist = json.load(f)
+            blacklist[str(user.id)] = ""
+            with open("blacklist.json", "w") as f:
+                json.dump(blacklist, f, indent=4)
+            em=discord.Embed(description=f"successfully blacklisted {user}", color=color())
+            await ctx.send(embed=em)
+
+    @blacklist.command()
+    @commands.cooldown(1,5,commands.BucketType.user)
+    async def remove(self, ctx, user : discord.User):
+        if is_mod(self.bot, user):
+            with open("blacklist.json", "r") as f:
+                blacklist = json.load(f)
+            blacklist.pop(str(user.id), None)
+            with open("blacklist.json", "w") as f:
+                json.dump(blacklist, f, indent=4)
+            em=discord.Embed(description=f"successfully unblacklisted {user}", color=color())
+            await ctx.send(embed=em)
+
+    @commands.group(invoke_without_command=True, aliases=["rp", "richpresence", "activity"])
+    async def status(self, ctx):
+        await ctx.invoke(self.bot.get_command("help"), {"command": ctx.command.name})
+
+    @status.command()
+    async def streaming(self, ctx, url, *, game):
+        if is_mod(self.bot, ctx.author):
+            await self.bot.change_presence(activity=discord.Streaming(name=str(game), url=f'https://www.twitch.tv/{url.lower()}'))
+            await ctx.message.add_reaction("✅")
+
+    @status.command()
+    async def playing(self, ctx, *, game):
+        if is_mod(self.bot, ctx.author):
+            await self.bot.change_presence(activity=discord.Game(name=game))
+            await ctx.message.add_reaction("✅")
+
+    @status.command()
+    async def watching(self, ctx, *, game):
+        if is_mod(self.bot, ctx.author):
+            await self.bot.change_presence(activity=discord.Activity(name=f"{game}", type=3))
+            await ctx.message.add_reaction("✅")
+
+    @status.command()
+    async def listening(self, ctx, *, game):
+        if is_mod(self.bot, ctx.author):
+            await self.bot.change_presence(activity=discord.Activity(name=f"{game}", type=2))
+            await ctx.message.add_reaction("✅")
+
+    @status.command()
+    async def competing(self, ctx, *, game):
+        if is_mod(self.bot, ctx.author):
+            await self.bot.change_presence(activity=discord.Activity(name=f"{game}", type=5))
+            await ctx.message.add_reaction("✅")
+
+def setup(bot):
+    bot.add_cog(fun(bot))
