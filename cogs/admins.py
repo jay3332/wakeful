@@ -89,7 +89,7 @@ class admin(commands.Cog):
     @status.command(aliases=["default", "original"])
     async def reset(self, ctx):
         if is_mod(self.bot, ctx.author):
-            await bot.change_presence(activity=discord.Game(f"@wakeful for prefix | {len(bot.guilds)} guilds & {len(bot.users)} users"))
+            await self.bot.change_presence(activity=discord.Game(f"@wakeful for prefix | {len(self.bot.guilds)} guilds & {len(self.bot.users)} users"))
             self.bot.status = None
             await ctx.message.add_reaction("✅")
 
