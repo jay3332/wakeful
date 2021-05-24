@@ -14,7 +14,7 @@ status_types = {
     "idle": discord.Status.idle
 }
 
-class fun(commands.Cog):
+class admin(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
@@ -57,12 +57,14 @@ class fun(commands.Cog):
         if is_mod(self.bot, ctx.author):
             await self.bot.change_presence(activity=discord.Streaming(name=str(game), url=f'https://www.twitch.tv/{url.lower()}'))
             await ctx.message.add_reaction("✅")
+            self.bot.status = ""
 
     @status.command()
     async def playing(self, ctx, *, game):
         if is_mod(self.bot, ctx.author):
             await self.bot.change_presence(activity=discord.Game(name=game))
             await ctx.message.add_reaction("✅")
+            self.bot.status = ""
 
     @status.command()
     async def watching(self, ctx, *, game):
@@ -75,12 +77,21 @@ class fun(commands.Cog):
         if is_mod(self.bot, ctx.author):
             await self.bot.change_presence(activity=discord.Activity(name=f"{game}", type=2))
             await ctx.message.add_reaction("✅")
+            self.bot.status = ""
 
     @status.command()
     async def competing(self, ctx, *, game):
         if is_mod(self.bot, ctx.author):
             await self.bot.change_presence(activity=discord.Activity(name=f"{game}", type=5))
             await ctx.message.add_reaction("✅")
+            self.bot.status = ""
+
+    @status.command(aliases=["default", "original"])
+    async def reset(self, ctx):
+        if is_mod(self.bot, ctx.author):
+            await bot.change_presence(activity=discord.Game(f"@wakeful for prefix | {len(bot.guilds)} guilds & {len(bot.users)} users"))
+            self.bot.status = None
+            await ctx.message.add_reaction("✅")
 
 def setup(bot):
-    bot.add_cog(fun(bot))
+    bot.add_cog(admin(bot))

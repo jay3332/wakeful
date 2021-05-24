@@ -40,6 +40,7 @@ bot.suggestions = conf["SUGGESTIONS"] # this will be used as a webhook for sugge
 bot.greenTick="✓"
 bot.redTick="x"
 bot.error="!"
+bot.status = None
 bot.guild = int(conf["GUILD"]) # your bots support server
 bot.mod_role = int(conf["MODROLE"]) # moderator role on your bots support server
 os.environ["JISHAKU_NO_UNDERSCORE"] = "True"
@@ -49,7 +50,10 @@ os.environ["JISHAKU_HIDE"] = "True"
 @tasks.loop(seconds=10)
 async def presence():
     await asyncio.sleep(2)
-    await bot.change_presence(activity=discord.Game(f"@wakeful for prefix | {len(bot.guilds)} guilds & {len(bot.users)} users"))
+    if bot.status == None:
+        await bot.change_presence(activity=discord.Game(f"@wakeful for prefix | {len(bot.guilds)} guilds & {len(bot.users)} users"))
+    else:
+        pass
 
 @bot.event
 async def on_message(msg):
