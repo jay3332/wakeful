@@ -1,4 +1,4 @@
-import discord, json
+import discord, json, asyncio, importlib
 from discord.ext import commands
 from utils.configs import color
 from utils.checks import is_mod
@@ -92,6 +92,24 @@ class admin(commands.Cog):
             await self.bot.change_presence(activity=discord.Game(f"@wakeful for prefix | {len(self.bot.guilds)} guilds & {len(self.bot.users)} users"))
             self.bot.status = None
             await ctx.message.add_reaction("✅")
+
+    @commands.command()
+    @commands.is_owner()
+    async def sync(self, ctx):
+        proc = await asyncio.create_subprocess_shell(
+            "git pull", stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE
+        )
+
+        stdout, stderr = await proc.communicate()
+
+        if stdout:
+            shell = f'[stdout]\n{stdout.decode()}'
+        if stderr:
+            shell = f'[stderr]\n{stderr.decode()}'
+
+        em=discord.Embed(description=f"```sh\n{shell}```", color=color())
+        await ctx.send(embed=em)
 
 def setup(bot):
     bot.add_cog(admin(bot))

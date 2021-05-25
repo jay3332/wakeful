@@ -1,7 +1,8 @@
-import discord, difflib
+import discord, difflib, asyncio
 from colorama import Fore
 from discord.ext import commands
 from utils.configs import color
+from utils.checks import is_mod
 
 class errors(commands.Cog):
 
@@ -11,8 +12,12 @@ class errors(commands.Cog):
     @commands.Cog.listener()
     async def on_command_error(self, ctx, error):
         if isinstance(error, commands.CommandOnCooldown):
-            embed=discord.Embed(description=f"this command is on cooldown, try again in `{round(error.retry_after, 1)}` seconds.", color=color())
-            await ctx.send(embed=embed)
+            if not is_mod(self.bot, ctx.author):
+                embed=discord.Embed(description=f"this command is on cooldown, try again in `{round(error.retry_after, 1)}` seconds.", color=color())
+                await ctx.send(embed=embed)
+            else:
+                ctx.command.reset_cooldown(ctx)
+                await ctx.invoke(ctx.command)
         elif isinstance(error, commands.MissingRequiredArgument):
             embed=discord.Embed(description=f"`{error.param}` is a required parameter that is missing", color=color())
             await ctx.send(embed=embed)
@@ -27,10 +32,14 @@ class errors(commands.Cog):
             if command:
                 if not command.hidden:
                     embed=discord.Embed(description=f"`{cmd}` is not a valid command, maybe you meant `{match[0]}`", color=color())
-                    await ctx.send(embed=embed)
+                    m = await ctx.send(embed=embed)
+                    await asyncio.sleep(3)
+                    await m.delete()
             else:
                 embed=discord.Embed(description=f"`{cmd}` is not a valid command", color=color())
-                await ctx.send(embed=embed)
+                m = await ctx.send(embed=embed)
+                await asyncio.sleep(3)
+                await m.delete()
         elif isinstance(error, commands.MemberNotFound):
             embed=discord.Embed(description=f"could not find member `{error.argument}`", color=color())
             await ctx.send(embed=embed)

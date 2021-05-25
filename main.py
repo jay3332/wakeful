@@ -90,8 +90,9 @@ for filename in os.listdir("./cogs"):
             try:
                 bot.load_extension(f"cogs.{filename[:-3]}")
                 print(f"{Fore.GREEN}cogs.{filename[:-3]} has been succesfully loaded{Fore.RESET}")
-            except:
+            except Exception as exc:
                 print(f"{Fore.RED}An error occured while loading cogs.{filename[:-3]}{Fore.RESET}")
+                raise exc
 
 bot.load_extension("jishaku")
 presence.start()
