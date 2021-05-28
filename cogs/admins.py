@@ -95,19 +95,13 @@ class admin(commands.Cog):
 
     @commands.command()
     @commands.is_owner()
-    async def sync(self, ctx):
-        proc = await asyncio.create_subprocess_shell(
-            "git pull", stdout=asyncio.subprocess.PIPE,
-            stderr=asyncio.subprocess.PIPE
-        )
-
+    async def pull(self, ctx):
+        proc = await asyncio.create_subprocess_shell("git pull", stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE)
         stdout, stderr = await proc.communicate()
-
         if stdout:
-            shell = f'[stdout]\n{stdout.decode()}'
+            shell = stdout.decode()
         if stderr:
-            shell = f'[stderr]\n{stderr.decode()}'
-
+            shell = stderr.decode()
         em=discord.Embed(description=f"```sh\n{shell}```", color=color())
         await ctx.send(embed=em)
 
