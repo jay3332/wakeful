@@ -23,7 +23,7 @@ async def get_prefix(bot, message):
 
 devprefix = "." # the prefix for the development version
 
-if os.getlogin() == "pi":
+if pwd.getpwuid(os.getuid())[0] == "pi":
     bot = commands.AutoShardedBot(command_prefix=get_prefix, case_insensitive=True, ShardCount=10, intents=discord.Intents.all())
 else:
     bot = commands.AutoShardedBot(command_prefix=devprefix, case_insensitive=True, ShardCount=10, intents=discord.Intents.all())
