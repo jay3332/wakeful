@@ -73,14 +73,13 @@ class fun(commands.Cog):
     @commands.command(description="Gets the http cat image of the given number", usage="[http code]")
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def httpcat(self, ctx, code : int):
-        async with aiohttp.ClientSession() as cs:
-            async with cs.get(f"https://http.cat/{code}") as res:
-                buf = io.BytesIO(await res.read())
-                file=discord.File(buf, filename=f"{code}.png")
-                em=discord.Embed(color=color(), timestamp=datetime.datetime.utcnow())
-                em.set_image(url=f"attachment://{code}.png")
-                em.set_footer(text=f"powered by dagpi.xyz • {ctx.author}", icon_url=ctx.author.avatar_url)
-                await ctx.send(embed=em, file=file)
+        res = await self.bot.session.get("https://http.cat/{code}")
+        buf = io.BytesIO(await res.read())
+        file=discord.File(buf, filename=f"{code}.png")
+        em=discord.Embed(color=color(), timestamp=datetime.datetime.utcnow())
+        em.set_image(url=f"attachment://{code}.png")
+        em.set_footer(text=f"powered by dagpi.xyz • {ctx.author}", icon_url=ctx.author.avatar_url)
+        await ctx.send(embed=em, file=file)
 
     @commands.command()
     @commands.cooldown(1, 5, commands.BucketType.user)
@@ -130,34 +129,12 @@ class fun(commands.Cog):
                 "Type": "CaptionRequest",
             }
             headers = {"Content-Type": "application/json; charset=utf-8"}
-            async with aiohttp.ClientSession() as cs:
+            async with self.bot.session as cs:
                 async with cs.post("https://captionbot.azurewebsites.net/api/messages", data=json.dumps(data), headers=headers) as res:
                     text = await res.text()
             em=discord.Embed(description=text, color=color())
             em.set_image(url=member.avatar_url_as(format="png"))
         await ctx.send(embed=em)
-
-    @commands.command()
-    @commands.cooldown(1, 5, commands.BucketType.user)
-    async def meme(self, ctx):
-        await ctx.trigger_typing()
-        async with aiohttp.ClientSession() as cs:
-            async with cs.get(f"https://reddit.com/r/memes/hot.json") as r:
-                try:
-                    json = await r.json()
-                    if json["data"]["children"][0]["data"]["is_video"] == "False":
-                        result = json["data"]["children"][random.randrange(1,50)]
-                        if not "youtu" in result["data"]["url"]: # im too lazy for regex lmao
-                            permalink = result["data"]["permalink"]
-                            em=discord.Embed(title=result["data"]["title"], url=f"https://reddit.com/{permalink}", color=color())
-                            em.set_image(url=result["data"]["url"])
-                            await ctx.send(embed=em)
-                        else:
-                            await ctx.invoke(self.meme)
-                    else:
-                        await ctx.invoke(self.meme)
-                except IndexError:
-                    await ctx.invoke(self.meme)
 
     @commands.command()
     @commands.cooldown(1, 5, commands.BucketType.user)

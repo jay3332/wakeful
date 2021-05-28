@@ -1,4 +1,4 @@
-import discord, os, datetime, json, asyncio
+import discord, os, datetime, json, asyncio, aiohttp
 from discord.ext import commands, tasks
 from colorama import Fore
 from discord.ext.commands.bot import when_mentioned_or
@@ -40,6 +40,7 @@ bot.suggestions = conf["SUGGESTIONS"] # this will be used as a webhook for sugge
 bot.greenTick="✓"
 bot.redTick="x"
 bot.error="!"
+bot.session = aiohttp.ClientSession()
 bot.status = None
 bot.guild = int(conf["GUILD"]) # your bots support server
 bot.mod_role = int(conf["MODROLE"]) # moderator role on your bots support server
@@ -81,7 +82,6 @@ async def on_message(msg):
 
 @bot.event
 async def on_ready():
-    os.system("clear")
     print(f"Logged in as: {bot.user.name}#{bot.user.discriminator} ({bot.user.id})")
 
 for filename in os.listdir("./cogs"):
