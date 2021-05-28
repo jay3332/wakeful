@@ -62,7 +62,7 @@ async def on_message(msg):
         return
     if is_blacklisted(msg.author):
         return
-    elif os.getlogin() == "pi":
+    elif pwd.getpwuid(os.getuid())[0] == "pi":
         if msg.content.startswith(await get_prefix(bot, msg)):
             await bot.process_commands(msg)
         elif msg.content == f"<@!{bot.user.id}>" or msg.content == f"<@{bot.user.id}>":
