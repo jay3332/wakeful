@@ -104,6 +104,7 @@ class admin(commands.Cog):
             shell = stderr.decode()
         em=discord.Embed(description=f"```sh\n{shell}```", color=color())
         await ctx.send(embed=em)
+        await self.bot.close() # close the bot, so systemd restarts it
 
 def setup(bot):
     bot.add_cog(admin(bot))
