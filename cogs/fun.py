@@ -73,7 +73,7 @@ class fun(commands.Cog):
     @commands.command(description="Gets the http cat image of the given number", usage="[http code]")
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def httpcat(self, ctx, code : int):
-        res = await self.bot.session.get("https://http.cat/{code}")
+        res = await self.bot.session.get(f"https://http.cat/{code}")
         buf = io.BytesIO(await res.read())
         file=discord.File(buf, filename=f"{code}.png")
         em=discord.Embed(color=color(), timestamp=datetime.datetime.utcnow())
