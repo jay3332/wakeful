@@ -1,4 +1,4 @@
-import discord, os, datetime, json, asyncio, aiohttp
+import discord, os, datetime, json, asyncio, aiohttp, pwd
 from discord.ext import commands, tasks
 from colorama import Fore
 from discord.ext.commands.bot import when_mentioned_or
@@ -9,7 +9,7 @@ from utils.checks import is_blacklisted, is_mod
 async def get_prefix(bot, message):
     await bot.wait_until_ready()
     if message.guild is None:
-        return when_mentioned_or("!")
+        return "!"
     else:
         with open("prefixes.json", "r") as f:
             prefixees = json.load(f)
@@ -86,17 +86,16 @@ async def on_ready():
 
 for filename in os.listdir("./cogs"):
     if filename.endswith(".py"):
-        if not filename[:-3] == "template":
-            try:
-                bot.load_extension(f"cogs.{filename[:-3]}")
-                print(f"{Fore.GREEN}cogs.{filename[:-3]} has been succesfully loaded{Fore.RESET}")
-            except Exception as exc:
-                print(f"{Fore.RED}An error occured while loading cogs.{filename[:-3]}{Fore.RESET}")
-                raise exc
+        try:
+            bot.load_extension(f"cogs.{filename[:-3]}")
+            print(f"{Fore.GREEN}cogs.{filename[:-3]} has been succesfully loaded{Fore.RESET}")
+        except Exception as exc:
+            print(f"{Fore.RED}An error occured while loading cogs.{filename[:-3]}{Fore.RESET}")
+            raise exc
 
 bot.load_extension("jishaku")
 presence.start()
-if os.getlogin() == "pi": # check if username is pi
+if pwd.getpwuid(os.getuid())[0] == "pi": # check if username is pi
     bot.run(token) # run stable
 else:
     bot.run(devtoken) # run development version
