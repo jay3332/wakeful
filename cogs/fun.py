@@ -118,22 +118,19 @@ class fun(commands.Cog):
                 attachment = ctx.message.attachments[0]
                 url = attachment.proxy_url
             else:
-                em=discord.Embed(description=f"missing required argument `member / attachment`", color=color())
-                await ctx.send(embed=em)
-                return
+                url = str(ctx.author.avatar_url_as(static_format="png", size=1024))
         else:
             url = str(member.avatar_url_as(static_format="png", size=1024))
         async with ctx.typing():
             data = {
                 "Content": url,
-                "Type": "CaptionRequest",
+                "Type": "CaptionRequest"
             }
             headers = {"Content-Type": "application/json; charset=utf-8"}
-            async with self.bot.session as cs:
-                async with cs.post("https://captionbot.azurewebsites.net/api/messages", data=json.dumps(data), headers=headers) as res:
-                    text = await res.text()
+            res = await self.bot.session.post("https://captionbot.azurewebsites.net/api/messages", json=data, headers=headers)
+            text = await res.text()
             em=discord.Embed(description=text, color=color())
-            em.set_image(url=member.avatar_url_as(format="png"))
+            em.set_image(url=url)
         await ctx.send(embed=em)
 
     @commands.command()
