@@ -9,12 +9,10 @@ def is_mod(bot, user):
     else:
         return False
 
-def is_blacklisted(user):
-    with open("blacklist.json", "r") as f:
-        blacklist = json.load(f)
+async def is_blacklisted(bot, user):
     try:
-        blacklist[str(user.id)]
-    except KeyError:
-        return False
-    else:
+        blacklist = await bot.db.fetchrow("SELECT * FROM blacklist WHERE user_id = $1", user.id)
+        blacklist["user_id"]
         return True
+    except:
+        return False

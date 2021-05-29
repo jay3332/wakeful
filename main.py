@@ -59,7 +59,7 @@ async def presence():
 async def on_message(msg):
     if msg.author.bot:
         return
-    if is_blacklisted(msg.author):
+    if await is_blacklisted(bot, msg.author):
         return
     elif pwd.getpwuid(os.getuid())[0] == "pi":
         if msg.content.startswith(await get_prefix(bot, msg)):

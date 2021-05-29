@@ -23,31 +23,34 @@ class admin(commands.Cog):
     @commands.group(invoke_without_command=True)
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def blacklist(self, ctx):
-        return
+        pass
 
     @blacklist.command()
-    @commands.cooldown(1,5,commands.BucketType.user)
     async def add(self, ctx, user : discord.User):
-        if is_mod(self.bot, user):
-            with open("blacklist.json", "r") as f:
-                blacklist = json.load(f)
-            blacklist[str(user.id)] = ""
-            with open("blacklist.json", "w") as f:
-                json.dump(blacklist, f, indent=4)
-            em=discord.Embed(description=f"successfully blacklisted {user}", color=color())
+        if is_mod(self.bot, ctx.author):
+            await self.bot.db.fetch("INSERT INTO blacklist (user_id) VALUES ($1)", user.id)
+            em=discord.Embed(description=f"successfully blacklisted {user.mention}", color=color())
             await ctx.send(embed=em)
 
     @blacklist.command()
-    @commands.cooldown(1,5,commands.BucketType.user)
     async def remove(self, ctx, user : discord.User):
-        if is_mod(self.bot, user):
-            with open("blacklist.json", "r") as f:
-                blacklist = json.load(f)
-            blacklist.pop(str(user.id), None)
-            with open("blacklist.json", "w") as f:
-                json.dump(blacklist, f, indent=4)
-            em=discord.Embed(description=f"successfully unblacklisted {user}", color=color())
+        if is_mod(self.bot, ctx.author):
+            await self.bot.db.fetch("DELETE FROM blacklist WHERE user_id = $1", user.id)
+            em=discord.Embed(description=f"successfully unblacklisted {user.mention}", color=color())
             await ctx.send(embed=em)
+
+    @blacklist.command()
+    async def check(self, ctx, user : discord.User):
+        if is_mod(self.bot, ctx.author):
+            try:
+                thing = await self.bot.db.fetchrow("SELECT * FROM blacklist WHERE user_id = $1", user.id)
+                thing["user_id"]
+            except TypeError:
+                em=discord.Embed(description=f"{user.mention} isn't blacklisted", color=color())
+                await ctx.send(embed=em)
+            else:
+                em=discord.Embed(description=f"{user.mention} is blacklisted", color=color())
+                await ctx.send(embed=em)
 
     @commands.group(invoke_without_command=True, aliases=["rp", "richpresence", "activity"])
     async def status(self, ctx):
