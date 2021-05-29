@@ -113,14 +113,15 @@ class admin(commands.Cog):
         res = await self.bot.db.fetch(query)
         if len(res) == 0:
             await ctx.message.add_reaction('✅')
-        headers = list(res[0].keys())
-        table = PrettyTable()
-        table.field_names = headers
-        for rec in res:
-            lst = list(rec)
-            table.add_row(lst)
-        msg = table.get_string()
-        await ctx.send(f"```\n{msg}\n```")
+        else:
+            headers = list(res[0].keys())
+            table = PrettyTable()
+            table.field_names = headers
+            for rec in res:
+                lst = list(rec)
+                table.add_row(lst)
+            msg = table.get_string()
+            await ctx.send(f"```\n{msg}\n```")
 
 def setup(bot):
     bot.add_cog(admin(bot))
