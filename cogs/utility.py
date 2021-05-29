@@ -82,7 +82,7 @@ class utility(commands.Cog):
                 title=f"results for: `{term}`",
                 timestamp=datetime.datetime.utcnow(),
                 color=color()
-            ).set_footer(text=f"requested by {ctx.author.name}#{ctx.author.discriminator} | safe-search: {safe_search}", icon_url=ctx.author.avatar_url)
+            ).set_footer(text=f"requested by {ctx.author.name}#{ctx.author.discriminator} • safe-search: {safe_search}", icon_url=ctx.author.avatar_url)
             for result in results:
                 if not value > 4:
                     epic = results[int(value)]
