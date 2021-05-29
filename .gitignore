@@ -2,8 +2,4 @@ cogs/__pycache__
 utils/__pycache__
 prefixes.json
 blacklist.json
-config.json
-*.json
-config.json
-config.json
 *.pyc

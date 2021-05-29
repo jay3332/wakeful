@@ -66,6 +66,11 @@ class errors(commands.Cog):
             await ctx.send(embed=embed)
             raise error
 
+    @commands.Cog.listener()
+    async def on_command_completion(self, ctx):
+        self.bot.cmdsSinceRestart += 1
+
+
 
 def setup(bot):
     bot.add_cog(errors(bot))

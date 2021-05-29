@@ -1,4 +1,4 @@
-import discord, datetime, async_cse, psutil, humanize, os, sys, inspect, mystbin, googletrans, asyncio, aiohttp, random
+import discord, datetime, async_cse, psutil, humanize, os, sys, inspect, mystbin, googletrans, asyncio, aiohttp, random, time, asyncdagpi
 from discord.ext import commands
 from discord import Webhook, AsyncWebhookAdapter
 from utils.configs import color
@@ -16,6 +16,7 @@ def do_translate(output, text):
 
 google = async_cse.Search(get_config("GOOGLE"))
 mystbinn = mystbin.Client()
+dagpi = asyncdagpi.Client(get_config("DAGPI"))
 
 class utility(commands.Cog):
 
@@ -380,10 +381,26 @@ class utility(commands.Cog):
             hours, remainder = divmod(int(delta_uptime.total_seconds()), 3600)
             minutes, seconds = divmod(remainder, 60)
             days, hours = divmod(hours, 24)
-            embed.add_field(name="system", value=f"- **os**: `{operating_system}`\n- **cpu**: `{process.cpu_percent()}`%\n- **memory**: `{humanize.naturalsize(process.memory_full_info().rss).lower()}`\n- **process**: `{process.pid}`\n- **threads**: `{process.num_threads()}`\n- **language**: `python`\n- **python version**: `{version[0]}.{version[1]}.{version[2]}`\n- **discord.py version**: `{discord.__version__}`", inline=True)
-            embed.add_field(name="bot", value=f"- **guilds**: `{len(self.bot.guilds)}`\n- **users**: `{len(self.bot.users)}`\n- **commands**: `{len(self.bot.commands)}`\n- **cogs**: `{len(self.bot.cogs)}`\n- **uptime**: `{days}d {hours}h {minutes}m {seconds}s`\n- [source]({self.bot.github})\n- [invite](https://discord.com/api/oauth2/authorize?client_id={self.bot.user.id}&permissions=8&scope=bot)", inline=True)
+            embed.add_field(name="system", value=f"""
+- **os**: `{operating_system}`
+- **cpu**: `{process.cpu_percent()}`%
+- **memory**: `{humanize.naturalsize(process.memory_full_info().rss).lower()}`
+- **process**: `{process.pid}`
+- **threads**: `{process.num_threads()}`
+- **language**: `python`
+- **python version**: `{version[0]}.{version[1]}.{version[2]}`
+- **discord.py version**: `{discord.__version__}`""", inline=True)
+            embed.add_field(name="bot", value=f"""
+- **guilds**: `{len(self.bot.guilds)}`
+- **users**: `{len(self.bot.users)}`
+- **commands**: `{len(self.bot.commands)}`
+- **commands executed**: `{self.bot.cmdsSinceRestart}`
+- **cogs**: `{len(self.bot.cogs)}`
+- **uptime**: `{days}d {hours}h {minutes}m {seconds}s`
+- [source]({self.bot.github})
+- [invite](https://discord.com/api/oauth2/authorize?client_id={self.bot.user.id}&permissions=8&scope=bot)""", inline=True)
             embed.set_thumbnail(url=self.bot.user.avatar_url)
-        msg = await ctx.send(embed=embed)
+        await ctx.send(embed=embed)
 
     @commands.command()
     @commands.cooldown(1, 5, commands.BucketType.user)
@@ -475,6 +492,61 @@ class utility(commands.Cog):
             else:
                 em=discord.Embed(description=f"this command does not exist", color=color())
                 await ctx.send(embed=em)
+
+    @commands.command()
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    async def ping(self, ctx):
+        embed=discord.Embed(color=color())
+        dagpi_ping = round(await dagpi.image_ping(), 3) * 1000
+        embed.add_field(name="latency", value=f"""
+- **typing**: `pinging`
+- **bot**: `{round(self.bot.latency*1000)}`ms
+- **database**: `pinging`
+- **dagpi**: `{dagpi_ping}`ms""", inline=False)
+        start=time.perf_counter()
+        msg = await ctx.send(embed=embed)
+        end=time.perf_counter()
+        final=end-start
+        api_latency = round(final*1000)
+        em=discord.Embed(color=color())
+        poststart = time.perf_counter()
+        await self.bot.db.fetch("SELECT 1")
+        postduration = (time.perf_counter() - poststart) * 1000
+        db_ping = round(postduration, 1)
+        em.add_field(name="latency", value=f"""
+- **typing**: `{api_latency}`ms
+- **bot**: `{round(self.bot.latency*1000)}`ms
+- **database**: `{db_ping}`ms
+- **dagpi**: `{dagpi_ping}`ms""", inline=False)
+        await msg.edit(embed=em)
+
+    @commands.command()
+    async def afk(self, ctx, *, reason : str = None):
+        if reason is None:
+            msg = f"okay, i've marked you as afk"
+        else:
+            msg = f"okay, i've marked you as afk for `{reason}`"
+        em=discord.Embed(description=msg, color=color())
+        await ctx.send(embed=em)
+        await asyncio.sleep(3)
+        self.bot.afks[ctx.author.id] = {"reason": reason}
+
+    @commands.Cog.listener()
+    async def on_message(self, msg):
+        if msg.author.id in list(self.bot.afks):
+            self.bot.afks.pop(msg.author.id)
+            em=discord.Embed(description=f"welcome back, {msg.author.mention}, i've unmarked you as afk", color=color())
+            await msg.channel.send(embed=em)
+        for user in list(self.bot.afks):
+            data = self.bot.afks[user]
+            obj = self.bot.get_user(user)
+            if f"<@!{user}>" in msg.content or f"<@{user}>" in msg.content:
+                if data["reason"] is None:
+                    mseg = f"hey! {obj.name} is currently marked as afk"
+                else:
+                    mseg = f"hey! {obj.name} is currently marked as afk for `{data['reason']}`"
+                em=discord.Embed(description=mseg, color=color())
+                await msg.reply(embed=em)
 
 def setup(bot):
     bot.add_cog(utility(bot))
