@@ -18,16 +18,16 @@ async def get_prefix(bot, message):
             prefix = await bot.db.fetchrow("SELECT prefix FROM prefixes WHERE guild = $1", message.guild.id)
             return prefix["prefix"]
 
-devprefix = "." # the prefix for the development version
+with open('config.json') as f:
+    conf = json.load(f)
+
+devprefix = conf["DEVPREFIX"] # the prefix for the development version
 
 if pwd.getpwuid(os.getuid())[0] == "pi":
     bot = commands.AutoShardedBot(command_prefix=get_prefix, case_insensitive=True, ShardCount=10, intents=discord.Intents.all())
 else:
     bot = commands.AutoShardedBot(command_prefix=devprefix, case_insensitive=True, ShardCount=10, intents=discord.Intents.all())
 bot.remove_command("help")
-
-with open('config.json') as f:
-    conf = json.load(f)
 
 bot.uptime = datetime.datetime.utcnow()
 token = conf["TOKEN"]
