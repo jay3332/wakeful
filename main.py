@@ -1,7 +1,6 @@
-import discord, os, datetime, json, asyncio, aiohttp, pwd
+import discord, os, datetime, json, asyncio, aiohttp, pwd, asyncpg
 from discord.ext import commands, tasks
 from colorama import Fore
-from discord.ext.commands.bot import when_mentioned_or
 from discord.flags import Intents
 from utils.configs import color
 from utils.checks import is_blacklisted, is_mod
@@ -11,15 +10,13 @@ async def get_prefix(bot, message):
     if message.guild is None:
         return "!"
     else:
-        with open("prefixes.json", "r") as f:
-            prefixees = json.load(f)
         try:
-            prefix = prefixees[str(message.guild.id)]
-        except KeyError:
-            prefixees[str(message.guild.id)] = "w,"
-            with open("prefixes.json", "w") as f:
-                json.dump(prefixees, f, indent=4)
-        return prefixees[str(message.guild.id)]
+            prefix = await bot.db.fetchrow("SELECT prefix FROM prefixes WHERE guild = $1", message.guild.id)
+            return prefix["prefix"]
+        except:
+            await bot.db.execute("INSERT INTO prefixes(guild, prefix) VALUES($1, $2)", message.guild.id, 'w,')
+            prefix = await bot.db.fetchrow("SELECT prefix FROM prefixes WHERE guild = $1", message.guild.id)
+            return prefix["prefix"]
 
 devprefix = "." # the prefix for the development version
 
@@ -40,6 +37,8 @@ bot.suggestions = conf["SUGGESTIONS"] # this will be used as a webhook for sugge
 bot.greenTick="✓"
 bot.redTick="x"
 bot.error="!"
+bot.cmdsSinceRestart = 0
+bot.afks = {}
 bot.session = aiohttp.ClientSession()
 bot.status = None
 bot.guild = int(conf["GUILD"]) # your bots support server
@@ -95,6 +94,7 @@ for filename in os.listdir("./cogs"):
 
 bot.load_extension("jishaku")
 presence.start()
+bot.db=bot.loop.run_until_complete(asyncpg.create_pool(host="localhost", port="5432", user=conf["dbuser"], password=conf["dbpw"], database="wakeful"))
 if pwd.getpwuid(os.getuid())[0] == "pi": # check if username is pi
     bot.run(token) # run stable
 else:

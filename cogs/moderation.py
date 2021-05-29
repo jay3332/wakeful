@@ -1,4 +1,4 @@
-import discord, string, random, asyncio, json
+import discord, string, random, asyncio, asyncpg
 from discord.ext import commands
 from gtts import gTTS
 from utils.configs import color
@@ -156,14 +156,10 @@ class moderation(commands.Cog):
     @commands.guild_only()
     @commands.has_guild_permissions(manage_guild=True)
     async def setprefix(self, ctx, prefix : str = "w,"):
-        with open("prefixes.json", "r") as f:
-            prefixes = json.load(f)
-        
-        prefixes[str(ctx.guild.id)] = prefix
-
-        with open("prefixes.json", "w") as f:
-            json.dump(prefixes,f, indent=4)
-
+        try:
+            await self.bot.db.execute("INSERT INTO prefixes (guild, prefix) VALUES ($1, $2)", ctx.guild.id, prefix)
+        except asyncpg.UniqueViolationError:
+            await self.bot.db.execute("UPDATE prefixes SET prefix = $1 WHERE guild = $2", prefix, ctx.guild.id)
         em=discord.Embed(description=f"sucessfully set the prefix for `{ctx.guild.name}` to `{prefix}`", color=color())
         em.set_footer(text=f"requested by {ctx.author}", icon_url=ctx.author.avatar_url)
         await ctx.send(embed=em)
