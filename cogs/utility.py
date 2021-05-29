@@ -4,6 +4,7 @@ from discord import Webhook, AsyncWebhookAdapter
 from utils.configs import color
 from utils.get import *
 from jishaku.functools import executor_function
+from main import get_prefix
 
 @executor_function
 def do_translate(output, text):
@@ -385,13 +386,96 @@ class utility(commands.Cog):
             embed.set_thumbnail(url=self.bot.user.avatar_url)
         msg = await ctx.send(embed=embed)
 
-class MyNewHelp(commands.MinimalHelpCommand):
-    async def send_pages(self):
-        destination = self.get_destination()
-        for page in self.paginator.pages:
-            emby = discord.Embed(description=page, color=color())
-            await destination.send(embed=emby)
+    @commands.command()
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    async def help(self, ctx, *, command : str = None):
+        if command == None:
+            raw_cogs=[]
+            for cog in self.bot.cogs:
+                raw_cogs.append(cog)
+            cog_objects=[]
+            for cog in raw_cogs:
+                cog_objects.append(self.bot.get_cog(str(cog)))
+            names = f"\n".join(cog.qualified_name for cog in cog_objects)
+            commandse = []
+            for cog in cog_objects:
+                for command in cog.walk_commands():
+                    commandse.append(command.name)
+            commands=", ".join(command for command in commandse)
+            em=discord.Embed(
+                description=f"Type `{ctx.prefix}help [command]` for more information about a command.\nYou need more help? Click [here](https://discord.gg/vhDqVxPB27) to get to the support server!",
+                timestamp=datetime.datetime.utcnow(),
+                color=color()
+            ).set_footer(text=f"Requested by {ctx.author.name}#{ctx.author.discriminator}", icon_url=ctx.author.avatar_url)
+            for cog in cog_objects:
+                if cog.get_commands():
+                    if not cog.qualified_name == "Jishaku":
+                        if not cog.qualified_name == "Developer":
+                            listts=[]
+                            for command in cog.walk_commands():
+                                if not command.hidden:
+                                    if not command.parent:
+                                        listts.append(f"`{command.name}`")
+                            em.add_field(
+                                name=f"{cog.qualified_name} ({len(cog.get_commands())})",
+                                value="> " + ", ".join(command for command in listts),
+                                inline=False
+                            )
+            await ctx.send(embed=em)
+        else:
+            if self.bot.get_command(str(command)):
+                given_command = self.bot.get_command(str(command))
+                if not given_command.hidden == True:
+                    can_run_check = await self.bot.can_run(given_command)
+                    #-------------------------------------
+                    if can_run_check == True:
+                        can_run = self.bot.greenTick
+                    elif can_run_check == False:
+                        can_run = self.bot.redTick
+                    #-------------------------------------
+                    try:
+                        command_subcommands = "> " + ", ".join(f"`{command.name}`" for command in given_command.commands)
+                    except:
+                        command_subcommands = "none"
+                    #-------------------------------------
+                    if given_command.enabled == True:
+                        command_enabled = self.bot.greenTick
+                    elif given_command.enabled == False:
+                        command_enabled = self.bot.redTick
+                    #-------------------------------------
+                    if given_command.usage:
+                        command_usage = given_command.usage
+                    else:
+                        command_usage = " ".join(f"<{e}>" for e in list(given_command.params) if not e in ["self", "ctx"])
+                    #-------------------------------------
+                    if given_command.parent:
+                        command_parent = given_command.parent
+                    else:
+                        command_parent = "none"
+                    #-------------------------------------
+                    em=discord.Embed(
+                        title=given_command.name,
+                        timestamp=datetime.datetime.utcnow(),
+                        description=given_command.description,
+                        color=color()
+                    ).set_footer(text=f"requested by {ctx.author}", icon_url=ctx.author.avatar_url)
+                    em.add_field(name="usage", value=f"{await get_prefix(self.bot, ctx.message)}{command} {command_usage}", inline=False)
+                    if given_command.aliases:
+                        em.add_field(name=f"aliases [{len(given_command.aliases)}]", value="> " + ", ".join(f"`{alias}`" for alias in given_command.aliases), inline=False)
+                    else:
+                        em.add_field(name="aliases [0]", value="none", inline=False)
+                    try:
+                        em.add_field(name=f"subcommands [{len(given_command.commands)}]", value=command_subcommands, inline=False)
+                    except AttributeError:
+                        em.add_field(name=f"subcommands [0]", value=command_subcommands, inline=False)
+                    em.add_field(name="category", value=given_command.cog_name, inline=False)
+                    await ctx.send(embed=em)
+                else:
+                    em=discord.Embed(description=f"this command does not exist", color=color())
+                    await ctx.send(embed=em)
+            else:
+                em=discord.Embed(description=f"this command does not exist", color=color())
+                await ctx.send(embed=em)
 
 def setup(bot):
-    bot.help_command = MyNewHelp()
     bot.add_cog(utility(bot))
