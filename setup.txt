@@ -1,0 +1,4 @@
+1. install all needed modules
+2. create a proper config.json
+3. setup a postgresql database
+4. create a prefixes table like this: "CREATE TABLE prefixes (guild BIGINT PRIMARY KEY, prefix TEXT)"
