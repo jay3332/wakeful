@@ -2,6 +2,7 @@ import discord, datetime, async_cse, psutil, humanize, os, sys, inspect, mystbin
 from discord.ext import commands
 from discord import Webhook, AsyncWebhookAdapter
 from utils.configs import color
+from utils.get import *
 from jishaku.functools import executor_function
 
 @executor_function
@@ -13,7 +14,7 @@ def do_translate(output, text):
     translation = translator.translate(str(text), dest=str(output))
     return translation
 
-google = async_cse.Search(os.getenv("GOOGLE"))
+google = async_cse.Search(get_config("GOOGLE"))
 mystbinn = mystbin.Client()
 
 class utility(commands.Cog):
