@@ -4,7 +4,6 @@ from discord import Webhook, AsyncWebhookAdapter
 from utils.configs import color
 from utils.get import *
 from jishaku.functools import executor_function
-from main import get_prefix
 
 @executor_function
 def do_translate(output, text):
@@ -403,7 +402,7 @@ class utility(commands.Cog):
                     commandse.append(command.name)
             commands=", ".join(command for command in commandse)
             em=discord.Embed(
-                description=f"Type `{ctx.prefix}help [command]` for more information about a command.\nYou need more help? Click [here](https://discord.gg/vhDqVxPB27) to get to the support server!",
+                description=f"type `{ctx.prefix}help [command]` for more information about a command.",
                 timestamp=datetime.datetime.utcnow(),
                 color=color()
             ).set_footer(text=f"Requested by {ctx.author.name}#{ctx.author.discriminator}", icon_url=ctx.author.avatar_url)
@@ -459,7 +458,7 @@ class utility(commands.Cog):
                         description=given_command.description,
                         color=color()
                     ).set_footer(text=f"requested by {ctx.author}", icon_url=ctx.author.avatar_url)
-                    em.add_field(name="usage", value=f"{await get_prefix(self.bot, ctx.message)}{command} {command_usage}", inline=False)
+                    em.add_field(name="usage", value=f"{ctx.prefix}{command} {command_usage}", inline=False)
                     if given_command.aliases:
                         em.add_field(name=f"aliases [{len(given_command.aliases)}]", value="> " + ", ".join(f"`{alias}`" for alias in given_command.aliases), inline=False)
                     else:
