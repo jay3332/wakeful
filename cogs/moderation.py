@@ -160,14 +160,8 @@ class moderation(commands.Cog):
             await self.bot.db.execute("INSERT INTO prefixes (guild, prefix) VALUES ($1, $2)", ctx.guild.id, prefix)
         except asyncpg.UniqueViolationError:
             await self.bot.db.execute("UPDATE prefixes SET prefix = $1 WHERE guild = $2", prefix, ctx.guild.id)
-        except Exception as exc:
-            raise exc
-            em=discord.Embed(description=f"```py\n{exc}```", color=color())
-            await ctx.send(embed=em)
-        else:
-            em=discord.Embed(description=f"sucessfully set the prefix for `{ctx.guild.name}` to `{prefix}`", color=color())
-            em.set_footer(text=f"requested by {ctx.author}", icon_url=ctx.author.avatar_url)
-            await ctx.send(embed=em)
-
+        em=discord.Embed(description=f"sucessfully set the prefix for `{ctx.guild.name}` to `{prefix}`", color=color())
+        em.set_footer(text=f"requested by {ctx.author}", icon_url=ctx.author.avatar_url)
+        await ctx.send(embed=em)
 def setup(bot):
     bot.add_cog(moderation(bot))
