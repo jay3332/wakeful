@@ -2,6 +2,7 @@ import discord, json, asyncio, importlib
 from discord.ext import commands
 from utils.configs import color
 from utils.checks import is_mod
+from prettytable import PrettyTable
 
 status_types = {
     "dnd": discord.Status.dnd,
@@ -105,6 +106,21 @@ class admin(commands.Cog):
         em=discord.Embed(description=f"```sh\n{shell}```", color=color())
         await ctx.send(embed=em)
         await self.bot.close() # close the bot, so systemd will start it right back up
+
+    @commands.command()
+    @commands.is_owner()
+    async def sql(self, ctx, *, query):
+        res = await self.bot.db.fetch(query)
+        if len(res) == 0:
+            await ctx.message.add_reaction('✅')
+        headers = list(res[0].keys())
+        table = PrettyTable()
+        table.field_names = headers
+        for rec in res:
+            lst = list(rec)
+            table.add_row(lst)
+        msg = table.get_string()
+        await ctx.send(f"```\n{msg}\n```")
 
 def setup(bot):
     bot.add_cog(admin(bot))
