@@ -425,6 +425,72 @@ class utility(commands.Cog):
     async def _embed(self, ctx, embed : dict):
         em=discord.Embed().from_dict(embed)
         await ctx.reply(embed=em)
+    
+    @commands.command(aliases=["rp", "activity", "richpresence", "status"])
+    @commands.cooldown(1,5,commands.BucketType.user)
+    async def presence(self, ctx, member : discord.Member = None):
+        if member is None:
+            member = ctx.author
+        em=discord.Embed(title=f"{member.name}'s activities", color=color(), timestamp=datetime.datetime.utcnow())
+        for activity in member.activities:
+            if isinstance(activity, discord.activity.Spotify):
+                artists = ", ".join(artist for artist in activity.artists)
+                duration = activity.duration
+                days, seconds = duration.days, duration.seconds
+                hours = days * 24 + seconds // 3600
+                minutes = (seconds % 3600) // 60
+                seconds = seconds % 60
+                em.add_field(
+                    name="Spotify",
+                    value=f"""
+title: `{activity.title}`
+artists: `{artists}`
+album: `{activity.album}`
+album cover: [url]({activity.album_cover_url})
+duration: `{hours}`h `{minutes}`m `{seconds}`s
+""",
+                    inline=False
+                )
+            elif isinstance(activity, discord.activity.CustomActivity):
+                if activity.emoji != None:
+                    emoji = f"[url]({activity.emoji.url})"
+                    emojiName = f"`{activity.emoji.name}`"
+                else:
+                    emoji = "`None`"
+                    emojiName = "`None`"
+                em.add_field(
+                    name="Custom",
+                    value=f"""
+text: `{activity.name}`
+emoji: {emoji}
+emoji name: {emojiName}
+""",
+                    inline=False
+                )
+            elif isinstance(activity, discord.activity.Game):
+                em.add_field(
+                    name="Game",
+                    value=f"name: `{activity.name}`",
+                    inline=False
+                )
+            elif isinstance(activity, discord.activity.Streaming):
+                em.add_field(
+                    name="Stream",
+                    value=f"""
+title: `{activity.name}`
+platform: `{activity.platform}`
+url: [{activity.url.split("/")[3]}]({activity.url})
+""",
+                    inline=False
+                )
+            else:
+                em.add_field(
+                    name="Unknown",
+                    value=f"name: `{activity.name}`",
+                    inline=False
+                )
+        em.set_footer(text=f"requested by {ctx.author}", icon_url=ctx.author.avatar_url)
+        await ctx.send(embed=em)
 
     @commands.command()
     @commands.cooldown(1, 5, commands.BucketType.user)

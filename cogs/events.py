@@ -19,7 +19,7 @@ class errors(commands.Cog):
                 ctx.command.reset_cooldown(ctx)
                 await ctx.invoke(ctx.command)
         elif isinstance(error, commands.MissingRequiredArgument):
-            embed=discord.Embed(description=f"`{error.param}` is a required parameter that is missing", color=color())
+            embed=discord.Embed(description=f"`{error.param}` is a required argument that is missing", color=color())
             await ctx.send(embed=embed)
         elif isinstance(error, commands.CommandNotFound):
             cmd = ctx.invoked_with

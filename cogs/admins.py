@@ -52,9 +52,9 @@ class admin(commands.Cog):
                 em=discord.Embed(description=f"{user.mention} is blacklisted", color=color())
                 await ctx.send(embed=em)
 
-    @commands.group(invoke_without_command=True, aliases=["rp", "richpresence", "activity"])
+    @commands.group(invoke_without_command=True, name="setstatus", aliases=["setrp", "setrichpresence", "setactivity"])
     async def status(self, ctx):
-        await ctx.invoke(self.bot.get_command("help"), {"command": ctx.command.name})
+        await ctx.invoke(self.bot.get_command("help"), **{"command": ctx.command.name})
 
     @status.command()
     async def streaming(self, ctx, url, *, game):
