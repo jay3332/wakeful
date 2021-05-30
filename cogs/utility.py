@@ -409,7 +409,7 @@ class utility(commands.Cog):
 - **users**: `{len(self.bot.users)}`
 - **channels**: `{channels["all"]}`:
     - **categories**: `{channels["category"]}`
-    - **text**: `{channels["voice"]}`
+    - **text**: `{channels["text"]}`
     - **voice**: `{channels["voice"]}`
     - **stage**: `{channels["stage"]}`
 - **commands**: `{len(self.bot.commands)}`
