@@ -420,11 +420,6 @@ class utility(commands.Cog):
 - [invite](https://discord.com/api/oauth2/authorize?client_id={self.bot.user.id}&permissions=8&scope=bot)""", inline=True)
             embed.set_thumbnail(url=self.bot.user.avatar_url)
         await ctx.send(embed=embed)
-
-    @commands.command(name="embed")
-    async def _embed(self, ctx, embed : dict):
-        em=discord.Embed().from_dict(embed)
-        await ctx.reply(embed=em)
     
     @commands.command(aliases=["rp", "activity", "richpresence", "status"])
     @commands.cooldown(1,5,commands.BucketType.user)
