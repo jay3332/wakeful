@@ -381,6 +381,20 @@ class utility(commands.Cog):
             hours, remainder = divmod(int(delta_uptime.total_seconds()), 3600)
             minutes, seconds = divmod(remainder, 60)
             days, hours = divmod(hours, 24)
+            channels = {"all": 0, "category": 0, "text": 0, "voice": 0, "stage": 0}
+            for guild in self.bot.guilds:
+                for channel in guild.channels:
+                    channels["all"] += 1
+                    if isinstance(channel, discord.CategoryChannel):
+                        channels["category"] +=1
+                    elif isinstance(channel, discord.TextChannel):
+                        channels["text"] += 1
+                    elif isinstance(channel, discord.VoiceChannel):
+                        channels["voice"] += 1
+                    elif isinstance(channel, discord.StageChannel):
+                        channels["stage"] += 1
+                    else:
+                        print(channel.__class__)
             embed.add_field(name="system", value=f"""
 - **os**: `{operating_system}`
 - **cpu**: `{process.cpu_percent()}`%
@@ -393,6 +407,11 @@ class utility(commands.Cog):
             embed.add_field(name="bot", value=f"""
 - **guilds**: `{len(self.bot.guilds)}`
 - **users**: `{len(self.bot.users)}`
+- **channels**: `{channels["all"]}`:
+    - **categories**: `{channels["category"]}`
+    - **text**: `{channels["voice"]}`
+    - **voice**: `{channels["voice"]}`
+    - **stage**: `{channels["stage"]}`
 - **commands**: `{len(self.bot.commands)}`
 - **commands executed**: `{self.bot.cmdsSinceRestart}`
 - **cogs**: `{len(self.bot.cogs)}`
@@ -401,6 +420,11 @@ class utility(commands.Cog):
 - [invite](https://discord.com/api/oauth2/authorize?client_id={self.bot.user.id}&permissions=8&scope=bot)""", inline=True)
             embed.set_thumbnail(url=self.bot.user.avatar_url)
         await ctx.send(embed=embed)
+
+    @commands.command(name="embed")
+    async def _embed(self, ctx, embed : dict):
+        em=discord.Embed().from_dict(embed)
+        await ctx.reply(embed=em)
 
     @commands.command()
     @commands.cooldown(1, 5, commands.BucketType.user)
