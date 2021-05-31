@@ -22,22 +22,6 @@ class fun(commands.Cog):
         self.bot = bot
 
     @commands.command()
-    async def say(self, ctx, *, text = ""):
-        try:
-            await ctx.message.delete()
-        except:
-            pass
-        await ctx.trigger_typing()
-        try:
-            attachment = ctx.message.attachments[0]
-        except:
-            attachment = None
-        if not attachment:
-            await ctx.send(text, allowed_mentions=discord.AllowedMentions.none())
-        else:
-            await ctx.send(text, file=await attachment.to_file(), allowed_mentions=discord.AllowedMentions.none())
-
-    @commands.command()
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def tts(self, ctx, *, message):
         async with ctx.typing():
