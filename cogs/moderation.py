@@ -10,6 +10,82 @@ class moderation(commands.Cog):
         self.bot = bot
 
     @commands.command()
+    @commands.has_guild_permissions(manage_guild=True)
+    @commands.cooldown(1,5,commands.BucketType.user)
+    async def disable(self, ctx, command):
+        if not command in ["help"]:
+            command = self.bot.get_command(command)
+            if command is None:
+                em=discord.Embed(description=f"this command hasn't been found", color=color())
+                await ctx.send(embed=em)
+            elif command.hidden:
+                em=discord.Embed(description=f"this command hasn't been found", color=color())
+                await ctx.send(embed=em)
+            else:
+                try:
+                    await self.bot.db.execute("INSERT INTO commands (guild, commands) VALUES ($1, $2)", ctx.guild.id, command.name)
+                except asyncpg.UniqueViolationError:
+                    commands = await self.bot.db.fetchrow("SELECT commands FROM commands WHERE guild = $1", ctx.guild.id)
+                    commands = commands["commands"]
+                    commands = commands.split(",")
+                    if not command.name in commands:
+                        commands.append(command.name)
+                        commands = ",".join(cmd for cmd in commands)
+                        await self.bot.db.execute("UPDATE commands SET commands = $1 WHERE guild = $2", commands, ctx.guild.id)
+                        em=discord.Embed(description=f"i've successfully disabled the `{command.name}` command", color=color())
+                        em.set_footer(text=f"requested by {ctx.author}", icon_url=ctx.author.avatar_url)
+                        await ctx.send(embed=em)
+                    else:
+                        em=discord.Embed(description=f"that command is already disabled", color=color())
+                        await ctx.send(embed=em)
+                else:
+                    em=discord.Embed(description=f"i've successfully disabled the `{command.name}` command", color=color())
+                    em.set_footer(text=f"requested by {ctx.author}", icon_url=ctx.author.avatar_url)
+                    await ctx.send(embed=em)
+        else:
+            em=discord.Embed(description=f"you are not allowed to disable the `{command}` command", color=color())
+            await ctx.send(embed=em)
+
+    @commands.command()
+    @commands.has_guild_permissions(manage_guild=True)
+    @commands.cooldown(1,5,commands.BucketType.user)
+    async def enable(self, ctx, command):
+        command = self.bot.get_command(command)
+        if command is None:
+            em=discord.Embed(description=f"this command hasn't been found", color=color())
+            await ctx.send(embed=em)
+        elif command.hidden:
+            em=discord.Embed(description=f"this command hasn't been found", color=color())
+            await ctx.send(embed=em)
+        else:
+            res = await self.bot.db.fetchrow("SELECT commands FROM commands WHERE guild = $1", ctx.guild.id)
+            try:
+                res["commands"]
+            except TypeError:
+                em=discord.Embed(description=f"that command isn't disabled", color=color())
+                await ctx.send(embed=em)
+            else:
+                commands = await self.bot.db.fetchrow("SELECT commands FROM commands WHERE guild = $1", ctx.guild.id)
+                commands = commands["commands"]
+                commands = commands.split(",")
+                if command.name in commands:
+                    commands.remove(command.name)
+                    commands = ",".join(cmd for cmd in commands)
+                    if len(commands) != 1:
+                        await self.bot.db.execute("UPDATE commands SET commands = $1 WHERE guild = $2", commands, ctx.guild.id)
+                        em=discord.Embed(description=f"i've successfully enabled the `{command.name}` command", color=color())
+                        em.set_footer(text=f"requested by {ctx.author}", icon_url=ctx.author.avatar_url)
+                        await ctx.send(embed=em)
+                    else:
+                        await self.bot.db.fetch("DELETE FROM commands WHERE guild = $1", ctx.guild.id)
+                        em=discord.Embed(description=f"i've successfully enabled the `{command.name}` command", color=color())
+                        em.set_footer(text=f"requested by {ctx.author}", icon_url=ctx.author.avatar_url)
+                        await ctx.send(embed=em)
+                else:
+                    em=discord.Embed(description=f"that command isn't disabled", color=color())
+                    await ctx.send(embed=em)
+
+    @commands.command()
     @commands.guild_only()
     @commands.has_guild_permissions(ban_members=True)
     @commands.cooldown(1,5,commands.BucketType.user)

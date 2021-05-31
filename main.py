@@ -58,24 +58,55 @@ async def presence():
 
 @bot.event
 async def on_message(msg):
+    if pwd.getpwuid(os.getuid())[0] == "pi":
+        prefix = await get_prefix(bot, msg)
+    else:
+        prefix = devprefix
+
     if msg.author.bot:
         return
+
     if await is_blacklisted(bot, msg.author):
         return
+
+    elif msg.content.startswith(prefix):
+        command = msg.content.split(prefix)
+        command = command[1]
+        res = await bot.db.fetchrow("SELECT commands FROM commands WHERE guild = $1", msg.guild.id)
+        try:
+            commands = res["commands"]
+        except:
+            success = False
+        else:
+            success = True
+        if success:
+            commands = commands.split(",")
+            if command in commands:
+                em=discord.Embed(description=f"this command has been disabled by the server administrators", color=color())
+                await msg.channel.send(embed=em)
+                return
+            else:
+                pass
+        else:
+            pass
+        await bot.process_commands(msg)
+
     elif pwd.getpwuid(os.getuid())[0] == "pi":
-        if msg.content.startswith(await get_prefix(bot, msg)):
+        if msg.content.startswith(prefix):
             await bot.process_commands(msg)
         elif msg.content == f"<@!{bot.user.id}>" or msg.content == f"<@{bot.user.id}>":
             if msg.guild:
-                em=discord.Embed(description=f"the prefix for `{msg.guild.name}` is `{await get_prefix(bot, msg)}`", color=color())
+                em=discord.Embed(description=f"the prefix for `{msg.guild.name}` is `{prefix}`", color=color())
                 await msg.channel.send(embed=em)
             else:
-                em=discord.Embed(description=f"the prefix for dms is `{await get_prefix(bot, msg)}`", color=color())
+                em=discord.Embed(description=f"the prefix for dms is `{prefix}`", color=color())
                 await msg.channel.send(embed=em)
+
     elif msg.content == f"<@!{bot.user.id}>" or msg.content == f"<@{bot.user.id}>":
         if is_mod(bot, msg.author):
             em=discord.Embed(description=f"my prefix is `{devprefix}`", color=color())
             await msg.channel.send(embed=em)
+
     elif msg.content.startswith(devprefix):
         if is_mod(bot, msg.author):
             await bot.process_commands(msg)

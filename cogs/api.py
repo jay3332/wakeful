@@ -132,9 +132,9 @@ class api(commands.Cog):
     async def fact(self, ctx):
         await ctx.invoke(self.bot.get_command("help"), **{"command": ctx.command})
     
-    @fact.command()
+    @fact.command(name="dog")
     @commands.cooldown(1,5,commands.BucketType.user)
-    async def dog(self, ctx):
+    async def _dog(self, ctx):
         res = await self.bot.session.get("https://some-random-api.ml/facts/dog")
         res = await res.json()
         fact = res["fact"]
@@ -142,9 +142,9 @@ class api(commands.Cog):
         em.set_footer(text=f"powered by some-random-api.ml • {ctx.author}", icon_url=ctx.author.avatar_url)
         await ctx.send(embed=em)
 
-    @fact.command()
+    @fact.command(name="cat")
     @commands.cooldown(1,5,commands.BucketType.user)
-    async def cat(self, ctx):
+    async def _cat(self, ctx):
         res = await self.bot.session.get("https://some-random-api.ml/facts/cat")
         res = await res.json()
         fact = res["fact"]
@@ -152,9 +152,9 @@ class api(commands.Cog):
         em.set_footer(text=f"powered by some-random-api.ml • {ctx.author}", icon_url=ctx.author.avatar_url)
         await ctx.send(embed=em)
     
-    @fact.command()
+    @fact.command(name="panda")
     @commands.cooldown(1,5,commands.BucketType.user)
-    async def panda(self, ctx):
+    async def _panda(self, ctx):
         res = await self.bot.session.get("https://some-random-api.ml/facts/panda")
         res = await res.json()
         fact = res["fact"]
@@ -162,9 +162,9 @@ class api(commands.Cog):
         em.set_footer(text=f"powered by some-random-api.ml • {ctx.author}", icon_url=ctx.author.avatar_url)
         await ctx.send(embed=em)
     
-    @fact.command()
+    @fact.command(name="fox")
     @commands.cooldown(1,5,commands.BucketType.user)
-    async def fox(self, ctx):
+    async def _fox(self, ctx):
         res = await self.bot.session.get("https://some-random-api.ml/facts/fox")
         res = await res.json()
         fact = res["fact"]
@@ -172,9 +172,9 @@ class api(commands.Cog):
         em.set_footer(text=f"powered by some-random-api.ml • {ctx.author}", icon_url=ctx.author.avatar_url)
         await ctx.send(embed=em)
     
-    @fact.command()
+    @fact.command(name="bird")
     @commands.cooldown(1,5,commands.BucketType.user)
-    async def bird(self, ctx):
+    async def _bird(self, ctx):
         res = await self.bot.session.get("https://some-random-api.ml/facts/bird")
         res = await res.json()
         fact = res["fact"]
@@ -182,9 +182,9 @@ class api(commands.Cog):
         em.set_footer(text=f"powered by some-random-api.ml • {ctx.author}", icon_url=ctx.author.avatar_url)
         await ctx.send(embed=em)
     
-    @fact.command()
+    @fact.command(name="koala")
     @commands.cooldown(1,5,commands.BucketType.user)
-    async def koala(self, ctx):
+    async def _koala(self, ctx):
         res = await self.bot.session.get("https://some-random-api.ml/facts/koala")
         res = await res.json()
         fact = res["fact"]
