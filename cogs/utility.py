@@ -502,6 +502,22 @@ url: [{activity.url.split("/")[3]}]({activity.url})
             em.set_author(name=f"{msg.author} ({msg.author.id})", icon_url=msg.author.avatar_url)
             await ctx.send(embed=em)
 
+    @commands.command()
+    @commands.cooldown(1,5, commands.BucketType.user)
+    async def disabled(self, ctx):
+        res = await self.bot.db.fetchrow("SELECT commands FROM commands WHERE guild = $1", ctx.guild.id)
+        try:
+            res["commands"]
+        except TypeError:
+            em=discord.Embed(description=f"there are no disabled commands", color=color())
+            await ctx.send(embed=em)
+        else:
+            commands = res["commands"]
+            commands = commands.split(",")
+            em=discord.Embed(title="disabled commands", description=", ".join(cmd for cmd in commands), color=color())
+            em.set_footer(text=f"requested by {ctx.author}", icon_url=ctx.author.avatar_url)
+            await ctx.send(embed=em)
+
     @commands.command(aliases=["rtfd"])
     @commands.cooldown(1,5,commands.BucketType.user)
     async def rtfm(self, ctx, query):
