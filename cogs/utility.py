@@ -514,9 +514,14 @@ url: [{activity.url.split("/")[3]}]({activity.url})
         else:
             commands = res["commands"]
             commands = commands.split(",")
-            em=discord.Embed(title="disabled commands", description=", ".join(cmd for cmd in commands), color=color())
-            em.set_footer(text=f"requested by {ctx.author}", icon_url=ctx.author.avatar_url)
-            await ctx.send(embed=em)
+            if len(commands) != 0 and commands != ['']:
+                print(commands)
+                em=discord.Embed(title="disabled commands", description=", ".join(cmd for cmd in commands), color=color())
+                em.set_footer(text=f"requested by {ctx.author}", icon_url=ctx.author.avatar_url)
+                await ctx.send(embed=em)
+            else:
+                em=discord.Embed(description=f"there are no disabled commands", color=color())
+                await ctx.send(embed=em)
 
     @commands.command(aliases=["rtfd"])
     @commands.cooldown(1,5,commands.BucketType.user)
