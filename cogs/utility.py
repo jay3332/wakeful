@@ -487,6 +487,21 @@ url: [{activity.url.split("/")[3]}]({activity.url})
         em.set_footer(text=f"requested by {ctx.author}", icon_url=ctx.author.avatar_url)
         await ctx.send(embed=em)
 
+    @commands.command()
+    @commands.cooldown(1,5,commands.BucketType.user)
+    async def snipe(self, ctx):
+        try:
+            msg = self.bot.message_cache[ctx.guild.id][ctx.channel.id]
+        except KeyError:
+            em=discord.Embed(description=f"there's no message to snipe", color=color())
+            em.set_footer(text=f"requested by {ctx.author}", icon_url=ctx.author.avatar_url)
+            await ctx.send(embed=em)
+        else:
+            em=discord.Embed(description=f"`{msg.content}`", color=color())
+            em.set_footer(text=f"requested by {ctx.author}", icon_url=ctx.author.avatar_url)
+            em.set_author(name=f"{msg.author} ({msg.author.id})", icon_url=msg.author.avatar_url)
+            await ctx.send(embed=em)
+
     @commands.command(aliases=["rtfd"])
     @commands.cooldown(1,5,commands.BucketType.user)
     async def rtfm(self, ctx, query):

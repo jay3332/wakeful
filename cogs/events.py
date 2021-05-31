@@ -10,6 +10,15 @@ class errors(commands.Cog):
         self.bot = bot
 
     @commands.Cog.listener()
+    async def on_message_delete(self, msg):
+        if not msg.author.bot:
+            self.bot.message_cache[msg.guild.id] = {}
+            self.bot.message_cache[msg.guild.id][msg.channel.id] = msg
+            await asyncio.sleep(10)
+            if self.bot.message_cache[msg.guild.id][msg.channel.id] == msg:
+                self.bot.message_cache[msg.guild.id].pop(msg.channel.id)
+
+    @commands.Cog.listener()
     async def on_command_error(self, ctx, error):
         if isinstance(error, commands.CommandOnCooldown):
             if not is_mod(self.bot, ctx.author):

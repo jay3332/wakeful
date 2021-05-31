@@ -38,6 +38,7 @@ bot.greenTick="✓"
 bot.redTick="x"
 bot.error="!"
 bot.cmdsSinceRestart = 0
+bot.message_cache = {}
 bot.afks = {}
 bot.session = aiohttp.ClientSession()
 bot.status = None
