@@ -110,6 +110,24 @@ class fun(commands.Cog):
             em.set_footer(text=f"powered by dagpi.xyz • {ctx.author}", icon_url=ctx.author.avatar_url)
         await ctx.send(embed=em)
 
+    @commands.command(aliases=["ppsize"])
+    @commands.cooldown(1,5,commands.BucketType.user)
+    async def pp(self, ctx, member : discord.Member = None):
+        if member is None:
+            member = ctx.author
+        em=discord.Embed(title=f"{member.name}'s pp", description="8"+"".join("=" for x in range(random.randrange(0,10)))+"D", color=color())
+        em.set_footer(text=f"requested by {ctx.author}", icon_url=ctx.author.avatar_url)
+        await ctx.send(embed=em)
+
+    @commands.command()
+    @commands.cooldown(1,5,commands.BucketType.user)
+    async def gayrate(self, ctx, member : discord.Member = None):
+        if member is None:
+            member = ctx.author
+        em=discord.Embed(title=f"{member.name}'s gayrate", description=f"{member.name} is `{random.randrange(0,100)}`% gay", color=color())
+        em.set_footer(text=f"requested by {ctx.author}", icon_url=ctx.author.avatar_url)
+        await ctx.send(embed=em)
+
     @commands.command(usage="[file]")
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def caption(self, ctx, member : discord.Member = None):

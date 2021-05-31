@@ -487,6 +487,22 @@ url: [{activity.url.split("/")[3]}]({activity.url})
         em.set_footer(text=f"requested by {ctx.author}", icon_url=ctx.author.avatar_url)
         await ctx.send(embed=em)
 
+    @commands.command(aliases=["rtfd"])
+    @commands.cooldown(1,5,commands.BucketType.user)
+    async def rtfm(self, ctx, query):
+        async with ctx.typing():
+            res = await self.bot.session.get(f"https://idevision.net/api/public/rtfm?query={query}&location=https://discordpy.readthedocs.io/en/latest&show-labels=false&label-labels=false")
+            res = await res.json()
+            nodes = res["nodes"]
+        if nodes != {}:
+            em=discord.Embed(description="\n".join(f"[`{e}`]({nodes[e]})" for e in nodes), color=color())
+            em.set_footer(text=f"powered by idevision.net • {ctx.author}", icon_url=ctx.author.avatar_url)
+            await ctx.send(embed=em)
+        else:
+            em=discord.Embed(description=f"no results found for `{query}`", color=color())
+            em.set_footer(text=f"requested by {ctx.author}", icon_url=ctx.author.avatar_url)
+            await ctx.send(embed=em)
+
     @commands.command()
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def help(self, ctx, *, command : str = None):
