@@ -785,7 +785,6 @@ type: `{type}`
         if res != "":
             em=discord.Embed(description=f"`{res}`", color=color())
             em.set_footer(text=f"powered by idevision.net • {ctx.author}", icon_url=ctx.author.avatar_url)
-            em.set_image(url=url)
             await ctx.reply(embed=em, mention_author=False)
         else:
             em=discord.Embed(description=f"i could not read what your image says", color=color())
