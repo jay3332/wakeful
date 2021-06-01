@@ -4,6 +4,7 @@ from discord import Webhook, AsyncWebhookAdapter
 from utils.configs import color
 from utils.get import *
 from jishaku.functools import executor_function
+import idevision
 
 @executor_function
 def do_translate(output, text):
@@ -17,6 +18,7 @@ def do_translate(output, text):
 google = async_cse.Search(get_config("GOOGLE"))
 mystbinn = mystbin.Client()
 dagpi = asyncdagpi.Client(get_config("DAGPI"))
+idevisionn = idevision.async_client(get_config("IDEVISION"))
 
 class utility(commands.Cog):
 
@@ -421,6 +423,34 @@ class utility(commands.Cog):
             embed.set_thumbnail(url=self.bot.user.avatar_url)
         await ctx.send(embed=embed)
 
+    @commands.command(aliases=["defenition"])
+    @commands.cooldown(1,5,commands.BucketType.user)
+    async def define(self, ctx, *, term):
+        async with ctx.typing():
+            res = await self.bot.session.get(f"https://api.dictionaryapi.dev/api/v2/entries/en/{term.replace(' ', '%20')}")
+            if res.status == 200:
+                res = await res.json()
+                res = res[0]
+                word = res["word"]
+                meanings = res["meanings"][0]
+                phonetics = res["phonetics"][0]["text"]
+                partOfSpeech = meanings["partOfSpeech"]
+                defenition = meanings["definitions"][0]["definition"]
+                synonyms = ", ".join(f"`{synonym}`" for synonym in meanings["definitions"][0]["synonyms"])
+                example = meanings["definitions"][0]["example"]
+                em=discord.Embed(title=f"{word} [{partOfSpeech}]", description=f"""
+phonetics: `{phonetics}`
+definition: {defenition}
+synonyms: {synonyms}
+example: `{example}`
+                """, color=color())
+                em.set_footer(text=f"requested by {ctx.author}", icon_url=ctx.author.avatar_url)
+                await ctx.send(embed=em)
+            else:
+                em=discord.Embed(description=f"an error occured while trying to get the definition for `{term}`\nreturn:\n```json\n{await res.json()}```", color=color())
+                em.set_footer(text=f"requested by {ctx.author}", icon_url=ctx.author.avatar_url)
+                await ctx.send(embed=em)
+
     @commands.command()
     @commands.cooldown(1,5,commands.BucketType.user)
     async def unspoiler(self, ctx, *, msg : str = None):
@@ -717,6 +747,49 @@ type: `{type}`
         await ctx.send(embed=em)
         await asyncio.sleep(3)
         self.bot.afks[ctx.author.id] = {"reason": reason}
+
+    @commands.command()
+    @commands.cooldown(1,10,commands.BucketType.user)
+    async def ocr(self, ctx, member : discord.Member = None):
+        if member is None:
+            if ctx.message.attachments:
+                if ctx.message.attachments[0].url.endswith("png") or ctx.message.attachments[0].url.endswith("jpg") or ctx.message.attachments[0].url.endswith("jpeg") or ctx.message.attachments[0].url.endswith("webp"):
+                    url = ctx.message.attachments[0].proxy_url or ctx.message.attachments[0].url
+                else:
+                    url = ctx.author.avatar_url_as(format="png", size=1024)
+            else:
+                url = ctx.author.avatar_url_as(format="png", size=1024)
+        else:
+            url = member.avatar_url_as(format="png", size=1024)
+
+        url = url.replace("cdn.discordapp.com", "media.discordapp.com")
+
+        res = await self.bot.session.get(url)
+
+        image = await res.read()
+
+        if url.endswith("png"):
+            filetype = "png"
+        elif url.endswith("jpg"):
+            filetype = "jpg"
+        elif url.endswith("jpeg"):
+            filetype = "jpeg"
+        elif url.endswith("webp"):
+            filetype = "webp"
+        else:
+            filetype = None
+        
+        async with ctx.typing():
+            res = await idevisionn.ocr(image, filetype=filetype)
+
+        if res != "":
+            em=discord.Embed(description=f"`{res}`", color=color())
+            em.set_footer(text=f"powered by idevision.net • {ctx.author}", icon_url=ctx.author.avatar_url)
+            em.set_image(url=url)
+            await ctx.reply(embed=em, mention_author=False)
+        else:
+            em=discord.Embed(description=f"i could not read what your image says", color=color())
+            await ctx.reply(embed=em, mention_author=False)
 
     @commands.Cog.listener()
     async def on_message(self, msg):
