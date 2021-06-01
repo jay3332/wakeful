@@ -420,6 +420,34 @@ class utility(commands.Cog):
 - [invite](https://discord.com/api/oauth2/authorize?client_id={self.bot.user.id}&permissions=8&scope=bot)""", inline=True)
             embed.set_thumbnail(url=self.bot.user.avatar_url)
         await ctx.send(embed=embed)
+
+    @commands.command()
+    @commands.cooldown(1,5,commands.BucketType.user)
+    async def unspoiler(self, ctx, *, msg : str = None):
+        if msg is None:
+            if ctx.message.reference:
+                text = ctx.message.reference.resolved.clean_content
+            else:
+                em=discord.Embed(description="😐", color=color())
+                await ctx.send(embed=em)
+                return
+        else:
+            text = msg
+        await ctx.reply(text.replace("|", ""), mention_author=False)
+    
+    @commands.command()
+    @commands.cooldown(1,5,commands.BucketType.user)
+    async def spoiler(self, ctx, *, msg : str = None):
+        if msg is None:
+            if ctx.message.reference:
+                text = ctx.message.reference.resolved.clean_content
+            else:
+                em=discord.Embed(description="😐", color=color())
+                await ctx.send(embed=em)
+                return
+        else:
+            text = msg
+        await ctx.reply("".join(f"||{letter}||" for letter in text), mention_author=False)
     
     @commands.command(aliases=["rp", "activity", "richpresence", "status"])
     @commands.cooldown(1,5,commands.BucketType.user)

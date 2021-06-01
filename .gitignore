@@ -1,6 +1,2 @@
-cogs/__pycache__
-utils/__pycache__
-prefixes.json
-blacklist.json
 *.pyc
 config.json
