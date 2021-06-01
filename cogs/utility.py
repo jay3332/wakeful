@@ -412,7 +412,7 @@ class utility(commands.Cog):
     - **text**: `{channels["text"]}`
     - **voice**: `{channels["voice"]}`
     - **stage**: `{channels["stage"]}`
-- **commands**: `{len(self.bot.commands)}`
+- **commands**: `{len([cmd for cmd in self.bot.commands if not cmd.hidden])}`
 - **commands executed**: `{self.bot.cmdsSinceRestart}`
 - **cogs**: `{len(self.bot.cogs)}`
 - **uptime**: `{days}d {hours}h {minutes}m {seconds}s`
