@@ -457,8 +457,8 @@ duration: `{hours}`h `{minutes}`m `{seconds}`s
                     name="Custom",
                     value=f"""
 text: `{activity.name}`
-emoji: {emoji}
 emoji name: {emojiName}
+emoji: {emoji}
 """,
                     inline=False
                 )
@@ -479,9 +479,18 @@ url: [{activity.url.split("/")[3]}]({activity.url})
                     inline=False
                 )
             else:
+                try:
+                    type = str(activity.type).lower().split("activitytype.")[1].title()
+                except:
+                    type = "None"
                 em.add_field(
                     name="Unknown",
-                    value=f"name: `{activity.name}`",
+                    value=f"""
+name: `{activity.name}`
+details: `{activity.details}`
+emoji: `{activity.emoji}`
+type: `{type}`
+""",
                     inline=False
                 )
         em.set_footer(text=f"requested by {ctx.author}", icon_url=ctx.author.avatar_url)
