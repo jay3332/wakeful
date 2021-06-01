@@ -24,7 +24,7 @@ class image(commands.Cog):
         else:
             url = member.avatar_url_as(format="png", size=1024)
         async with ctx.typing():
-            img = await dagpi.image_process(asyncdagpi.ImageFeatures.pixel(), url=url)
+            img = await dagpi.image_process(asyncdagpi.ImageFeatures.pixel(), url=str(url))
             file=discord.File(img.image, f"{ctx.command.name}.png")
             em=discord.Embed(color=color(), timestamp=datetime.datetime.utcnow())
             em.set_image(url=f"attachment://{ctx.command.name}.png")
@@ -45,7 +45,7 @@ class image(commands.Cog):
         else:
             url = member.avatar_url_as(format="png", size=1024)
         async with ctx.typing():
-            img = await dagpi.image_process(asyncdagpi.ImageFeatures.america(), url=url)
+            img = await dagpi.image_process(asyncdagpi.ImageFeatures.america(), url=str(url))
             file=discord.File(img.image, f"{ctx.command.name}.png")
             em=discord.Embed(color=color(), timestamp=datetime.datetime.utcnow())
             em.set_image(url=f"attachment://{ctx.command.name}.png")
@@ -66,7 +66,7 @@ class image(commands.Cog):
         else:
             url = member.avatar_url_as(format="png", size=1024)
         async with ctx.typing():
-            img = await dagpi.image_process(asyncdagpi.ImageFeatures.triggered(), url=url)
+            img = await dagpi.image_process(asyncdagpi.ImageFeatures.triggered(), url=str(url))
             file=discord.File(img.image, f"{ctx.command.name}.gif")
             em=discord.Embed(color=color(), timestamp=datetime.datetime.utcnow())
             em.set_image(url=f"attachment://{ctx.command.name}.gif")
@@ -87,7 +87,7 @@ class image(commands.Cog):
         else:
             url = member.avatar_url_as(format="png", size=1024)
         async with ctx.typing():
-            img = await dagpi.image_process(asyncdagpi.ImageFeatures.wasted(), url=url)
+            img = await dagpi.image_process(asyncdagpi.ImageFeatures.wasted(), url=str(url))
             file=discord.File(img.image, f"{ctx.command.name}.png")
             em=discord.Embed(color=color(), timestamp=datetime.datetime.utcnow())
             em.set_image(url=f"attachment://{ctx.command.name}.png")
@@ -108,7 +108,7 @@ class image(commands.Cog):
         else:
             url = member.avatar_url_as(format="png", size=1024)
         async with ctx.typing():
-            img = await dagpi.image_process(asyncdagpi.ImageFeatures.invert(), url=url)
+            img = await dagpi.image_process(asyncdagpi.ImageFeatures.invert(), url=str(url))
             file=discord.File(img.image, f"{ctx.command.name}.png")
             em=discord.Embed(color=color(), timestamp=datetime.datetime.utcnow())
             em.set_image(url=f"attachment://{ctx.command.name}.png")
@@ -129,7 +129,7 @@ class image(commands.Cog):
         else:
             url = member.avatar_url_as(format="png", size=1024)
         async with ctx.typing():
-            img = await dagpi.image_process(asyncdagpi.ImageFeatures.sobel(), url=url)
+            img = await dagpi.image_process(asyncdagpi.ImageFeatures.sobel(), url=str(url))
             file=discord.File(img.image, f"{ctx.command.name}.png")
             em=discord.Embed(color=color(), timestamp=datetime.datetime.utcnow())
             em.set_image(url=f"attachment://{ctx.command.name}.png")
@@ -150,7 +150,7 @@ class image(commands.Cog):
         else:
             url = member.avatar_url_as(format="png", size=1024)
         async with ctx.typing():
-            img = await dagpi.image_process(asyncdagpi.ImageFeatures.triangle(), url=url)
+            img = await dagpi.image_process(asyncdagpi.ImageFeatures.triangle(), url=str(url))
             file=discord.File(img.image, f"{ctx.command.name}.png")
             em=discord.Embed(color=color(), timestamp=datetime.datetime.utcnow())
             em.set_image(url=f"attachment://{ctx.command.name}.png")
@@ -171,7 +171,7 @@ class image(commands.Cog):
         else:
             url = member.avatar_url_as(format="png", size=1024)
         async with ctx.typing():
-            img = await dagpi.image_process(asyncdagpi.ImageFeatures.blur(), url=url)
+            img = await dagpi.image_process(asyncdagpi.ImageFeatures.blur(), url=str(url))
             file=discord.File(img.image, f"{ctx.command.name}.png")
             em=discord.Embed(color=color(), timestamp=datetime.datetime.utcnow())
             em.set_image(url=f"attachment://{ctx.command.name}.png")
@@ -192,7 +192,7 @@ class image(commands.Cog):
         else:
             url = member.avatar_url_as(format="png", size=1024)
         async with ctx.typing():
-            img = await dagpi.image_process(asyncdagpi.ImageFeatures.angel(), url=url)
+            img = await dagpi.image_process(asyncdagpi.ImageFeatures.angel(), url=str(url))
             file=discord.File(img.image, f"{ctx.command.name}.png")
             em=discord.Embed(color=color(), timestamp=datetime.datetime.utcnow())
             em.set_image(url=f"attachment://{ctx.command.name}.png")
@@ -213,7 +213,7 @@ class image(commands.Cog):
         else:
             url = member.avatar_url_as(format="png", size=1024)
         async with ctx.typing():
-            img = await dagpi.image_process(asyncdagpi.ImageFeatures.satan(), url=url)
+            img = await dagpi.image_process(asyncdagpi.ImageFeatures.satan(), url=str(url))
             file=discord.File(img.image, f"{ctx.command.name}.png")
             em=discord.Embed(color=color(), timestamp=datetime.datetime.utcnow())
             em.set_image(url=f"attachment://{ctx.command.name}.png")
@@ -234,7 +234,7 @@ class image(commands.Cog):
         else:
             url = member.avatar_url_as(format="png", size=1024)
         async with ctx.typing():
-            img = await dagpi.image_process(asyncdagpi.ImageFeatures.delete(), url=url)
+            img = await dagpi.image_process(asyncdagpi.ImageFeatures.delete(), url=str(url))
             file=discord.File(img.image, f"{ctx.command.name}.png")
             em=discord.Embed(color=color(), timestamp=datetime.datetime.utcnow())
             em.set_image(url=f"attachment://{ctx.command.name}.png")
@@ -255,7 +255,7 @@ class image(commands.Cog):
         else:
             url = member.avatar_url_as(format="png", size=1024)
         async with ctx.typing():
-            img = await dagpi.image_process(asyncdagpi.ImageFeatures.fedora(), url=url)
+            img = await dagpi.image_process(asyncdagpi.ImageFeatures.fedora(), url=str(url))
             file=discord.File(img.image, f"{ctx.command.name}.png")
             em=discord.Embed(color=color(), timestamp=datetime.datetime.utcnow())
             em.set_image(url=f"attachment://{ctx.command.name}.png")
@@ -276,7 +276,7 @@ class image(commands.Cog):
         else:
             url = member.avatar_url_as(format="png", size=1024)
         async with ctx.typing():
-            img = await dagpi.image_process(asyncdagpi.ImageFeatures.hitler(), url=url)
+            img = await dagpi.image_process(asyncdagpi.ImageFeatures.hitler(), url=str(url))
             file=discord.File(img.image, f"{ctx.command.name}.png")
             em=discord.Embed(color=color(), timestamp=datetime.datetime.utcnow())
             em.set_image(url=f"attachment://{ctx.command.name}.png")
@@ -297,7 +297,7 @@ class image(commands.Cog):
         else:
             url = member.avatar_url_as(format="png", size=1024)
         async with ctx.typing():
-            img = await dagpi.image_process(asyncdagpi.ImageFeatures.wanted(), url=url)
+            img = await dagpi.image_process(asyncdagpi.ImageFeatures.wanted(), url=str(url))
             file=discord.File(img.image, f"{ctx.command.name}.png")
             em=discord.Embed(color=color(), timestamp=datetime.datetime.utcnow())
             em.set_image(url=f"attachment://{ctx.command.name}.png")
@@ -318,7 +318,7 @@ class image(commands.Cog):
         else:
             url = member.avatar_url_as(format="png", size=1024)
         async with ctx.typing():
-            img = await dagpi.image_process(asyncdagpi.ImageFeatures.jail(), url=url)
+            img = await dagpi.image_process(asyncdagpi.ImageFeatures.jail(), url=str(url))
             file=discord.File(img.image, f"{ctx.command.name}.png")
             em=discord.Embed(color=color(), timestamp=datetime.datetime.utcnow())
             em.set_image(url=f"attachment://{ctx.command.name}.png")
@@ -339,7 +339,7 @@ class image(commands.Cog):
         else:
             url = member.avatar_url_as(format="png", size=1024)
         async with ctx.typing():
-            img = await dagpi.image_process(asyncdagpi.ImageFeatures.pride(), url=url, flag=flag)
+            img = await dagpi.image_process(asyncdagpi.ImageFeatures.pride(), url=str(url), flag=flag)
             file=discord.File(img.image, f"{ctx.command.name}.png")
             em=discord.Embed(color=color(), timestamp=datetime.datetime.utcnow())
             em.set_image(url=f"attachment://{ctx.command.name}.png")
@@ -360,7 +360,7 @@ class image(commands.Cog):
         else:
             url = member.avatar_url_as(format="png", size=1024)
         async with ctx.typing():
-            img = await dagpi.image_process(asyncdagpi.ImageFeatures.trash(), url=url)
+            img = await dagpi.image_process(asyncdagpi.ImageFeatures.trash(), url=str(url))
             file=discord.File(img.image, f"{ctx.command.name}.png")
             em=discord.Embed(color=color(), timestamp=datetime.datetime.utcnow())
             em.set_image(url=f"attachment://{ctx.command.name}.png")
@@ -381,7 +381,7 @@ class image(commands.Cog):
         else:
             url = member.avatar_url_as(format="png", size=1024)
         async with ctx.typing():
-            img = await dagpi.image_process(asyncdagpi.ImageFeatures.magik(), url=url)
+            img = await dagpi.image_process(asyncdagpi.ImageFeatures.magik(), url=str(url))
             file=discord.File(img.image, f"{ctx.command.name}.gif")
             em=discord.Embed(color=color(), timestamp=datetime.datetime.utcnow())
             em.set_image(url=f"attachment://{ctx.command.name}.gif")
@@ -402,7 +402,7 @@ class image(commands.Cog):
         else:
             url = member.avatar_url_as(format="png", size=1024)
         async with ctx.typing():
-            img = await dagpi.image_process(asyncdagpi.ImageFeatures.paint(), url=url)
+            img = await dagpi.image_process(asyncdagpi.ImageFeatures.paint(), url=str(url))
             file=discord.File(img.image, f"{ctx.command.name}.png")
             em=discord.Embed(color=color(), timestamp=datetime.datetime.utcnow())
             em.set_image(url=f"attachment://{ctx.command.name}.png")
@@ -423,7 +423,7 @@ class image(commands.Cog):
         else:
             url = member.avatar_url_as(format="png", size=1024)
         async with ctx.typing():
-            img = await dagpi.image_process(asyncdagpi.ImageFeatures.captcha(), url=url, text=text)
+            img = await dagpi.image_process(asyncdagpi.ImageFeatures.captcha(), url=str(url), text=text)
             file=discord.File(img.image, f"{ctx.command.name}.png")
             em=discord.Embed(color=color(), timestamp=datetime.datetime.utcnow())
             em.set_image(url=f"attachment://{ctx.command.name}.png")
