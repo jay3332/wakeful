@@ -288,7 +288,7 @@ class utility(commands.Cog):
         else:
             if suggestion.content.lower() != "cancel":
                 webhook = Webhook.from_url(str(self.bot.suggestions), adapter=AsyncWebhookAdapter(cs))
-                em=discord.Embed(description=f"```{suggestion.content}```", color=color())
+                em=discord.Embed(description=f"```{suggestion.clean_content}```", color=color())
                 em.set_footer(text=f"suggestion by {ctx.author} ({ctx.author.id})", icon_url=ctx.author.avatar_url)
                 await webhook.send(embed=em)
                 await suggestion.add_reaction("✅")
@@ -515,7 +515,6 @@ url: [{activity.url.split("/")[3]}]({activity.url})
             commands = res["commands"]
             commands = commands.split(",")
             if len(commands) != 0 and commands != ['']:
-                print(commands)
                 em=discord.Embed(title="disabled commands", description=", ".join(cmd for cmd in commands), color=color())
                 em.set_footer(text=f"requested by {ctx.author}", icon_url=ctx.author.avatar_url)
                 await ctx.send(embed=em)
@@ -528,6 +527,8 @@ url: [{activity.url.split("/")[3]}]({activity.url})
     async def rtfm(self, ctx, query):
         async with ctx.typing():
             res = await self.bot.session.get(f"https://idevision.net/api/public/rtfm?query={query}&location=https://discordpy.readthedocs.io/en/latest&show-labels=false&label-labels=false")
+            print(res.text)
+            print(res.status)
             res = await res.json()
             nodes = res["nodes"]
         if nodes != {}:
@@ -560,25 +561,37 @@ url: [{activity.url.split("/")[3]}]({activity.url})
                 timestamp=datetime.datetime.utcnow(),
                 color=color()
             ).set_footer(text=f"Requested by {ctx.author.name}#{ctx.author.discriminator}", icon_url=ctx.author.avatar_url)
+            disabled = await self.bot.db.fetchrow("SELECT commands FROM commands WHERE guild = $1", ctx.guild.id)
+            try:
+                disabled = disabled["commands"]
+            except:
+                pass
+            else:
+                disabled = disabled.split(",")
             for cog in cog_objects:
                 if cog.get_commands():
-                    if not cog.qualified_name == "Jishaku":
-                        if not cog.qualified_name == "Developer":
-                            listts=[]
-                            for command in cog.walk_commands():
-                                if not command.hidden:
-                                    if not command.parent:
-                                        listts.append(f"`{command.name}`")
-                            em.add_field(
-                                name=f"{cog.qualified_name} ({len(cog.get_commands())})",
-                                value="> " + ", ".join(command for command in listts),
-                                inline=False
-                            )
+                    if len([cmd for cmd in cog.get_commands() if not cmd.hidden]) != 0:
+                        listts=[]
+                        for command in cog.walk_commands():
+                            if not command.hidden and not command.parent and not command.name in disabled:
+                                listts.append(f"`{command.name}`")
+                        em.add_field(
+                            name=f"{cog.qualified_name} ({len([cmd for cmd in cog.get_commands() if not cmd.hidden])})",
+                            value="> " + ", ".join(command for command in listts),
+                            inline=False
+                        )
             await ctx.send(embed=em)
         else:
             if self.bot.get_command(str(command)):
                 given_command = self.bot.get_command(str(command))
-                if not given_command.hidden == True:
+                disabled = await self.bot.db.fetchrow("SELECT commands FROM commands WHERE guild = $1", ctx.guild.id)
+                try:
+                    disabled = disabled["commands"]
+                except:
+                    pass
+                else:
+                    disabled = disabled.split(",")
+                if not given_command.hidden == True and not given_command.name in disabled:
                     can_run_check = await self.bot.can_run(given_command)
                     #-------------------------------------
                     if can_run_check == True:

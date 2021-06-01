@@ -138,7 +138,7 @@ class api(commands.Cog):
         res = await self.bot.session.get("https://some-random-api.ml/facts/dog")
         res = await res.json()
         fact = res["fact"]
-        em=discord.Embed(description=f'"{fact}"', color=color(), timestamp=datetime.datetime.utcnow())
+        em=discord.Embed(description=fact, color=color(), timestamp=datetime.datetime.utcnow())
         em.set_footer(text=f"powered by some-random-api.ml • {ctx.author}", icon_url=ctx.author.avatar_url)
         await ctx.send(embed=em)
 
@@ -148,7 +148,7 @@ class api(commands.Cog):
         res = await self.bot.session.get("https://some-random-api.ml/facts/cat")
         res = await res.json()
         fact = res["fact"]
-        em=discord.Embed(description=f'"{fact}"', color=color(), timestamp=datetime.datetime.utcnow())
+        em=discord.Embed(description=fact, color=color(), timestamp=datetime.datetime.utcnow())
         em.set_footer(text=f"powered by some-random-api.ml • {ctx.author}", icon_url=ctx.author.avatar_url)
         await ctx.send(embed=em)
     
@@ -158,7 +158,7 @@ class api(commands.Cog):
         res = await self.bot.session.get("https://some-random-api.ml/facts/panda")
         res = await res.json()
         fact = res["fact"]
-        em=discord.Embed(description=f'"{fact}"', color=color(), timestamp=datetime.datetime.utcnow())
+        em=discord.Embed(description=fact, color=color(), timestamp=datetime.datetime.utcnow())
         em.set_footer(text=f"powered by some-random-api.ml • {ctx.author}", icon_url=ctx.author.avatar_url)
         await ctx.send(embed=em)
     
@@ -168,7 +168,7 @@ class api(commands.Cog):
         res = await self.bot.session.get("https://some-random-api.ml/facts/fox")
         res = await res.json()
         fact = res["fact"]
-        em=discord.Embed(description=f'"{fact}"', color=color(), timestamp=datetime.datetime.utcnow())
+        em=discord.Embed(description=fact, color=color(), timestamp=datetime.datetime.utcnow())
         em.set_footer(text=f"powered by some-random-api.ml • {ctx.author}", icon_url=ctx.author.avatar_url)
         await ctx.send(embed=em)
     
@@ -178,7 +178,7 @@ class api(commands.Cog):
         res = await self.bot.session.get("https://some-random-api.ml/facts/bird")
         res = await res.json()
         fact = res["fact"]
-        em=discord.Embed(description=f'"{fact}"', color=color(), timestamp=datetime.datetime.utcnow())
+        em=discord.Embed(description=fact, color=color(), timestamp=datetime.datetime.utcnow())
         em.set_footer(text=f"powered by some-random-api.ml • {ctx.author}", icon_url=ctx.author.avatar_url)
         await ctx.send(embed=em)
     
@@ -188,7 +188,7 @@ class api(commands.Cog):
         res = await self.bot.session.get("https://some-random-api.ml/facts/koala")
         res = await res.json()
         fact = res["fact"]
-        em=discord.Embed(description=f'"{fact}"', color=color(), timestamp=datetime.datetime.utcnow())
+        em=discord.Embed(description=fact, color=color(), timestamp=datetime.datetime.utcnow())
         em.set_footer(text=f"powered by some-random-api.ml • {ctx.author}", icon_url=ctx.author.avatar_url)
         await ctx.send(embed=em)
     

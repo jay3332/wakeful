@@ -26,10 +26,7 @@ class errors(commands.Cog):
                 await ctx.send(embed=embed)
             else:
                 ctx.command.reset_cooldown(ctx)
-                try:
-                    await ctx.invoke(ctx.command)
-                except:
-                    pass
+                await self.bot.process_commands(ctx.message)
         elif isinstance(error, commands.MissingRequiredArgument):
             embed=discord.Embed(description=f"`{error.param}` is a required argument that is missing", color=color())
             await ctx.send(embed=embed)

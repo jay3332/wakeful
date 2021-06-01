@@ -20,26 +20,26 @@ class admin(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.group(invoke_without_command=True)
+    @commands.group(invoke_without_command=True, hidden=True)
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def blacklist(self, ctx):
         pass
 
-    @blacklist.command()
+    @blacklist.command(hidden=True)
     async def add(self, ctx, user : discord.User):
         if is_mod(self.bot, ctx.author):
             await self.bot.db.fetch("INSERT INTO blacklist (user_id) VALUES ($1)", user.id)
             em=discord.Embed(description=f"successfully blacklisted {user.mention}", color=color())
             await ctx.send(embed=em)
 
-    @blacklist.command()
+    @blacklist.command(hidden=True)
     async def remove(self, ctx, user : discord.User):
         if is_mod(self.bot, ctx.author):
             await self.bot.db.fetch("DELETE FROM blacklist WHERE user_id = $1", user.id)
             em=discord.Embed(description=f"successfully unblacklisted {user.mention}", color=color())
             await ctx.send(embed=em)
 
-    @blacklist.command()
+    @blacklist.command(hidden=True)
     async def check(self, ctx, user : discord.User):
         if is_mod(self.bot, ctx.author):
             try:
@@ -52,52 +52,52 @@ class admin(commands.Cog):
                 em=discord.Embed(description=f"{user.mention} is blacklisted", color=color())
                 await ctx.send(embed=em)
 
-    @commands.group(invoke_without_command=True, name="setstatus", aliases=["setrp", "setrichpresence", "setactivity"])
+    @commands.group(invoke_without_command=True, name="setstatus", aliases=["setrp", "setrichpresence", "setactivity"], hidden=True)
     async def status(self, ctx):
         await ctx.invoke(self.bot.get_command("help"), **{"command": ctx.command.name})
 
-    @status.command()
+    @status.command(hidden=True)
     async def streaming(self, ctx, url, *, game):
         if is_mod(self.bot, ctx.author):
             await self.bot.change_presence(activity=discord.Streaming(name=str(game), url=f'https://www.twitch.tv/{url.lower()}'))
             await ctx.message.add_reaction("✅")
             self.bot.status = ""
 
-    @status.command()
+    @status.command(hidden=True)
     async def playing(self, ctx, *, game):
         if is_mod(self.bot, ctx.author):
             await self.bot.change_presence(activity=discord.Game(name=game))
             await ctx.message.add_reaction("✅")
             self.bot.status = ""
 
-    @status.command()
+    @status.command(hidden=True)
     async def watching(self, ctx, *, game):
         if is_mod(self.bot, ctx.author):
             await self.bot.change_presence(activity=discord.Activity(name=f"{game}", type=3))
             await ctx.message.add_reaction("✅")
 
-    @status.command()
+    @status.command(hidden=True)
     async def listening(self, ctx, *, game):
         if is_mod(self.bot, ctx.author):
             await self.bot.change_presence(activity=discord.Activity(name=f"{game}", type=2))
             await ctx.message.add_reaction("✅")
             self.bot.status = ""
 
-    @status.command()
+    @status.command(hidden=True)
     async def competing(self, ctx, *, game):
         if is_mod(self.bot, ctx.author):
             await self.bot.change_presence(activity=discord.Activity(name=f"{game}", type=5))
             await ctx.message.add_reaction("✅")
             self.bot.status = ""
 
-    @status.command(aliases=["default", "original"])
+    @status.command(aliases=["default", "original"], hidden=True)
     async def reset(self, ctx):
         if is_mod(self.bot, ctx.author):
             await self.bot.change_presence(activity=discord.Game(f"@wakeful for prefix | {len(self.bot.guilds)} guilds & {len(self.bot.users)} users"))
             self.bot.status = None
             await ctx.message.add_reaction("✅")
 
-    @commands.command()
+    @commands.command(hidden=True)
     @commands.is_owner()
     async def pull(self, ctx):
         proc = await asyncio.create_subprocess_shell("git pull", stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE)
@@ -110,7 +110,7 @@ class admin(commands.Cog):
         await ctx.send(embed=em)
         await self.bot.close() # close the bot, so systemd will start it right back up
 
-    @commands.command()
+    @commands.command(hidden=True)
     @commands.is_owner()
     async def sql(self, ctx, *, query):
         res = await self.bot.db.fetch(query)
