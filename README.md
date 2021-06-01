@@ -1,5 +1,7 @@
 # wakeful
 
+[icon i think](https://cdn.discordapp.com/avatars/845720048668114977/15f6afd90a3b4946a410c60e5fdbe619.png?size=1024)
+
 - a discord bot founded 22.5.21
 - idk just some normal open source discord bot
 - (warning) pretty messy code
