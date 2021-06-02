@@ -423,34 +423,6 @@ class utility(commands.Cog):
             embed.set_thumbnail(url=self.bot.user.avatar_url)
         await ctx.send(embed=embed)
 
-    @commands.command(aliases=["defenition"])
-    @commands.cooldown(1,5,commands.BucketType.user)
-    async def define(self, ctx, *, term):
-        async with ctx.typing():
-            res = await self.bot.session.get(f"https://api.dictionaryapi.dev/api/v2/entries/en/{term.replace(' ', '%20')}")
-            if res.status == 200:
-                res = await res.json()
-                res = res[0]
-                word = res["word"]
-                meanings = res["meanings"][0]
-                phonetics = res["phonetics"][0]["text"]
-                partOfSpeech = meanings["partOfSpeech"]
-                defenition = meanings["definitions"][0]["definition"]
-                synonyms = ", ".join(f"`{synonym}`" for synonym in meanings["definitions"][0]["synonyms"])
-                example = meanings["definitions"][0]["example"]
-                em=discord.Embed(title=f"{word} [{partOfSpeech}]", description=f"""
-phonetics: `{phonetics}`
-definition: {defenition}
-synonyms: {synonyms}
-example: `{example}`
-                """, color=color())
-                em.set_footer(text=f"requested by {ctx.author}", icon_url=ctx.author.avatar_url)
-                await ctx.send(embed=em)
-            else:
-                em=discord.Embed(description=f"an error occured while trying to get the definition for `{term}`\nreturn:\n```json\n{await res.json()}```", color=color())
-                em.set_footer(text=f"requested by {ctx.author}", icon_url=ctx.author.avatar_url)
-                await ctx.send(embed=em)
-
     @commands.command()
     @commands.cooldown(1,5,commands.BucketType.user)
     async def unspoiler(self, ctx, *, msg : str = None):

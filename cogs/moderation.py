@@ -147,7 +147,7 @@ class moderation(commands.Cog):
         msg = await ctx.send(embed=em)
         await msg.add_reaction("✅")
         await msg.add_reaction("❌")
-        reaction, user = await self.bot.wait_for("reaction_add", check=lambda reaction, user: user == ctx.author and str(reaction.emoji) in ["✅", "❌"] and reaction.message == msg)
+        reaction, user = await self.bot.wait_for("reaction_add", check=lambda reaction, user: user.guild_permissions.manage_channels and str(reaction.emoji) in ["✅", "❌"] and reaction.message == msg)
         if str(reaction.emoji) == "✅":
             new = await channel.clone()
             await channel.delete()
