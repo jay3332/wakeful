@@ -5,3 +5,8 @@ def get_config(string : str):
         conf = json.load(f)
     value = conf[string]
     return value
+
+def get_owner(bot):
+    owners = list(bot.owner_ids)
+    print(owners)
+    return owners[0]

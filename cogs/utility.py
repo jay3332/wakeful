@@ -1,4 +1,4 @@
-import discord, datetime, async_cse, psutil, humanize, os, sys, inspect, mystbin, googletrans, asyncio, aiohttp, random, time, asyncdagpi
+import discord, datetime, async_cse, psutil, humanize, os, sys, inspect, mystbin, googletrans, asyncio, aiohttp, random, time, asyncdagpi, hashlib
 from discord.ext import commands
 from discord import Webhook, AsyncWebhookAdapter
 from utils.configs import color
@@ -35,6 +35,12 @@ class utility(commands.Cog):
             if "@someone" in message.content:
                 if message.author.guild_permissions.mention_everyone:
                     await message.channel.send(random.choice(mem).mention)
+
+    @commands.command(name="sha256")
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    async def _sha(self, ctx, *, message):
+        res = hashlib.sha256(message.encode()).hexdigest()
+        await ctx.reply(f"`{message}` -> `{res}`", mention_author=False)
 
     @commands.command()
     @commands.cooldown(1, 5, commands.BucketType.user)
@@ -582,21 +588,14 @@ type: `{type}`
     @commands.command()
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def help(self, ctx, *, command : str = None):
-        if command == None:
-            raw_cogs=[]
-            for cog in self.bot.cogs:
-                raw_cogs.append(cog)
-            cog_objects=[]
-            for cog in raw_cogs:
-                cog_objects.append(self.bot.get_cog(str(cog)))
-            names = f"\n".join(cog.qualified_name for cog in cog_objects)
-            commandse = []
-            for cog in cog_objects:
-                for command in cog.walk_commands():
-                    commandse.append(command.name)
-            commands=", ".join(command for command in commandse)
+        if command is None:
             em=discord.Embed(
-                description=f"type `{ctx.prefix}help [command]` for more information about a command.",
+                description=f"""
+```py
+type `{ctx.prefix}help [command / cog] for more info on a command / cog`
+
+[Developer](https://discord.com/users/{get_owner(self.bot)}) | [Support]({self.bot.invite}) | [Invite](https://discord.com/api/oauth2/authorize?client_id={self.bot.user.id}&permissions=8&scope=bot)
+""",
                 timestamp=datetime.datetime.utcnow(),
                 color=color()
             ).set_footer(text=f"Requested by {ctx.author.name}#{ctx.author.discriminator}", icon_url=ctx.author.avatar_url)
@@ -607,18 +606,12 @@ type: `{type}`
                 pass
             else:
                 disabled = disabled.split(",")
-            for cog in cog_objects:
-                if cog.get_commands():
-                    if len([cmd for cmd in cog.get_commands() if not cmd.hidden]) != 0:
-                        listts=[]
-                        for command in cog.walk_commands():
-                            if not command.hidden and not command.parent and not command.name in disabled:
-                                listts.append(f"`{command.name}`")
-                        em.add_field(
-                            name=f"{cog.qualified_name} ({len([cmd for cmd in cog.get_commands() if not cmd.hidden])})",
-                            value="> " + ", ".join(command for command in listts),
-                            inline=False
-                        )
+            em.add_field(
+                name="Cogs",
+                value="\n".join(f"`{cog.qualified_name}`" for cog in self.bot.cogs),
+                inline=True
+            )
+            em.set_image(url="https://media.discordapp.net/attachments/832746281335783426/849721738987307008/banner.png")
             await ctx.send(embed=em)
         else:
             if self.bot.get_command(str(command)):
@@ -643,20 +636,10 @@ type: `{type}`
                     except:
                         command_subcommands = "none"
                     #-------------------------------------
-                    if given_command.enabled == True:
-                        command_enabled = self.bot.greenTick
-                    elif given_command.enabled == False:
-                        command_enabled = self.bot.redTick
-                    #-------------------------------------
                     if given_command.usage:
                         command_usage = given_command.usage
                     else:
                         command_usage = " ".join(f"<{e}>" for e in list(given_command.params) if not e in ["self", "ctx"])
-                    #-------------------------------------
-                    if given_command.parent:
-                        command_parent = given_command.parent
-                    else:
-                        command_parent = "none"
                     #-------------------------------------
                     em=discord.Embed(
                         title=given_command.name,
@@ -674,13 +657,18 @@ type: `{type}`
                     except AttributeError:
                         em.add_field(name=f"subcommands [0]", value=command_subcommands, inline=False)
                     em.add_field(name="category", value=given_command.cog_name, inline=False)
-                    await ctx.send(embed=em)
+                    await ctx.reply(embed=em, mention_author=False)
                 else:
                     em=discord.Embed(description=f"this command does not exist", color=color())
                     await ctx.send(embed=em)
+            elif self.bot.get_cog(str(command)) :
+               given_cog = self.bot.get_cog(str(command))
+               em=discord.Embed(title=f"{given_cog.qualified_name}'s commands", description="> "+", ".join(f"`{cmd.name}`" for cmd in given_cog.walk_commands()), color=color())
+               em.set_image(url="https://media.discordapp.net/attachments/832746281335783426/849721738987307008/banner.png")
+               await ctx.reply(embed=em, mention_author=False)
             else:
-                em=discord.Embed(description=f"this command does not exist", color=color())
-                await ctx.send(embed=em)
+                em=discord.Embed(description=f"there isn't a cog / command with the name `{command}`", color=color())
+                await ctx.reply(embed=em, mention_author=False)
 
     @commands.command()
     @commands.cooldown(1, 5, commands.BucketType.user)

@@ -1,2 +1,2 @@
 def color():
-    return 0x2cfc03
+    return 0x2F3136
