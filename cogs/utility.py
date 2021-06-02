@@ -655,7 +655,7 @@ Type: `{type}`
                     if given_command.usage:
                         command_usage = given_command.usage
                     else:
-                        command_usage = " ".join(f"<{e}>" for e in list(given_command.params) if not e in ["self", "ctx"])
+                        command_usage = " ".join(e for e in list(given_command.params) if not e in ["self", "ctx"])
                     #-------------------------------------
                     em=discord.Embed(
                         title=given_command.name,
