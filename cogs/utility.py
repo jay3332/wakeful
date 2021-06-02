@@ -646,12 +646,6 @@ Type: `{type}`
                 else:
                     disabled = disabled.split(",")
                 if not given_command.hidden == True and not given_command.name in disabled:
-                    can_run_check = await self.bot.can_run(given_command)
-                    #-------------------------------------
-                    if can_run_check == True:
-                        can_run = self.bot.greenTick
-                    elif can_run_check == False:
-                        can_run = self.bot.redTick
                     #-------------------------------------
                     try:
                         command_subcommands = "> " + ", ".join(f"`{command.name}`" for command in given_command.commands)
