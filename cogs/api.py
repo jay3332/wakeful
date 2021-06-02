@@ -2,7 +2,7 @@ import discord, io, asyncio, datetime, aiohttp,json
 from discord.ext import commands
 from utils.configs import color
 
-class api(commands.Cog):
+class API(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
@@ -15,7 +15,7 @@ class api(commands.Cog):
         image = res[0]["url"]
         em=discord.Embed(color=color(), timestamp=datetime.datetime.utcnow())
         em.set_image(url=image)
-        em.set_footer(text=f"powered by thecatapi.com • {ctx.author}", icon_url=ctx.author.avatar_url)
+        em.set_footer(text=f"Powered by thecatapi.com • {ctx.author}", icon_url=ctx.author.avatar_url)
         await ctx.send(embed=em)
 
     @commands.command()
@@ -26,7 +26,7 @@ class api(commands.Cog):
         image = res["message"]
         em=discord.Embed(color=color(), timestamp=datetime.datetime.utcnow())
         em.set_image(url=image)
-        em.set_footer(text=f"powered by dog.ceo • {ctx.author}", icon_url=ctx.author.avatar_url)
+        em.set_footer(text=f"Powered by dog.ceo • {ctx.author}", icon_url=ctx.author.avatar_url)
         await ctx.send(embed=em)
 
     @commands.command()
@@ -37,7 +37,7 @@ class api(commands.Cog):
         image = res["media"]["gif"]
         em=discord.Embed(color=color(), timestamp=datetime.datetime.utcnow())
         em.set_image(url=image)
-        em.set_footer(text=f"powered by bunnies.io • {ctx.author}", icon_url=ctx.author.avatar_url)
+        em.set_footer(text=f"Powered by bunnies.io • {ctx.author}", icon_url=ctx.author.avatar_url)
         await ctx.send(embed=em)
 
     @commands.command()
@@ -48,7 +48,7 @@ class api(commands.Cog):
         image = res["url"]
         em=discord.Embed(color=color(), timestamp=datetime.datetime.utcnow())
         em.set_image(url=image)
-        em.set_footer(text=f"powered by random-d.uk • {ctx.author}", icon_url=ctx.author.avatar_url)
+        em.set_footer(text=f"Powered by random-d.uk • {ctx.author}", icon_url=ctx.author.avatar_url)
         await ctx.send(embed=em)
 
     @commands.command()
@@ -59,7 +59,7 @@ class api(commands.Cog):
         image = res["image"]
         em=discord.Embed(color=color(), timestamp=datetime.datetime.utcnow())
         em.set_image(url=image)
-        em.set_footer(text=f"powered by randomfox.ca • {ctx.author}", icon_url=ctx.author.avatar_url)
+        em.set_footer(text=f"Powered by randomfox.ca • {ctx.author}", icon_url=ctx.author.avatar_url)
         await ctx.send(embed=em)
 
     @commands.command()
@@ -70,7 +70,7 @@ class api(commands.Cog):
         image = res["url"]
         em=discord.Embed(color=color(), timestamp=datetime.datetime.utcnow())
         em.set_image(url=image)
-        em.set_footer(text=f"powered by nekos.life • {ctx.author}", icon_url=ctx.author.avatar_url)
+        em.set_footer(text=f"Powered by nekos.life • {ctx.author}", icon_url=ctx.author.avatar_url)
         await ctx.send(embed=em)
 
     @commands.command()
@@ -81,7 +81,7 @@ class api(commands.Cog):
         image = res[0]
         em=discord.Embed(color=color(), timestamp=datetime.datetime.utcnow())
         em.set_image(url=image)
-        em.set_footer(text=f"powered by shibe.online • {ctx.author}", icon_url=ctx.author.avatar_url)
+        em.set_footer(text=f"Powered by shibe.online • {ctx.author}", icon_url=ctx.author.avatar_url)
         await ctx.send(embed=em)
 
     @commands.command()
@@ -92,7 +92,7 @@ class api(commands.Cog):
         image = res["link"]
         em=discord.Embed(color=color(), timestamp=datetime.datetime.utcnow())
         em.set_image(url=image)
-        em.set_footer(text=f"powered by some-random-api.ml • {ctx.author}", icon_url=ctx.author.avatar_url)
+        em.set_footer(text=f"Powered by some-random-api.ml • {ctx.author}", icon_url=ctx.author.avatar_url)
         await ctx.send(embed=em)
 
     @commands.command()
@@ -103,7 +103,7 @@ class api(commands.Cog):
         image = res["link"]
         em=discord.Embed(color=color(), timestamp=datetime.datetime.utcnow())
         em.set_image(url=image)
-        em.set_footer(text=f"powered by some-random-api.ml • {ctx.author}", icon_url=ctx.author.avatar_url)
+        em.set_footer(text=f"Powered by some-random-api.ml • {ctx.author}", icon_url=ctx.author.avatar_url)
         await ctx.send(embed=em)
 
     @commands.command()
@@ -114,7 +114,7 @@ class api(commands.Cog):
         image = res["link"]
         em=discord.Embed(color=color(), timestamp=datetime.datetime.utcnow())
         em.set_image(url=image)
-        em.set_footer(text=f"powered by some-random-api.ml • {ctx.author}", icon_url=ctx.author.avatar_url)
+        em.set_footer(text=f"Powered by some-random-api.ml • {ctx.author}", icon_url=ctx.author.avatar_url)
         await ctx.send(embed=em)
 
     @commands.command()
@@ -125,7 +125,7 @@ class api(commands.Cog):
         image = res["link"]
         em=discord.Embed(color=color(), timestamp=datetime.datetime.utcnow())
         em.set_image(url=image)
-        em.set_footer(text=f"powered by some-random-api.ml • {ctx.author}", icon_url=ctx.author.avatar_url)
+        em.set_footer(text=f"Powered by some-random-api.ml • {ctx.author}", icon_url=ctx.author.avatar_url)
         await ctx.send(embed=em)
 
     @commands.group(invoke_without_command=True)
@@ -139,7 +139,7 @@ class api(commands.Cog):
         res = await res.json()
         fact = res["fact"]
         em=discord.Embed(description=fact, color=color(), timestamp=datetime.datetime.utcnow())
-        em.set_footer(text=f"powered by some-random-api.ml • {ctx.author}", icon_url=ctx.author.avatar_url)
+        em.set_footer(text=f"Powered by some-random-api.ml • {ctx.author}", icon_url=ctx.author.avatar_url)
         await ctx.send(embed=em)
 
     @fact.command(name="cat")
@@ -149,7 +149,7 @@ class api(commands.Cog):
         res = await res.json()
         fact = res["fact"]
         em=discord.Embed(description=fact, color=color(), timestamp=datetime.datetime.utcnow())
-        em.set_footer(text=f"powered by some-random-api.ml • {ctx.author}", icon_url=ctx.author.avatar_url)
+        em.set_footer(text=f"Powered by some-random-api.ml • {ctx.author}", icon_url=ctx.author.avatar_url)
         await ctx.send(embed=em)
     
     @fact.command(name="panda")
@@ -159,7 +159,7 @@ class api(commands.Cog):
         res = await res.json()
         fact = res["fact"]
         em=discord.Embed(description=fact, color=color(), timestamp=datetime.datetime.utcnow())
-        em.set_footer(text=f"powered by some-random-api.ml • {ctx.author}", icon_url=ctx.author.avatar_url)
+        em.set_footer(text=f"Powered by some-random-api.ml • {ctx.author}", icon_url=ctx.author.avatar_url)
         await ctx.send(embed=em)
     
     @fact.command(name="fox")
@@ -169,7 +169,7 @@ class api(commands.Cog):
         res = await res.json()
         fact = res["fact"]
         em=discord.Embed(description=fact, color=color(), timestamp=datetime.datetime.utcnow())
-        em.set_footer(text=f"powered by some-random-api.ml • {ctx.author}", icon_url=ctx.author.avatar_url)
+        em.set_footer(text=f"Powered by some-random-api.ml • {ctx.author}", icon_url=ctx.author.avatar_url)
         await ctx.send(embed=em)
     
     @fact.command(name="bird")
@@ -179,7 +179,7 @@ class api(commands.Cog):
         res = await res.json()
         fact = res["fact"]
         em=discord.Embed(description=fact, color=color(), timestamp=datetime.datetime.utcnow())
-        em.set_footer(text=f"powered by some-random-api.ml • {ctx.author}", icon_url=ctx.author.avatar_url)
+        em.set_footer(text=f"Powered by some-random-api.ml • {ctx.author}", icon_url=ctx.author.avatar_url)
         await ctx.send(embed=em)
     
     @fact.command(name="koala")
@@ -189,9 +189,9 @@ class api(commands.Cog):
         res = await res.json()
         fact = res["fact"]
         em=discord.Embed(description=fact, color=color(), timestamp=datetime.datetime.utcnow())
-        em.set_footer(text=f"powered by some-random-api.ml • {ctx.author}", icon_url=ctx.author.avatar_url)
+        em.set_footer(text=f"Powered by some-random-api.ml • {ctx.author}", icon_url=ctx.author.avatar_url)
         await ctx.send(embed=em)
     
 
 def setup(bot):
-    bot.add_cog(api(bot))
+    bot.add_cog(API(bot))

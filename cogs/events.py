@@ -4,7 +4,7 @@ from discord.ext import commands
 from utils.configs import color
 from utils.checks import is_mod
 
-class errors(commands.Cog):
+class Errors(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
@@ -22,7 +22,7 @@ class errors(commands.Cog):
     async def on_command_error(self, ctx, error):
         if isinstance(error, commands.CommandOnCooldown):
             if not is_mod(self.bot, ctx.author):
-                embed=discord.Embed(description=f"this command is on cooldown, try again in `{round(error.retry_after, 1)}` seconds.", color=color())
+                embed=discord.Embed(description=f"This command is on cooldown, try again in `{round(error.retry_after, 1)}` seconds.", color=color())
                 await ctx.send(embed=embed)
             else:
                 ctx.command.reset_cooldown(ctx)
@@ -50,21 +50,21 @@ class errors(commands.Cog):
                 await asyncio.sleep(3)
                 await m.delete()
         elif isinstance(error, commands.MemberNotFound):
-            embed=discord.Embed(description=f"could not find member `{error.argument}`", color=color())
+            embed=discord.Embed(description=f"Couldn't find member `{error.argument}`", color=color())
             await ctx.send(embed=embed)
         elif isinstance(error, commands.BotMissingPermissions):
-            embed=discord.Embed(description=f"i do not have permission to do this", color=color())
+            embed=discord.Embed(description=f"I don't have permission to do this", color=color())
             await ctx.send(embed=embed)
         elif isinstance(error, commands.MissingPermissions):
-            embed=discord.Embed(description=f"you do not have permission to do this", color=color())
+            embed=discord.Embed(description=f"You don't have permission to do this", color=color())
             await ctx.send(embed=embed)
         elif isinstance(error, commands.MissingAnyRole):
-            embed=discord.Embed(description=f"you do not have permission to do this", color=color())
+            embed=discord.Embed(description=f"You don't have permission to do this", color=color())
             await ctx.send(embed=embed)
         elif isinstance(error, commands.CommandInvokeError):
             error = error.original
             if isinstance(error, discord.Forbidden):
-                embed=discord.Embed(description=f"i do not have permission to do this", color=color())
+                embed=discord.Embed(description=f"I don't have permission to do this", color=color())
                 await ctx.send(embed=embed)
             else:
                 embed=discord.Embed(description=f"```{error}```", color=color())
@@ -82,4 +82,4 @@ class errors(commands.Cog):
 
 
 def setup(bot):
-    bot.add_cog(errors(bot))
+    bot.add_cog(Errors(bot))

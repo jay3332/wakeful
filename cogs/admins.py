@@ -15,7 +15,7 @@ status_types = {
     "idle": discord.Status.idle
 }
 
-class admin(commands.Cog):
+class Admin(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
@@ -29,14 +29,14 @@ class admin(commands.Cog):
     async def add(self, ctx, user : discord.User):
         if is_mod(self.bot, ctx.author):
             await self.bot.db.fetch("INSERT INTO blacklist (user_id) VALUES ($1)", user.id)
-            em=discord.Embed(description=f"successfully blacklisted {user.mention}", color=color())
+            em=discord.Embed(description=f"Successfully blacklisted {user.mention}", color=color())
             await ctx.send(embed=em)
 
     @blacklist.command(hidden=True)
     async def remove(self, ctx, user : discord.User):
         if is_mod(self.bot, ctx.author):
             await self.bot.db.fetch("DELETE FROM blacklist WHERE user_id = $1", user.id)
-            em=discord.Embed(description=f"successfully unblacklisted {user.mention}", color=color())
+            em=discord.Embed(description=f"Successfully unblacklisted {user.mention}", color=color())
             await ctx.send(embed=em)
 
     @blacklist.command(hidden=True)
@@ -126,4 +126,4 @@ class admin(commands.Cog):
             await ctx.send(f"```\n{msg}\n```")
 
 def setup(bot):
-    bot.add_cog(admin(bot))
+    bot.add_cog(Admin(bot))

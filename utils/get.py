@@ -7,6 +7,4 @@ def get_config(string : str):
     return value
 
 def get_owner(bot):
-    owners = list(bot.owner_ids)
-    print(owners)
-    return owners[0]
+    return bot.ownersid

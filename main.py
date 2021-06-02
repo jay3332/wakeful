@@ -32,13 +32,14 @@ bot.remove_command("help")
 bot.uptime = datetime.datetime.utcnow()
 token = conf["TOKEN"]
 devtoken = conf["DEVTOKEN"]
-bot.github = "https://github.com/pvffyn/wakeful" # the github the bot is hosted on
+bot.github = "https://github.com/jottew/wakeful" # the github the bot is hosted on
 bot.suggestions = conf["SUGGESTIONS"] # this will be used as a webhook for suggestions
 bot.invite = "https://discord.gg/RkCqvMJsDY"
 bot.cmdsSinceRestart = 0
 bot.message_cache = {}
 bot.ownersid = 797044260196319282
 bot.afks = {}
+bot.banner = "https://media.discordapp.net/attachments/832746281335783426/849721738987307008/banner.png"
 bot.session = aiohttp.ClientSession()
 bot.status = None
 bot.guild = int(conf["GUILD"]) # your bots support server
@@ -81,7 +82,7 @@ async def on_message(msg):
         if success:
             commands = commands.split(",")
             if command in commands and command != "":
-                em=discord.Embed(description=f"this command has been disabled by the server administrators", color=color())
+                em=discord.Embed(description=f"This command has been disabled by the server administrators", color=color())
                 await msg.channel.send(embed=em)
                 return
             else:
@@ -95,10 +96,10 @@ async def on_message(msg):
             await bot.process_commands(msg)
         elif msg.content == f"<@!{bot.user.id}>" or msg.content == f"<@{bot.user.id}>":
             if msg.guild:
-                em=discord.Embed(description=f"the prefix for `{msg.guild.name}` is `{prefix}`", color=color())
+                em=discord.Embed(description=f"The prefix for `{msg.guild.name}` is `{prefix}`", color=color())
                 await msg.channel.send(embed=em)
             else:
-                em=discord.Embed(description=f"the prefix for dms is `{prefix}`", color=color())
+                em=discord.Embed(description=f"The prefix for dms is `{prefix}`", color=color())
                 await msg.channel.send(embed=em)
 
     elif msg.content == f"<@!{bot.user.id}>" or msg.content == f"<@{bot.user.id}>":

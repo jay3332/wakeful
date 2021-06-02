@@ -20,7 +20,7 @@ mystbinn = mystbin.Client()
 dagpi = asyncdagpi.Client(get_config("DAGPI"))
 idevisionn = idevision.async_client(get_config("IDEVISION"))
 
-class utility(commands.Cog):
+class Utility(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
@@ -66,7 +66,7 @@ class utility(commands.Cog):
             keywords = json["info"]["keywords"] or "None"
             em=discord.Embed(
                 title=name,
-                description=f"{description}\n**author**: {author}\n**author email**: {author_email}\n\n**website**: {website}\n**documentation**: {documentation}\n**keywords**: {keywords}\n**license**: {license_}",
+                description=f"{description}\n**Author**: {author}\n**Author Email**: {author_email}\n\n**Website**: {website}\n**Documentation**: {documentation}\n**Keywords**: {keywords}\n**License**: {license_}",
                 url=url,
                 color=color()
             ).set_thumbnail(url="https://cdn.discordapp.com/attachments/381963689470984203/814267252437942272/pypi.png")
@@ -81,17 +81,17 @@ class utility(commands.Cog):
         async with ctx.typing():
             if ctx.channel.is_nsfw():
                 safe_search_setting=False
-                safe_search="disabled"
+                safe_search="Disabled"
             else:
                 safe_search_setting=True
-                safe_search="enabled"
+                safe_search="Enabled"
             value=0
             results = await google.search(str(term), safesearch=safe_search_setting)
             em=discord.Embed(
-                title=f"results for: `{term}`",
+                title=f"Results for: `{term}`",
                 timestamp=datetime.datetime.utcnow(),
                 color=color()
-            ).set_footer(text=f"requested by {ctx.author.name}#{ctx.author.discriminator} • safe-search: {safe_search}", icon_url=ctx.author.avatar_url)
+            ).set_footer(text=f"Requested by {ctx.author.name}#{ctx.author.discriminator} • Safe-Search: {safe_search}", icon_url=ctx.author.avatar_url)
             for result in results:
                 if not value > 4:
                     epic = results[int(value)]
@@ -109,8 +109,8 @@ class utility(commands.Cog):
         async with ctx.typing():
             translation = await do_translate(output, text)
             em = discord.Embed(color=color())
-            em.add_field(name=f"input [{translation.src.upper()}]", value=f"```{text}```", inline=False)
-            em.add_field(name=f"output [{translation.dest.upper()}]", value=f"```{translation.text}```", inline=False)
+            em.add_field(name=f"Input [{translation.src.upper()}]", value=f"```{text}```", inline=False)
+            em.add_field(name=f"Output [{translation.dest.upper()}]", value=f"```{translation.text}```", inline=False)
             em.set_author(name=ctx.author, icon_url=ctx.author.avatar_url)
         await ctx.send(embed=em)
 
@@ -149,13 +149,13 @@ class utility(commands.Cog):
         for member in ctx.guild.members:
             if member.bot:
                 bots+=1
-            elif member.raw_status == "online":
+            elif member.raw_status == "Online":
                 online += 1
-            elif member.raw_status == "dnd":
+            elif member.raw_status == "Dnd":
                 dnd += 1
-            elif member.raw_status == "offline":
+            elif member.raw_status == "Offline":
                 offline += 1
-            elif member.raw_status == "idle":
+            elif member.raw_status == "Idle":
                 idle += 1
         created_at = ctx.guild.created_at.strftime("20%y/%m/%d at %H:%M:%S")
         em=discord.Embed(
@@ -166,7 +166,7 @@ class utility(commands.Cog):
         ).set_image(url=ctx.guild.banner_url).set_thumbnail(url=ctx.guild.icon_url)
         em.add_field(
             name="members",
-            value=f"online: `{online}`\ndnd: `{dnd}`\nidle: `{idle}`\noffline: `{offline}`\nbots: `{bots}`",
+            value=f"Online: `{online}`\nDND: `{dnd}`\nIdle: `{idle}`\nOffline: `{offline}`\nBots: `{bots}`",
             inline=True
         )
         try:
@@ -174,18 +174,18 @@ class utility(commands.Cog):
         except AttributeError:
             booster_role = "none"
         em.add_field(
-            name="boosts",
-            value=f"- amount: `{ctx.guild.premium_subscription_count}`\n- role: {booster_role}",
+            name="Boosts",
+            value=f"- Amount: `{ctx.guild.premium_subscription_count}`\n- Role: {booster_role}",
             inline=True
         )
         em.add_field(
-            name="channels",
-            value=f"- all `{len(ctx.guild.channels)}`\n- text: `{len(ctx.guild.text_channels)}`\n- voice: `{len(ctx.guild.voice_channels)}`",
+            name="Channels",
+            value=f"- All `{len(ctx.guild.channels)}`\n- Text: `{len(ctx.guild.text_channels)}`\n- Voice: `{len(ctx.guild.voice_channels)}`",
             inline=True
         )
         em.add_field(
-            name="other",
-            value=f"- owner: {ctx.guild.owner.mention}\n- roles: `{len(ctx.guild.roles)}`\n- region: `{ctx.guild.region}`\n- created at: `{created_at}` ({humanize.naturaltime(ctx.guild.created_at)})",
+            name="Other",
+            value=f"- Owner: {ctx.guild.owner.mention}\n- Roles: `{len(ctx.guild.roles)}`\n- Ŕegion: `{ctx.guild.region}`\n- Created at: `{created_at}` ({humanize.naturaltime(ctx.guild.created_at)})",
             inline=True
         )
         em.set_footer(
@@ -240,7 +240,7 @@ class utility(commands.Cog):
         )
         em.add_field(
             name="info",
-            value=f"- name: `{member.name}`\n- tag: `{member.discriminator}`\n- nickname: `{member.display_name}`\n- mention: {member.mention}\n- id: `{member.id}`\n- status: `{member.raw_status}`\n- bot: {member_bot}\n- mobile: {mobile_status}\n- web: {web_status}\n- desktop: {desktop_status}\n- created at: `{created_at}` ({humanize.naturaltime(member.created_at)})\n- avatar: [click here]({member.avatar_url})",
+            value=f"- Name: `{member.name}`\n- Tag: `{member.discriminator}`\n- Nickname: `{member.display_name}`\n- Mention: {member.mention}\n- ID: `{member.id}`\n- Status: `{member.raw_status}`\n- Bot: {member_bot}\n- Mobile: {mobile_status}\n- Web: {web_status}\n- Desktop: {desktop_status}\n- Created at: `{created_at}` ({humanize.naturaltime(member.created_at)})\n- Avatar: [click here]({member.avatar_url})",
             inline=True
         )
         if member.top_role.name == "@everyone":
@@ -249,7 +249,7 @@ class utility(commands.Cog):
             top_role=member.top_role.mention
         em.add_field(
             name="guild",
-            value=f"- owner: {guild_owner}\n- roles: `{len(member.roles)}`\n- top role: {top_role}\n- joined at: `{joined_at}` ({humanize.naturaltime(member.joined_at)})",
+            value=f"- Owner: {guild_owner}\n- Roles: `{len(member.roles)}`\n- Top Role: {top_role}\n- Joined at: `{joined_at}` ({humanize.naturaltime(member.joined_at)})",
             inline=False
         )
         if ctx.message.content.endswith("--roles"):
@@ -264,14 +264,14 @@ class utility(commands.Cog):
             except AttributeError:
                 mutual_guilds=len(self.bot.guilds)
             em.add_field(
-                name="other",
-                value=f"- bot owner: {bot_owner}\n- mutual guilds: `{mutual_guilds}`",
+                name="Other",
+                value=f"- Bot Owner: {bot_owner}\n- Mutual Guilds: `{mutual_guilds}`",
                 inline=False
             )
         else:
             em.add_field(
-                name="other",
-                value=f"- mutual guilds: `{len(member.mutual_guilds)}`",
+                name="Other",
+                value=f"- Mutual guilds: `{len(member.mutual_guilds)}`",
                 inline=False
             )
         em.set_footer(
@@ -284,14 +284,14 @@ class utility(commands.Cog):
     @commands.cooldown(1,5,commands.BucketType.user)
     async def suggest(self, ctx):
         cs = self.bot.session
-        em=discord.Embed(description=f"please now enter your suggestion below:", color=color())
-        em.set_footer(text=f"requested by {ctx.author}", icon_url=ctx.author.avatar_url)
+        em=discord.Embed(description=f"Please now enter your suggestion below:", color=color())
+        em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
         msg = await ctx.send(embed=em)
         try:
             suggestion = await self.bot.wait_for("message", check=lambda msg: msg.channel == ctx.channel and msg.author == ctx.author, timeout=30)
         except asyncio.TimeoutError:
-            em=discord.Embed(description="you took too long to respond, now ignoring next messages", color=color())
-            em.set_footer(text=f"requested by {ctx.author}", icon_url=ctx.author.avatar_url)
+            em=discord.Embed(description="You took too long to respond, now ignoring next messages", color=color())
+            em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
             await msg.edit(embed=em)
         else:
             if suggestion.content.lower() != "cancel":
@@ -300,8 +300,8 @@ class utility(commands.Cog):
                 em.set_footer(text=f"suggestion by {ctx.author} ({ctx.author.id})", icon_url=ctx.author.avatar_url)
                 await webhook.send(embed=em)
                 await suggestion.add_reaction("✅")
-                em=discord.Embed(description="your suggestion has been sent to the admins\nnote: abuse may get you blacklisted", color=color())
-                em.set_footer(text=f"requested by {ctx.author}", icon_url=ctx.author.avatar_url)
+                em=discord.Embed(description="Your suggestion has been sent to the admins\nnote: abuse may get you blacklisted", color=color())
+                em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
                 await msg.edit(embed=em)
             else:
                 await msg.delete()
@@ -312,31 +312,31 @@ class utility(commands.Cog):
     @commands.cooldown(1,5,commands.BucketType.user)
     async def source(self, ctx, command_name : str = None):
         if command_name == None:
-            em=discord.Embed(description=f"my source code can be found [here]({self.bot.github})", color=color())
+            em=discord.Embed(description=f"My source code can be found [here]({self.bot.github})", color=color())
             await ctx.send(embed=em)
         else:
             command = self.bot.get_command(command_name)
             if not command:
-                em=discord.Embed(description=f"could not find command `{command_name}`", color=color())
+                em=discord.Embed(description=f"Couldn't find command `{command_name}`", color=color())
                 await ctx.send(embed=em)
             else:
                 try:
                     source_lines, _ = inspect.getsourcelines(command.callback)
                 except (TypeError, OSError):
-                    em=discord.Embed(description=f"could retrieve source for `{command_name}`", color=color())
+                    em=discord.Embed(description=f"Couldn't retrieve source for `{command_name}`", color=color())
                     await ctx.send(embed=em)
                 else:
                     source_lines = ''.join(source_lines).split('\n')
                     src = "\n".join(line for line in source_lines).replace("`", "'")
-                    em=discord.Embed(title=f"{command.name} source", description=f"note: most of the \" ' \" stand for a \" ` \"\n\n```py\n{src}```", color=color(), timestamp=datetime.datetime.utcnow())
-                    em.set_footer(text=f"requested by {ctx.author}", icon_url=ctx.author.avatar_url)
+                    em=discord.Embed(title=f"{command.name} source", description=f"Note: most of the \" ' \" stand for a \" ` \"\n\n```py\n{src}```", color=color(), timestamp=datetime.datetime.utcnow())
+                    em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
                     try:
                         await ctx.author.send(embed=em)
                     except discord.HTTPException:
                         async with ctx.author.typing():
                             post = await mystbinn.post(src)
-                            em=discord.Embed(description=f"note: most of the \" ' \" stand for a \" ` \"\nthe output was too long so it got uploaded to [mystbin]({post})", color=color(), timestamp=datetime.datetime.utcnow())
-                            em.set_footer(text=f"requested by {ctx.author}", icon_url=ctx.author.avatar_url)
+                            em=discord.Embed(description=f"Note: most of the \" ' \" stand for a \" ` \"\nthe output was too long so it got uploaded to [mystbin]({post})", color=color(), timestamp=datetime.datetime.utcnow())
+                            em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
                         await ctx.author.send(embed=em)
                     await ctx.message.add_reaction("✅")
 
@@ -363,14 +363,14 @@ class utility(commands.Cog):
     @commands.command(aliases=["lc"])
     @commands.cooldown(1,5,commands.BucketType.user)
     async def lettercount(self, ctx, *, text):
-        em=discord.Embed(description=f"your text is {len(text)} letters long", color=color())
+        em=discord.Embed(description=f"Your text is {len(text)} letters long", color=color())
         await ctx.send(embed=em)
 
     @commands.command(aliases=["wc"])
     @commands.cooldown(1,5,commands.BucketType.user)
     async def wordcount(self, ctx, *, text):
         text_list = text.split(" ")
-        em=discord.Embed(description=f"your text is {len(text_list)} words long", color=color())
+        em=discord.Embed(description=f"Your text is {len(text_list)} words long", color=color())
         await ctx.send(embed=em)
 
     @commands.command(aliases=["botinfo", "about", "bi"])
@@ -378,9 +378,9 @@ class utility(commands.Cog):
     async def info(self, ctx):
         operating_system=None
         if os.name == "nt":
-            operating_system = "windows"
+            operating_system = "Windows"
         elif os.name == "posix":
-            operating_system = "linux"
+            operating_system = "Linux"
         async with ctx.typing():
             process = psutil.Process()
             version = sys.version_info
@@ -404,26 +404,26 @@ class utility(commands.Cog):
                     else:
                         print(channel.__class__)
             embed.add_field(name="system", value=f"""
-- **os**: `{operating_system}`
-- **cpu**: `{process.cpu_percent()}`%
-- **memory**: `{humanize.naturalsize(process.memory_full_info().rss).lower()}`
-- **process**: `{process.pid}`
-- **threads**: `{process.num_threads()}`
-- **language**: `python`
-- **python version**: `{version[0]}.{version[1]}.{version[2]}`
+- **OS**: `{operating_system}`
+- **CPU**: `{process.cpu_percent()}`%
+- **Memory**: `{humanize.naturalsize(process.memory_full_info().rss)}`
+- **Process**: `{process.pid}`
+- **Threads**: `{process.num_threads()}`
+- **Language**: `python`
+- **Python version**: `{version[0]}.{version[1]}.{version[2]}`
 - **discord.py version**: `{discord.__version__}`""", inline=True)
             embed.add_field(name="bot", value=f"""
-- **guilds**: `{len(self.bot.guilds)}`
-- **users**: `{len(self.bot.users)}`
-- **channels**: `{channels["all"]}`:
-    - **categories**: `{channels["category"]}`
-    - **text**: `{channels["text"]}`
-    - **voice**: `{channels["voice"]}`
-    - **stage**: `{channels["stage"]}`
-- **commands**: `{len([cmd for cmd in self.bot.commands if not cmd.hidden])}`
-- **commands executed**: `{self.bot.cmdsSinceRestart}`
-- **cogs**: `{len(self.bot.cogs)}`
-- **uptime**: `{days}d {hours}h {minutes}m {seconds}s`
+- **Guilds**: `{len(self.bot.guilds)}`
+- **Users**: `{len(self.bot.users)}`
+- **Channels**: `{channels["all"]}`:
+    - **Categories**: `{channels["category"]}`
+    - **Text**: `{channels["text"]}`
+    - **Voice**: `{channels["voice"]}`
+    - **Stage**: `{channels["stage"]}`
+- **Commands**: `{len([cmd for cmd in self.bot.commands if not cmd.hidden])}`
+- **Commands executed**: `{self.bot.cmdsSinceRestart}`
+- **Cogs**: `{len(self.bot.cogs)}`
+- **Uptime**: `{days}d {hours}h {minutes}m {seconds}s`
 - [source]({self.bot.github})
 - [invite](https://discord.com/api/oauth2/authorize?client_id={self.bot.user.id}&permissions=8&scope=bot)""", inline=True)
             embed.set_thumbnail(url=self.bot.user.avatar_url)
@@ -474,11 +474,11 @@ class utility(commands.Cog):
                 em.add_field(
                     name="Spotify",
                     value=f"""
-title: `{activity.title}`
-artists: `{artists}`
-album: `{activity.album}`
-album cover: [url]({activity.album_cover_url})
-duration: `{hours}`h `{minutes}`m `{seconds}`s
+Title: `{activity.title}`
+Artists: `{artists}`
+Album: `{activity.album}`
+Album Cover: [url]({activity.album_cover_url})
+Duration: `{hours}`h `{minutes}`m `{seconds}`s
 """,
                     inline=False
                 )
@@ -492,25 +492,25 @@ duration: `{hours}`h `{minutes}`m `{seconds}`s
                 em.add_field(
                     name="Custom",
                     value=f"""
-text: `{activity.name}`
-emoji name: {emojiName}
-emoji: {emoji}
+Text: `{activity.name}`
+Emoji Name: {emojiName}
+Emoji: {emoji}
 """,
                     inline=False
                 )
             elif isinstance(activity, discord.activity.Game):
                 em.add_field(
                     name="Game",
-                    value=f"name: `{activity.name}`",
+                    value=f"Name: `{activity.name}`",
                     inline=False
                 )
             elif isinstance(activity, discord.activity.Streaming):
                 em.add_field(
                     name="Stream",
                     value=f"""
-title: `{activity.name}`
-platform: `{activity.platform}`
-url: [{activity.url.split("/")[3]}]({activity.url})
+Title: `{activity.name}`
+Platform: `{activity.platform}`
+URL: [{activity.url.split("/")[3]}]({activity.url})
 """,
                     inline=False
                 )
@@ -522,14 +522,14 @@ url: [{activity.url.split("/")[3]}]({activity.url})
                 em.add_field(
                     name="Unknown",
                     value=f"""
-name: `{activity.name}`
-details: `{activity.details}`
-emoji: `{activity.emoji}`
-type: `{type}`
+Name: `{activity.name}`
+Details: `{activity.details}`
+Emoji: `{activity.emoji}`
+Type: `{type}`
 """,
                     inline=False
                 )
-        em.set_footer(text=f"requested by {ctx.author}", icon_url=ctx.author.avatar_url)
+        em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
         await ctx.send(embed=em)
 
     @commands.command()
@@ -538,12 +538,12 @@ type: `{type}`
         try:
             msg = self.bot.message_cache[ctx.guild.id][ctx.channel.id]
         except KeyError:
-            em=discord.Embed(description=f"there's no message to snipe", color=color())
-            em.set_footer(text=f"requested by {ctx.author}", icon_url=ctx.author.avatar_url)
+            em=discord.Embed(description=f"There's no message to snipe", color=color())
+            em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
             await ctx.send(embed=em)
         else:
             em=discord.Embed(description=f"`{msg.content}`", color=color())
-            em.set_footer(text=f"requested by {ctx.author}", icon_url=ctx.author.avatar_url)
+            em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
             em.set_author(name=f"{msg.author} ({msg.author.id})", icon_url=msg.author.avatar_url)
             await ctx.send(embed=em)
 
@@ -554,17 +554,17 @@ type: `{type}`
         try:
             res["commands"]
         except TypeError:
-            em=discord.Embed(description=f"there are no disabled commands", color=color())
+            em=discord.Embed(description=f"There are no disabled commands", color=color())
             await ctx.send(embed=em)
         else:
             commands = res["commands"]
             commands = commands.split(",")
             if len(commands) != 0 and commands != ['']:
-                em=discord.Embed(title="disabled commands", description=", ".join(cmd for cmd in commands), color=color())
-                em.set_footer(text=f"requested by {ctx.author}", icon_url=ctx.author.avatar_url)
+                em=discord.Embed(title="Disabled commands", description=", ".join(cmd for cmd in commands), color=color())
+                em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
                 await ctx.send(embed=em)
             else:
-                em=discord.Embed(description=f"there are no disabled commands", color=color())
+                em=discord.Embed(description=f"There are no disabled commands", color=color())
                 await ctx.send(embed=em)
 
     @commands.command(aliases=["rtfd"])
@@ -578,11 +578,11 @@ type: `{type}`
             nodes = res["nodes"]
         if nodes != {}:
             em=discord.Embed(description="\n".join(f"[`{e}`]({nodes[e]})" for e in nodes), color=color())
-            em.set_footer(text=f"powered by idevision.net • {ctx.author}", icon_url=ctx.author.avatar_url)
+            em.set_footer(text=f"Powered by idevision.net • {ctx.author}", icon_url=ctx.author.avatar_url)
             await ctx.send(embed=em)
         else:
-            em=discord.Embed(description=f"no results found for `{query}`", color=color())
-            em.set_footer(text=f"requested by {ctx.author}", icon_url=ctx.author.avatar_url)
+            em=discord.Embed(description=f"No results found for `{query}`", color=color())
+            em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
             await ctx.send(embed=em)
 
     @commands.command()
@@ -590,15 +590,16 @@ type: `{type}`
     async def help(self, ctx, *, command : str = None):
         if command is None:
             em=discord.Embed(
-                description=f"""
-```py
-type `{ctx.prefix}help [command / cog] for more info on a command / cog`
-
+                description=f'''
+```diff
++ Type "{ctx.prefix}help [command]" or "{ctx.prefix}help [cog]" for more information about a command or cog
+```
 [Developer](https://discord.com/users/{get_owner(self.bot)}) | [Support]({self.bot.invite}) | [Invite](https://discord.com/api/oauth2/authorize?client_id={self.bot.user.id}&permissions=8&scope=bot)
-""",
+''',
                 timestamp=datetime.datetime.utcnow(),
                 color=color()
-            ).set_footer(text=f"Requested by {ctx.author.name}#{ctx.author.discriminator}", icon_url=ctx.author.avatar_url)
+            )
+            em.set_footer(text=f"Requested by {ctx.author.name}#{ctx.author.discriminator}", icon_url=ctx.author.avatar_url)
             disabled = await self.bot.db.fetchrow("SELECT commands FROM commands WHERE guild = $1", ctx.guild.id)
             try:
                 disabled = disabled["commands"]
@@ -608,10 +609,31 @@ type `{ctx.prefix}help [command / cog] for more info on a command / cog`
                 disabled = disabled.split(",")
             em.add_field(
                 name="Cogs",
-                value="\n".join(f"`{cog.qualified_name}`" for cog in self.bot.cogs),
+                value="\n".join(f"`{self.bot.get_cog(cog).qualified_name}`" for cog in self.bot.cogs if self.bot.get_cog(cog).qualified_name.lower() != "jishaku" and self.bot.get_cog(cog).get_commands() and len(self.bot.get_cog(cog).get_commands()) != 0),
                 inline=True
             )
-            em.set_image(url="https://media.discordapp.net/attachments/832746281335783426/849721738987307008/banner.png")
+            operating_system=None
+            if os.name == "nt":
+                operating_system = "Windows"
+            elif os.name == "posix":
+                operating_system = "Linux"
+            process = psutil.Process()
+            delta_uptime = datetime.datetime.utcnow() - self.bot.uptime
+            hours, remainder = divmod(int(delta_uptime.total_seconds()), 3600)
+            minutes, seconds = divmod(remainder, 60)
+            days, hours = divmod(hours, 24)
+            em.add_field(
+                name="Information",
+                value=f"""
+- **Uptime**: `{days}d {hours}h {minutes}m {seconds}s`
+- **Commands**: `{len([cmd for cmd in self.bot.commands if not cmd.hidden])}`
+- **Cogs**: `{len(self.bot.cogs)}`
+- **CPU**: `{process.cpu_percent()}`%
+- **Memory**: `{humanize.naturalsize(process.memory_full_info().rss)}`
+""",
+                inline=True
+            )
+            em.set_image(url=self.bot.banner)
             await ctx.send(embed=em)
         else:
             if self.bot.get_command(str(command)):
@@ -657,18 +679,23 @@ type `{ctx.prefix}help [command / cog] for more info on a command / cog`
                     except AttributeError:
                         em.add_field(name=f"subcommands [0]", value=command_subcommands, inline=False)
                     em.add_field(name="category", value=given_command.cog_name, inline=False)
+                    em.set_footer(text=f"Requested by {ctx.author.name}#{ctx.author.discriminator}", icon_url=ctx.author.avatar_url)
                     await ctx.reply(embed=em, mention_author=False)
                 else:
-                    em=discord.Embed(description=f"this command does not exist", color=color())
+                    em=discord.Embed(description=f"This command does not exist", color=color())
+                    em.set_footer(text=f"Requested by {ctx.author.name}#{ctx.author.discriminator}", icon_url=ctx.author.avatar_url)
                     await ctx.send(embed=em)
-            elif self.bot.get_cog(str(command)) :
-               given_cog = self.bot.get_cog(str(command))
-               em=discord.Embed(title=f"{given_cog.qualified_name}'s commands", description="> "+", ".join(f"`{cmd.name}`" for cmd in given_cog.walk_commands()), color=color())
-               em.set_image(url="https://media.discordapp.net/attachments/832746281335783426/849721738987307008/banner.png")
-               await ctx.reply(embed=em, mention_author=False)
             else:
-                em=discord.Embed(description=f"there isn't a cog / command with the name `{command}`", color=color())
-                await ctx.reply(embed=em, mention_author=False)
+                given_cog = self.bot.get_cog(str(command).title())
+                if given_cog != None:
+                    em=discord.Embed(title=f"{given_cog.qualified_name}'s commands", description="> "+", ".join(f"`{cmd.name}`" for cmd in given_cog.walk_commands()), color=color())
+                    em.set_footer(text=f"Requested by {ctx.author.name}#{ctx.author.discriminator}", icon_url=ctx.author.avatar_url)
+                    em.set_image(url=self.bot.banner)
+                    await ctx.reply(embed=em, mention_author=False)
+                else:
+                    em=discord.Embed(description=f"there isn't a cog / command with the name `{command}`", color=color())
+                    em.set_footer(text=f"Requested by {ctx.author.name}#{ctx.author.discriminator}", icon_url=ctx.author.avatar_url)
+                    await ctx.reply(embed=em, mention_author=False)
 
     @commands.command()
     @commands.cooldown(1, 5, commands.BucketType.user)
@@ -676,10 +703,10 @@ type `{ctx.prefix}help [command / cog] for more info on a command / cog`
         embed=discord.Embed(color=color())
         dagpi_ping = round(await dagpi.image_ping(), 3) * 1000
         embed.add_field(name="latency", value=f"""
-- **typing**: `pinging`
-- **bot**: `{round(self.bot.latency*1000)}`ms
-- **database**: `pinging`
-- **dagpi**: `{dagpi_ping}`ms""", inline=False)
+- **Typing**: `pinging`
+- **Bot**: `{round(self.bot.latency*1000)}`ms
+- **Database**: `pinging`
+- **Dagpi**: `{dagpi_ping}`ms""", inline=False)
         start=time.perf_counter()
         msg = await ctx.send(embed=embed)
         end=time.perf_counter()
@@ -691,10 +718,10 @@ type `{ctx.prefix}help [command / cog] for more info on a command / cog`
         postduration = (time.perf_counter() - poststart) * 1000
         db_ping = round(postduration, 1)
         em.add_field(name="latency", value=f"""
-- **typing**: `{api_latency}`ms
-- **bot**: `{round(self.bot.latency*1000)}`ms
-- **database**: `{db_ping}`ms
-- **dagpi**: `{dagpi_ping}`ms""", inline=False)
+- **Typing**: `{api_latency}`ms
+- **Bot**: `{round(self.bot.latency*1000)}`ms
+- **Database**: `{db_ping}`ms
+- **Dagpi**: `{dagpi_ping}`ms""", inline=False)
         await msg.edit(embed=em)
 
     @commands.command()
@@ -744,28 +771,28 @@ type `{ctx.prefix}help [command / cog] for more info on a command / cog`
 
         if res != "":
             em=discord.Embed(description=f"`{res}`", color=color())
-            em.set_footer(text=f"powered by idevision.net • {ctx.author}", icon_url=ctx.author.avatar_url)
+            em.set_footer(text=f"Powered by idevision.net • {ctx.author}", icon_url=ctx.author.avatar_url)
             await ctx.reply(embed=em, mention_author=False)
         else:
-            em=discord.Embed(description=f"i could not read what your image says", color=color())
+            em=discord.Embed(description=f"I couldn't read what your image says", color=color())
             await ctx.reply(embed=em, mention_author=False)
 
     @commands.Cog.listener()
     async def on_message(self, msg):
         if msg.author.id in list(self.bot.afks):
             self.bot.afks.pop(msg.author.id)
-            em=discord.Embed(description=f"welcome back, {msg.author.mention}, i've unmarked you as afk", color=color())
+            em=discord.Embed(description=f"Welcome back, {msg.author.mention}, i've unmarked you as afk", color=color())
             await msg.channel.send(embed=em)
         for user in list(self.bot.afks):
             data = self.bot.afks[user]
             obj = self.bot.get_user(user)
             if f"<@!{user}>" in msg.content or f"<@{user}>" in msg.content:
                 if data["reason"] is None:
-                    mseg = f"hey! {obj.name} is currently marked as afk"
+                    mseg = f"Hey! {obj.name} is currently marked as afk"
                 else:
-                    mseg = f"hey! {obj.name} is currently marked as afk for `{data['reason']}`"
+                    mseg = f"Hey! {obj.name} is currently marked as afk for `{data['reason']}`"
                 em=discord.Embed(description=mseg, color=color())
                 await msg.reply(embed=em)
 
 def setup(bot):
-    bot.add_cog(utility(bot))
+    bot.add_cog(Utility(bot))
