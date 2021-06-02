@@ -23,6 +23,8 @@ def circular(img):
 
 class Image(commands.Cog):
 
+    """Image manipulation commands"""
+
     def __init__(self, bot):
         self.bot = bot
 

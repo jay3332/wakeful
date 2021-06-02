@@ -22,6 +22,8 @@ idevisionn = idevision.async_client(get_config("IDEVISION"))
 
 class Utility(commands.Cog):
 
+    """Useful commands"""
+
     def __init__(self, bot):
         self.bot = bot
 
@@ -648,7 +650,7 @@ Type: `{type}`
                 if not given_command.hidden == True and not given_command.name in disabled:
                     #-------------------------------------
                     try:
-                        command_subcommands = "> " + ", ".join(f"`{command.name}`" for command in given_command.commands)
+                        command_subcommands = "> " + ", ".join(f"`{command.name}`" for command in given_command.commands if not command.hidden or not command.name in disabled)
                     except:
                         command_subcommands = "none"
                     #-------------------------------------
@@ -680,9 +682,17 @@ Type: `{type}`
                     em.set_footer(text=f"Requested by {ctx.author.name}#{ctx.author.discriminator}", icon_url=ctx.author.avatar_url)
                     await ctx.send(embed=em)
             else:
+                disabled = await self.bot.db.fetchrow("SELECT commands FROM commands WHERE guild = $1", ctx.guild.id)
+                try:
+                    disabled = disabled["commands"]
+                except:
+                    pass
+                else:
+                    disabled = disabled.split(",")
                 given_cog = self.bot.get_cog(str(command).title())
+                commands_ = [cmd for cmd in given_cog.walk_commands() if not cmd.hidden and not cmd.name in disabled]
                 if given_cog != None:
-                    em=discord.Embed(title=f"{given_cog.qualified_name} commands [{len([cmd for cmd in given_cog.walk_commands()])}]", description=f"{given_cog.description}\n> "+", ".join(f"`{cmd.name}`" for cmd in given_cog.walk_commands()), color=color())
+                    em=discord.Embed(title=f"{given_cog.qualified_name} commands [{len(commands_)}]", description=f"{given_cog.description}\n\n> "+", ".join(f"`{cmd.name}`" for cmd in commands_), color=color())
                     em.set_footer(text=f"Requested by {ctx.author.name}#{ctx.author.discriminator}", icon_url=ctx.author.avatar_url)
                     em.set_image(url=self.bot.banner)
                     await ctx.reply(embed=em, mention_author=False)

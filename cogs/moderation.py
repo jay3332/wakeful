@@ -6,6 +6,8 @@ from utils.configs import color
 
 class Moderation(commands.Cog):
 
+    """Moderation commands"""
+
     def __init__(self, bot):
         self.bot = bot
 

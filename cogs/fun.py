@@ -18,6 +18,8 @@ def do_tts(language, message):
 
 class Fun(commands.Cog):
 
+    """Fun & games commands"""
+
     def __init__(self, bot):
         self.bot = bot
 

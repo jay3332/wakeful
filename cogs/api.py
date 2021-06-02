@@ -4,6 +4,8 @@ from utils.configs import color
 
 class API(commands.Cog):
 
+    """API commands"""
+
     def __init__(self, bot):
         self.bot = bot
 
