@@ -1,5 +1,4 @@
 import discord, asyncdagpi, datetime, io
-from PIL import Image, ImageOps, ImageDraw
 from discord.ext import commands
 from utils.get import get_config
 from utils.configs import color
@@ -15,6 +14,7 @@ def circular(img):
     draw.ellipse((0, 0) + (128, 128), fill=0)
     img = Image.open(img)
     output = ImageOps.fit(img, mask.size, centering=(0.5, 0.5))
+    output.putalpha(500)
     output.paste(0, mask=mask)
     output.convert('P', palette=Image.ADAPTIVE)
     array = io.BytesIO()
