@@ -592,6 +592,7 @@ Type: `{type}`
     async def help(self, ctx, *, command : str = None):
         if command is None:
             em=discord.Embed(
+                title="Help Page",
                 description=f'''
 ```diff
 + Type "{ctx.prefix}help [command]" or "{ctx.prefix}help [cog]" for more information about a command or cog
