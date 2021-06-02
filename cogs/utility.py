@@ -594,7 +594,7 @@ Type: `{type}`
 ```diff
 + Type "{ctx.prefix}help [command]" or "{ctx.prefix}help [cog]" for more information about a command or cog
 ```
-[Developer](https://discord.com/users/{get_owner(self.bot)}) | [Support]({self.bot.invite}) | [Invite](https://discord.com/api/oauth2/authorize?client_id={self.bot.user.id}&permissions=8&scope=bot)
+[Developer](https://discord.com/users/{self.bot.ownersid}) | [Support]({self.bot.invite}) | [Invite](https://discord.com/api/oauth2/authorize?client_id={self.bot.user.id}&permissions=8&scope=bot)
 ''',
                 timestamp=datetime.datetime.utcnow(),
                 color=color()
