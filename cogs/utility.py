@@ -656,7 +656,7 @@ Type: `{type}`
                         command_usage = given_command.usage
                     else:
                         command_usage = " ".join(e for e in list(given_command.params) if not e in ["self", "ctx"])
-                    #-------------------------------------
+                    #---------------------------------------
                     em=discord.Embed(
                         title=given_command.name,
                         timestamp=datetime.datetime.utcnow(),
@@ -682,7 +682,7 @@ Type: `{type}`
             else:
                 given_cog = self.bot.get_cog(str(command).title())
                 if given_cog != None:
-                    em=discord.Embed(title=f"{given_cog.qualified_name}'s commands", description="> "+", ".join(f"`{cmd.name}`" for cmd in given_cog.walk_commands()), color=color())
+                    em=discord.Embed(title=f"{given_cog.qualified_name} commands [{len([cmd for cmd in given_cog.walk_commands()])}]", description=f"{given_cog.description}\n> "+", ".join(f"`{cmd.name}`" for cmd in given_cog.walk_commands()), color=color())
                     em.set_footer(text=f"Requested by {ctx.author.name}#{ctx.author.discriminator}", icon_url=ctx.author.avatar_url)
                     em.set_image(url=self.bot.banner)
                     await ctx.reply(embed=em, mention_author=False)
