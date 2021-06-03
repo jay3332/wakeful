@@ -1,4 +1,4 @@
-import discord, os, datetime, json, asyncio, aiohttp, pwd, asyncpg
+import discord, os, datetime, json, asyncio, aiohttp, pwd, asyncpg, logging, coloredlogs
 from discord.ext import commands, tasks
 from colorama import Fore
 from discord.flags import Intents
@@ -49,6 +49,10 @@ bot.mod_role = int(conf["MODROLE"]) # moderator role on your bots support server
 os.environ["JISHAKU_NO_UNDERSCORE"] = "True"
 os.environ["JISHAKU_NO_DM_TRACEBACK"] = "True" 
 os.environ["JISHAKU_HIDE"] = "True"
+
+coloredlogs.install()
+logger = logging.getLogger('discord')
+logger.setLevel(logging.INFO)
 
 @tasks.loop(seconds=10)
 async def presence():
@@ -119,15 +123,15 @@ async def on_message(msg):
 
 @bot.event
 async def on_ready():
-    print(f"Logged in as: {bot.user.name}#{bot.user.discriminator} ({bot.user.id})")
+    logger.info(f"Logged in as: {bot.user.name}#{bot.user.discriminator} ({bot.user.id})")
 
 for filename in os.listdir("./cogs"):
     if filename.endswith(".py"):
         try:
             bot.load_extension(f"cogs.{filename[:-3]}")
-            print(f"{Fore.GREEN}cogs.{filename[:-3]} has been succesfully loaded{Fore.RESET}")
+            logger.info(f"{Fore.GREEN}cogs.{filename[:-3]} has been succesfully loaded{Fore.RESET}")
         except Exception as exc:
-            print(f"{Fore.RED}An error occured while loading cogs.{filename[:-3]}{Fore.RESET}")
+            logger.info(f"{Fore.RED}An error occured while loading cogs.{filename[:-3]}{Fore.RESET}")
             raise exc
 
 bot.load_extension("jishaku")

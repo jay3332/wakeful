@@ -41,6 +41,27 @@ class Fun(commands.Cog):
             file = await do_tts("en", message)
         await ctx.reply(file=file, mention_author=False)
 
+    @commands.command()
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    async def meme(self, ctx):
+        async with ctx.typing():
+            res = await self.bot.session.get("https://reddit.com/r/memes/top.json")
+            res = await res.json()
+            amount = len(res["data"]["children"])
+            meme = res["data"]["children"][random.randrange(0,amount)]["data"]
+        if meme["pinned"] != True and meme["over_18"] != True and not "youtu" in meme["url"] and meme["is_video"] != True:
+            title = meme["title"]
+            url = meme["url"]
+            permalink = meme["permalink"]
+            upvotes = meme["ups"]
+            comments = meme["num_comments"]
+            em = discord.Embed(title=title, url="https://reddit.com"+permalink, color=color())
+            em.set_footer(text=f"👍 {upvotes}• 💬 {comments} • {ctx.author}", icon_url=ctx.author.avatar_url)
+            em.set_image(url=url)
+            await ctx.reply(embed=em, mention_author=False)
+        else:
+            await ctx.invoke(self.bot.get_command("meme"))
+
     @commands.command(aliases=["typerace"], description="Makes the bot send an image with text, which someone has to type in 20 seconds")
     @commands.guild_only()
     @commands.cooldown(1, 5, commands.BucketType.user)
