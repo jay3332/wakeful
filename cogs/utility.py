@@ -1,4 +1,4 @@
-import discord, datetime, async_cse, psutil, humanize, os, sys, inspect, mystbin, googletrans, asyncio, aiohttp, random, time, asyncdagpi, hashlib
+import discord, datetime, async_cse, psutil, humanize, os, sys, inspect, mystbin, googletrans, asyncio, aiohttp, random, time, asyncdagpi, hashlib, asyncpg
 from discord.ext import commands
 from discord import Webhook, AsyncWebhookAdapter
 from utils.configs import color
@@ -42,7 +42,7 @@ class Utility(commands.Cog):
     async def on_message(self, msg):
         if msg.author.id in list(self.bot.afks):
             self.bot.afks.pop(msg.author.id)
-            em=discord.Embed(description=f"Welcome back, {msg.author.mention}, i've unmarked you as afk", color=color())
+            em=discord.Embed(description=f"Welcome back, {msg.author.mention}, I've unmarked you as afk", color=color())
             await msg.channel.send(embed=em)
         for user in list(self.bot.afks):
             data = self.bot.afks[user]
@@ -57,7 +57,73 @@ class Utility(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, msg):
-        pass
+        if msg.author.bot:
+            return
+        if ":" in msg.content:
+            emojis = msg.content.split(":")
+            emoji_ = emojis[1]
+            if emoji_ != "" and not " " in emoji_:
+                res = await self.bot.db.fetchrow("SELECT commands FROM commands WHERE guild = $1", msg.guild.id)
+                try:
+                    res["commands"]
+                except TypeError:
+                    pass
+                else:
+                    commands = res["commands"]
+                    commands = commands.split(",")
+                    if len(commands) != 0 and commands != ['']:
+                        if "emojis" in commands:
+                            return
+                        else:
+                            pass
+                    else:
+                        pass
+                res = await self.bot.db.fetchrow("SELECT user_id FROM emojis WHERE user_id = $1", msg.author.id)
+                try:
+                    res["user_id"]
+                except TypeError:
+                    return
+                else:
+                    emoji = None
+                    for e in self.bot.emojis:
+                        if e.name.lower().startswith(emoji_.lower()):
+                            emoji = e
+                    if emoji is not None:
+                        await msg.reply(str(emoji), mention_author=False)
+
+    @commands.group(invoke_without_command=True, aliases=["emoji"])
+    @commands.cooldown(1,5,commands.BucketType.user)
+    async def emojis(self, ctx):
+        await ctx.invoke(self.bot.get_command("help"), **{"command": ctx.command})
+
+    @emojis.command(aliases=["opt-in"])
+    @commands.cooldown(1,5,commands.BucketType.user)
+    async def optin(self, ctx):
+        try:
+            await self.bot.db.execute("INSERT INTO emojis (user_id) VALUES ($1)", ctx.author.id)
+        except asyncpg.UniqueViolationError:
+            em=discord.Embed(description=f"You've already opted into the emojis program", color=color())
+            em.set_footer(text=f"Requested by {ctx.author.name}#{ctx.author.discriminator}", icon_url=ctx.author.avatar_url)
+            await ctx.reply(embed=em, mention_author=False)
+        else:
+            em=discord.Embed(description=f"Alright! I've successfully opted you into the emojis program", color=color())
+            em.set_footer(text=f"Requested by {ctx.author.name}#{ctx.author.discriminator}", icon_url=ctx.author.avatar_url)
+            await ctx.reply(embed=em, mention_author=False)
+
+    @emojis.command(aliases=["opt-out"])
+    @commands.cooldown(1,5,commands.BucketType.user)
+    async def optout(self, ctx):
+        res = await self.bot.db.fetchrow("SELECT user_id FROM emojis WHERE user_id = $1", ctx.author.id)
+        try:
+            res["user_id"]
+        except TypeError:
+            em=discord.Embed(description=f"You aren't opted into the emojis program", color=color())
+            em.set_footer(text=f"Requested by {ctx.author.name}#{ctx.author.discriminator}", icon_url=ctx.author.avatar_url)
+            await ctx.reply(embed=em, mention_author=False)
+        else:
+            em=discord.Embed(description=f"Alright! I've successfully opted you out of the emojis program", color=color())
+            em.set_footer(text=f"Requested by {ctx.author.name}#{ctx.author.discriminator}", icon_url=ctx.author.avatar_url)
+            await ctx.reply(embed=em, mention_author=False)
 
     @commands.command(name="sha256")
     @commands.cooldown(1, 5, commands.BucketType.user)
@@ -92,7 +158,9 @@ class Utility(commands.Cog):
                 description=f"{description}\n**Author**: {author}\n**Author Email**: {author_email}\n\n**Website**: {website}\n**Documentation**: {documentation}\n**Keywords**: {keywords}\n**License**: {license_}",
                 url=url,
                 color=color()
-            ).set_thumbnail(url="https://cdn.discordapp.com/attachments/381963689470984203/814267252437942272/pypi.png")
+            )
+            em.set_thumbnail(url="https://cdn.discordapp.com/attachments/381963689470984203/814267252437942272/pypi.png")
+            em.set_footer(text=f"Requested by {ctx.author.name}#{ctx.author.discriminator}", icon_url=ctx.author.avatar_url)
             await ctx.reply(embed=em, mention_author=False)
         except aiohttp.ContentTypeError:
             em=discord.Embed(description=f"this package wasn't found", color=color())
@@ -757,7 +825,7 @@ Count: `{shard.shard_count}`
                     try:
                         command_subcommands = "> " + ", ".join(f"`{command.name}`" for command in given_command.commands if not command.hidden or not command.name in disabled)
                     except:
-                        command_subcommands = "none"
+                        pass
                     #-------------------------------------
                     if given_command.usage:
                         command_usage = given_command.usage
@@ -784,9 +852,9 @@ Count: `{shard.shard_count}`
                     else:
                         em.add_field(name="Aliases [0]", value="None", inline=False)
                     try:
-                        em.add_field(name=f"Subcommands [{len(given_command.commands)}]", value=command_subcommands, inline=False)
+                        em.add_field(name=f"Subcommands [{len([cmd for cmd in given_command.commands if not command.hidden or not command.name in disabled])}]", value=command_subcommands, inline=False)
                     except AttributeError:
-                        em.add_field(name=f"Subcommands [0]", value=command_subcommands, inline=False)
+                        em.add_field(name=f"Subcommands [0]", value="None", inline=False)
                     em.add_field(name="Category", value=given_command.cog_name, inline=False)
                     em.set_footer(text=f"Requested by {ctx.author.name}#{ctx.author.discriminator}", icon_url=ctx.author.avatar_url)
                     await ctx.reply(embed=em, mention_author=False)
@@ -844,9 +912,9 @@ Count: `{shard.shard_count}`
     @commands.command()
     async def afk(self, ctx, *, reason : str = None):
         if reason is None:
-            msg = f"okay, i've marked you as afk"
+            msg = f"Okay, I've marked you as afk"
         else:
-            msg = f"okay, i've marked you as afk for `{reason}`"
+            msg = f"Okay, I've marked you as afk for `{reason}`"
         em=discord.Embed(description=msg, color=color())
         await ctx.reply(embed=em, mention_author=False)
         await asyncio.sleep(3)
