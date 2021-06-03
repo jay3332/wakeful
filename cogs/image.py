@@ -22,6 +22,7 @@ def rounden(img, ellipse : tuple):
     output.save(array, format="png")
     return discord.File(io.BytesIO(array.getvalue()), "circular.png")
 
+"""
 @executor_function
 def rectangle(img, size : tuple, color : str = None):
     from PIL import Image, ImageDraw
@@ -33,6 +34,7 @@ def rectangle(img, size : tuple, color : str = None):
     array = io.BytesIO()
     image.save(array, format="png")
     return discord.File(io.BytesIO(array.getvalue()), "rectangle.png")
+"""
 
 class Image(commands.Cog):
 
@@ -60,27 +62,6 @@ class Image(commands.Cog):
             res = await rounden(io.BytesIO(img), (0,0))
             em=discord.Embed(color=color())
             em.set_image(url="attachment://circular.png")
-        await ctx.reply(file=res, embed=em, mention_author=False)
-
-    @commands.command()
-    @commands.cooldown(1,15,commands.BucketType.user)
-    async def rectangle(self, ctx, member : discord.Member = None):
-        if member is None:
-            if ctx.message.attachments:
-                if ctx.message.attachments[0].url.endswith("png") or ctx.message.attachments[0].url.endswith("jpg") or ctx.message.attachments[0].url.endswith("jpeg") or ctx.message.attachments[0].url.endswith("webp"):
-                    url = ctx.message.attachments[0].proxy_url or ctx.message.attachments[0].url
-                else:
-                    url = ctx.author.avatar_url_as(format="png", size=1024)
-            else:
-                url = ctx.author.avatar_url_as(format="png", size=1024)
-        else:
-            url = member.avatar_url_as(format="png", size=1024)
-        async with ctx.typing():
-            img = await self.bot.session.get(str(url))
-            img = await img.read()
-            res = await rectangle(io.BytesIO(img), (0,0,1024,1024))
-            em=discord.Embed(color=color())
-            em.set_image(url="attachment://rectangle.png")
         await ctx.reply(file=res, embed=em, mention_author=False)
 
     @commands.command()
