@@ -104,11 +104,11 @@ class Utility(commands.Cog):
             await self.bot.db.execute("INSERT INTO emojis (user_id) VALUES ($1)", ctx.author.id)
         except asyncpg.UniqueViolationError:
             em=discord.Embed(description=f"You've already opted into the emojis program", color=color())
-            em.set_footer(text=f"Requested by {ctx.author.name}#{ctx.author.discriminator}", icon_url=ctx.author.avatar_url)
+            em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
             await ctx.reply(embed=em, mention_author=False)
         else:
             em=discord.Embed(description=f"Alright! I've successfully opted you into the emojis program", color=color())
-            em.set_footer(text=f"Requested by {ctx.author.name}#{ctx.author.discriminator}", icon_url=ctx.author.avatar_url)
+            em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
             await ctx.reply(embed=em, mention_author=False)
 
     @emojis.command(aliases=["opt-out"])
@@ -119,11 +119,11 @@ class Utility(commands.Cog):
             res["user_id"]
         except TypeError:
             em=discord.Embed(description=f"You aren't opted into the emojis program", color=color())
-            em.set_footer(text=f"Requested by {ctx.author.name}#{ctx.author.discriminator}", icon_url=ctx.author.avatar_url)
+            em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
             await ctx.reply(embed=em, mention_author=False)
         else:
             em=discord.Embed(description=f"Alright! I've successfully opted you out of the emojis program", color=color())
-            em.set_footer(text=f"Requested by {ctx.author.name}#{ctx.author.discriminator}", icon_url=ctx.author.avatar_url)
+            em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
             await ctx.reply(embed=em, mention_author=False)
 
     @commands.command(name="sha256")
@@ -161,7 +161,7 @@ class Utility(commands.Cog):
                 color=color()
             )
             em.set_thumbnail(url="https://cdn.discordapp.com/attachments/381963689470984203/814267252437942272/pypi.png")
-            em.set_footer(text=f"Requested by {ctx.author.name}#{ctx.author.discriminator}", icon_url=ctx.author.avatar_url)
+            em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
             await ctx.reply(embed=em, mention_author=False)
         except aiohttp.ContentTypeError:
             em=discord.Embed(description=f"this package wasn't found", color=color())
@@ -184,7 +184,7 @@ class Utility(commands.Cog):
                 timestamp=datetime.datetime.utcnow(),
                 color=color()
             )
-            em.set_footer(text=f"Requested by {ctx.author.name}#{ctx.author.discriminator} • Safe-Search: {safe_search}", icon_url=ctx.author.avatar_url)
+            em.set_footer(text=f"Requested by {ctx.author} • Safe-Search: {safe_search}", icon_url=ctx.author.avatar_url)
             for result in results:
                 if not value > 4:
                     epic = results[int(value)]
@@ -212,7 +212,7 @@ class Utility(commands.Cog):
                 image = res
         if image is not None:
             em=discord.Embed(title=f"Results for: `{query}`", description=f"[{image.title}]({image.url})", timestamp=datetime.datetime.utcnow(), color=color())
-            em.set_footer(text=f"Requested by {ctx.author.name}#{ctx.author.discriminator} • Safe-Search: {safe_search}", icon_url=ctx.author.avatar_url)
+            em.set_footer(text=f"Requested by {ctx.author} • Safe-Search: {safe_search}", icon_url=ctx.author.avatar_url)
             em.set_image(url=image.image_url)
             await ctx.reply(embed=em, mention_author=False)
         else:
@@ -306,7 +306,7 @@ class Utility(commands.Cog):
             inline=True
         )
         em.set_footer(
-            text=f"Requested by {ctx.author.name}#{ctx.author.discriminator}",
+            text=f"Requested by {ctx.author}",
             icon_url=ctx.author.avatar_url
         )
         await ctx.reply(embed=em, mention_author=False)
@@ -392,7 +392,7 @@ class Utility(commands.Cog):
                 inline=False
             )
         em.set_footer(
-            text=f"Requested by {ctx.author.name}#{ctx.author.discriminator}",
+            text=f"Requested by {ctx.author}",
             icon_url=ctx.author.avatar_url
         )
         await ctx.reply(embed=em, mention_author=False)
@@ -805,7 +805,7 @@ Count: `{shard.shard_count}`
                 timestamp=datetime.datetime.utcnow(),
                 color=color()
             )
-            em.set_footer(text=f"Requested by {ctx.author.name}#{ctx.author.discriminator}", icon_url=ctx.author.avatar_url)
+            em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
             if ctx.guild is not None:
                 disabled = await self.bot.db.fetchrow("SELECT commands FROM commands WHERE guild = $1", ctx.guild.id)
                 try:
@@ -906,11 +906,11 @@ Count: `{shard.shard_count}`
                     except AttributeError:
                         em.add_field(name=f"Subcommands [0]", value="None", inline=False)
                     em.add_field(name="Category", value=given_command.cog_name, inline=False)
-                    em.set_footer(text=f"Requested by {ctx.author.name}#{ctx.author.discriminator}", icon_url=ctx.author.avatar_url)
+                    em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
                     await ctx.reply(embed=em, mention_author=False)
                 else:
                     em=discord.Embed(description=f"This command does not exist", color=color())
-                    em.set_footer(text=f"Requested by {ctx.author.name}#{ctx.author.discriminator}", icon_url=ctx.author.avatar_url)
+                    em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
                     await ctx.reply(embed=em, mention_author=False)
             else:
                 disabled = await self.bot.db.fetchrow("SELECT commands FROM commands WHERE guild = $1", ctx.guild.id)
@@ -921,18 +921,23 @@ Count: `{shard.shard_count}`
                 else:
                     disabled = disabled.split(",")
                 given_cog = self.bot.get_cog(str(command).title())
-                if is_mod(self.bot, ctx.author):
-                    commands_ = [cmd for cmd in given_cog.walk_commands() if cmd.parent is None]
-                else:
-                    commands_ = [cmd for cmd in given_cog.walk_commands() if not cmd.hidden and not cmd.name in disabled and cmd.parent is None]
-                if given_cog != None and commands_ is not None and commands_ != []:
-                    em=discord.Embed(title=f"{given_cog.qualified_name} commands [{len(commands_)}]", description=f"{given_cog.description}\n\n> "+", ".join(f"`{cmd.name}`" for cmd in commands_), color=color())
-                    em.set_footer(text=f"Requested by {ctx.author.name}#{ctx.author.discriminator}", icon_url=ctx.author.avatar_url)
-                    em.set_image(url=self.bot.banner)
-                    await ctx.reply(embed=em, mention_author=False)
+                if given_cog is not None:
+                    if is_mod(self.bot, ctx.author):
+                        commands_ = [cmd for cmd in given_cog.walk_commands() if cmd.parent is None]
+                    else:
+                        commands_ = [cmd for cmd in given_cog.walk_commands() if not cmd.hidden and not cmd.name in disabled and cmd.parent is None]
+                    if commands_ is not None and commands_ != []:
+                        em=discord.Embed(title=f"{given_cog.qualified_name} commands [{len(commands_)}]", description=f"{given_cog.description}\n\n> "+", ".join(f"`{cmd.name}`" for cmd in commands_), color=color())
+                        em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
+                        em.set_image(url=self.bot.banner)
+                        await ctx.reply(embed=em, mention_author=False)
+                    else:
+                        em=discord.Embed(description=f"There isn't a cog / command with the name `{command}`", color=color())
+                        em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
+                        await ctx.reply(embed=em, mention_author=False)
                 else:
                     em=discord.Embed(description=f"There isn't a cog / command with the name `{command}`", color=color())
-                    em.set_footer(text=f"Requested by {ctx.author.name}#{ctx.author.discriminator}", icon_url=ctx.author.avatar_url)
+                    em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
                     await ctx.reply(embed=em, mention_author=False)
 
     @commands.command()
