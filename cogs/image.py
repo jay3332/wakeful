@@ -542,10 +542,10 @@ class Image(commands.Cog):
 
     @commands.command(aliases=["phc", "pornhubcomment"])
     @commands.cooldown(1,5,commands.BucketType.user)
-    async def phcomment(self, ctx, *, message):
+    async def phcomment(self, ctx, member : discord.Member, *, message):
         message = message.replace(" ", "%20")
         async with ctx.typing():
-            res = await self.bot.session.get(f"https://nekobot.xyz/api/imagegen?type=phcomment&image={ctx.author.avatar_url_as(format='png')}&username={ctx.author.display_name}&text={message}")
+            res = await self.bot.session.get(f"https://nekobot.xyz/api/imagegen?type=phcomment&image={member.avatar_url_as(format='png')}&username={member.display_name}&text={message}")
             res = await res.json()
             res = res["message"]
             em=discord.Embed(color=color())

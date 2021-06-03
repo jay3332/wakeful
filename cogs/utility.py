@@ -550,7 +550,7 @@ class Utility(commands.Cog):
 - **Memory**: `{humanize.naturalsize(process.memory_full_info().rss)}`
 - **Process**: `{process.pid}`
 - **Threads**: `{process.num_threads()}`
-- **Language**: `python`
+- **Language**: `Python`
 - **Python version**: `{version[0]}.{version[1]}.{version[2]}`
 - **discord.py version**: `{discord.__version__}`""", inline=True)
             em.add_field(name="Bot", value=f"""
