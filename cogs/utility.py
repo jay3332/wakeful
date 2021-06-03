@@ -1,9 +1,9 @@
-from utils.checks import is_mod
-import discord, datetime, async_cse, psutil, humanize, os, sys, inspect, mystbin, googletrans, asyncio, aiohttp, random, time, asyncdagpi, hashlib, asyncpg
+import discord, datetime, async_cse, psutil, humanize, os, sys, inspect, mystbin, googletrans, asyncio, aiohttp, random, time, asyncdagpi, hashlib, asyncpg, io
 from discord.ext import commands
 from discord import Webhook, AsyncWebhookAdapter
 from utils.configs import color
 from utils.get import *
+from utils.checks import *
 from jishaku.functools import executor_function
 import idevision
 
@@ -678,6 +678,24 @@ Type: `{type}`
             em.set_author(name=f"{msg.author} ({msg.author.id})", icon_url=msg.author.avatar_url)
             await ctx.reply(embed=em, mention_author=False)
 
+    @commands.command(aliases=["ss"])
+    @commands.is_nsfw()
+    @commands.cooldown(1,5,commands.BucketType.user)
+    async def screenshot(self, ctx, website):
+        async with ctx.typing():
+            res = await self.bot.session.get(f"https://shot.screenshotapi.net/screenshot?&url={website}&output=image&file_type=png")
+            res = io.BytesIO(await res.read())
+            em=discord.Embed(color=color(), timestamp=datetime.datetime.utcnow())
+            em.set_image(url="attachment://screenshot.png")
+            em.set_footer(text=f"Powered by screenshotapi.net • {ctx.author}", icon_url=ctx.author.avatar_url)
+        msg = await ctx.reply(embed=em, file=discord.File(res, "screenshot.png"), mention_author=False)
+        await msg.add_reaction("🚮")
+        reaction, user = await self.bot.wait_for("reaction_add", check=lambda reaction, user: str(reaction.emoji) == "🚮" and reaction.message == msg and not user.bot)
+        await msg.delete()
+        em=discord.Embed(description=f"The screenshot has been deleted by {user.mention}", color=color(), timestamp=datetime.datetime.utcnow())
+        await ctx.reply(embed=em, mention_author=False)
+
+
     @commands.command()
     @commands.cooldown(1,5, commands.BucketType.user)
     async def disabled(self, ctx):
@@ -691,7 +709,7 @@ Type: `{type}`
             commands = res["commands"]
             commands = commands.split(",")
             if len(commands) != 0 and commands != ['']:
-                em=discord.Embed(title="Disabled commands", description=", ".join(cmd for cmd in commands), color=color())
+                em=discord.Embed(title="Disabled commands", description=", ".join(cmd for cmd in commands if cmd != ""), color=color())
                 em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
                 await ctx.reply(embed=em, mention_author=False)
             else:
