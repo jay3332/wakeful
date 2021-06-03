@@ -60,8 +60,8 @@ class Utility(commands.Cog):
     async def on_message(self, msg):
         if msg.author.bot:
             return
-        if "::" in msg.content:
-            emojis = msg.content.split("::")
+        if ";;" in msg.content:
+            emojis = msg.content.split(";;")
             emoji_ = emojis[1]
             if emoji_ != "" and not " " in emoji_:
                 res = await self.bot.db.fetchrow("SELECT commands FROM commands WHERE guild = $1", msg.guild.id)
