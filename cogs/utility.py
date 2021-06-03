@@ -231,6 +231,18 @@ class Utility(commands.Cog):
             em.set_author(name=ctx.author, icon_url=ctx.author.avatar_url)
         await ctx.reply(embed=em, mention_author=False)
 
+    @commands.command()
+    async def commits(self, ctx):
+        github = self.bot.github.replace("https://github.com/", "").split("/")
+        username = github[0]
+        repo = github[1]
+        res = await self.bot.session.get(f"https://api.github.com/repos/{username}/{repo}/commits")
+        res = await res.json()
+        print(res)
+        em = discord.Embed(title=f"Commits", description="\n".join(f"[`{commit['sha'][:6]}`]({commit['html_url']}) {commit['commit']['message']}" for commit in res[:5]), url=self.bot.github+"/commits")
+        em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
+        await ctx.reply(embed=em, mention_author=False)
+
     @commands.command(aliases=["guildav", "servericon", "serverav"])
     @commands.guild_only()
     @commands.cooldown(1, 5, commands.BucketType.user)
