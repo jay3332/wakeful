@@ -45,7 +45,7 @@ class Fun(commands.Cog):
             font = ImageFont.truetype("data/font.ttf", 150)
             draw.text((0, 0),str(sentence),(0,0,0),font=font)
             array = io.BytesIO()
-            draw.save(array, format="png")
+            img.save(array, format="png")
             _file = discord.File(io.BytesIO(array.getvalue()), "typeracer.png")
             em=discord.Embed(description="First one to type this sentence", color=color())
             em.set_image(url="attachments://typeracer.jpg")
