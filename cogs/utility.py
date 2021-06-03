@@ -38,6 +38,27 @@ class Utility(commands.Cog):
                 if message.author.guild_permissions.mention_everyone:
                     await message.channel.send(random.choice(mem).mention)
 
+    @commands.Cog.listener()
+    async def on_message(self, msg):
+        if msg.author.id in list(self.bot.afks):
+            self.bot.afks.pop(msg.author.id)
+            em=discord.Embed(description=f"Welcome back, {msg.author.mention}, i've unmarked you as afk", color=color())
+            await msg.channel.send(embed=em)
+        for user in list(self.bot.afks):
+            data = self.bot.afks[user]
+            obj = self.bot.get_user(user)
+            if f"<@!{user}>" in msg.content or f"<@{user}>" in msg.content:
+                if data["reason"] is None:
+                    mseg = f"Hey! {obj.name} is currently marked as afk"
+                else:
+                    mseg = f"Hey! {obj.name} is currently marked as afk for `{data['reason']}`"
+                em=discord.Embed(description=mseg, color=color())
+                await msg.reply(embed=em)
+
+    @commands.Cog.listener()
+    async def on_message(self, msg):
+        pass
+
     @commands.command(name="sha256")
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def _sha(self, ctx, *, message):
@@ -685,13 +706,16 @@ Count: `{shard.shard_count}`
                 color=color()
             )
             em.set_footer(text=f"Requested by {ctx.author.name}#{ctx.author.discriminator}", icon_url=ctx.author.avatar_url)
-            disabled = await self.bot.db.fetchrow("SELECT commands FROM commands WHERE guild = $1", ctx.guild.id)
-            try:
-                disabled = disabled["commands"]
-            except:
-                pass
+            if ctx.guild is not None:
+                disabled = await self.bot.db.fetchrow("SELECT commands FROM commands WHERE guild = $1", ctx.guild.id)
+                try:
+                    disabled = disabled["commands"]
+                except:
+                    pass
+                else:
+                    disabled = disabled.split(",")
             else:
-                disabled = disabled.split(",")
+                disabled = []
             em.add_field(
                 name="Cogs",
                 value="\n".join(f"`{self.bot.get_cog(cog).qualified_name}`" for cog in self.bot.cogs if self.bot.get_cog(cog).qualified_name.lower() != "jishaku" and self.bot.get_cog(cog).get_commands() and len(self.bot.get_cog(cog).get_commands()) != 0),
@@ -869,23 +893,6 @@ Count: `{shard.shard_count}`
         else:
             em=discord.Embed(description=f"I couldn't read what your image says", color=color())
             await ctx.reply(embed=em, mention_author=False)
-
-    @commands.Cog.listener()
-    async def on_message(self, msg):
-        if msg.author.id in list(self.bot.afks):
-            self.bot.afks.pop(msg.author.id)
-            em=discord.Embed(description=f"Welcome back, {msg.author.mention}, i've unmarked you as afk", color=color())
-            await msg.channel.send(embed=em)
-        for user in list(self.bot.afks):
-            data = self.bot.afks[user]
-            obj = self.bot.get_user(user)
-            if f"<@!{user}>" in msg.content or f"<@{user}>" in msg.content:
-                if data["reason"] is None:
-                    mseg = f"Hey! {obj.name} is currently marked as afk"
-                else:
-                    mseg = f"Hey! {obj.name} is currently marked as afk for `{data['reason']}`"
-                em=discord.Embed(description=mseg, color=color())
-                await msg.reply(embed=em)
 
 def setup(bot):
     bot.add_cog(Utility(bot))

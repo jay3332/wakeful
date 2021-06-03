@@ -72,25 +72,26 @@ async def on_message(msg):
         return
 
     elif msg.content.startswith(prefix):
-        command = msg.content.split(prefix)
-        command = command[1]
-        res = await bot.db.fetchrow("SELECT commands FROM commands WHERE guild = $1", msg.guild.id)
-        try:
-            commands = res["commands"]
-        except:
-            success = False
-        else:
-            success = True
-        if success:
-            commands = commands.split(",")
-            if command in commands and command != "":
-                em=discord.Embed(description=f"This command has been disabled by the server administrators", color=color())
-                await msg.channel.send(embed=em)
-                return
+        if msg.guild is not None:
+            command = msg.content.split(prefix)
+            command = command[1]
+            res = await bot.db.fetchrow("SELECT commands FROM commands WHERE guild = $1", msg.guild.id)
+            try:
+                commands = res["commands"]
+            except:
+                success = False
+            else:
+                success = True
+            if success:
+                commands = commands.split(",")
+                if command in commands and command != "":
+                    em=discord.Embed(description=f"This command has been disabled by the server administrators", color=color())
+                    await msg.channel.send(embed=em)
+                    return
+                else:
+                    pass
             else:
                 pass
-        else:
-            pass
         await bot.process_commands(msg)
 
     elif pwd.getpwuid(os.getuid())[0] == "pi":
