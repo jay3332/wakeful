@@ -531,8 +531,16 @@ class Utility(commands.Cog):
                         channels["voice"] += 1
                     elif isinstance(channel, discord.StageChannel):
                         channels["stage"] += 1
+            cogs = []
+            for cog in self.bot.cogs:
+                cog = get_cog(self.bot, cog)
+                if not cog.qualified_name.lower() in ["jishaku"]:
+                    if is_mod(self.bot, ctx.author):
+                        cmds = [cmd for cmd in cog.get_commands()]
                     else:
-                        print(channel.__class__)
+                        cmds = [cmd for cmd in cog.get_commands() if not cmd.hidden and not cmd.name in disabled]
+                    if len(cmds) != 0 and cmds != []:
+                        cogs.append(cog)
             embed.add_field(name="system", value=f"""
 - **OS**: `{operating_system}`
 - **CPU**: `{process.cpu_percent()}`%
@@ -553,7 +561,7 @@ class Utility(commands.Cog):
 - **Shards**: `{len(list(self.bot.shards))}`
 - **Commands**: `{len([cmd for cmd in self.bot.commands if not cmd.hidden])}`
 - **Commands executed**: `{self.bot.cmdsSinceRestart}`
-- **Cogs**: `{len(self.bot.cogs)}`
+- **Cogs**: `{len(cogs)}`
 - **Uptime**: `{days}d {hours}h {minutes}m {seconds}s`
 - [source]({self.bot.github})
 - [invite](https://discord.com/api/oauth2/authorize?client_id={self.bot.user.id}&permissions=8&scope=bot)""", inline=True)
@@ -827,7 +835,7 @@ Count: `{shard.shard_count}`
                     if len(cmds) != 0 and cmds != []:
                         cogs.append(cog)
             em.add_field(
-                name="Cogs",
+                name=f"Cogs [{len(cogs)}]",
                 value="\n".join(f"`{cog.qualified_name}`" for cog in cogs),
                 inline=True
             )
@@ -845,6 +853,7 @@ Count: `{shard.shard_count}`
                 name="Information",
                 value=f"""
 **Uptime**: `{days}d {hours}h {minutes}m {seconds}s`
+**Commands**: `{len([cmd for cmd in self.bot.commands if not cmd.hidden])}`
 **Shards**: `{len(list(self.bot.shards))}`
 **Memory**: `{humanize.naturalsize(process.memory_full_info().rss)}`
 """,

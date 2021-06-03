@@ -125,10 +125,16 @@ class Moderation(commands.Cog):
     @commands.guild_only()
     @commands.has_guild_permissions(manage_messages=True)
     @commands.cooldown(1,5,commands.BucketType.user)
-    async def purge(self, ctx, amount : int = 10):
+    async def purge(self, ctx, amount : int = 10, member : discord.Member = None):
         if not amount > 100:
-            e = await ctx.channel.purge(limit=amount)
-            em=discord.Embed(description=f"I've successfully purged `{len(e)}` messages", color=color())
+            if member is None:
+                e = await ctx.channel.purge(limit=amount)
+            else:
+                e = await ctx.channel.purge(limit=amount, check=lambda message: message.author == member and message != ctx.message)
+            if member is None:
+                em=discord.Embed(description=f"I've successfully purged `{len(e)}` messages", color=color())
+            else:
+                em=discord.Embed(description=f"I've successfully purged `{len(e)}` messages from {member.mention}", color=color())
             em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
             msg = await ctx.reply(embed=em, mention_author=False)
             await asyncio.sleep(2)
