@@ -52,7 +52,7 @@ os.environ["JISHAKU_HIDE"] = "True"
 
 @tasks.loop(seconds=10)
 async def presence():
-    await asyncio.sleep(2)
+    await bot.wait_until_ready()
     if bot.status == None:
         await bot.change_presence(activity=discord.Game(f"@wakeful for prefix | {len(bot.guilds)} guilds & {len(bot.users)} users"))
     else:
