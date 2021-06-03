@@ -956,7 +956,9 @@ UID: `{uid}`
             em.set_thumbnail(url=f"https://crafatar.com/avatars/{uid}?default=MHF_Steve&overlay&size=256")
             await ctx.reply(embed=em, mention_author=False)
         else:
-            await ctx.invoke(self.bot.get_command("httpcat"), uid.status)
+            em=discord.Embed(description=f"I couldn't find a player with the name `{username}`", color=color(), timestamp=datetime.datetime.utcnow())
+            em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
+            await ctx.reply(embed=em, mention_author=False)
 
     @minecraft.command()
     @commands.cooldown(1,10,commands.BucketType.user)
@@ -971,7 +973,9 @@ UID: `{uid}`
             em.set_image(url=f"https://crafatar.com/avatars/{uid}?default=MHF_Steve&overlay&size128")
             await ctx.reply(embed=em, mention_author=False)
         else:
-            await ctx.invoke(self.bot.get_command("httpcat"), uid.status)
+            em=discord.Embed(description=f"I couldn't find a player with the name `{username}`", color=color(), timestamp=datetime.datetime.utcnow())
+            em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
+            await ctx.reply(embed=em, mention_author=False)
 
     @minecraft.command()
     @commands.cooldown(1,10,commands.BucketType.user)
@@ -986,7 +990,9 @@ UID: `{uid}`
             em.set_image(url=f"https://crafatar.com/renders/body/{uid}?default=MHF_Steve&overlay&scale=5")
             await ctx.reply(embed=em, mention_author=False)
         else:
-            await ctx.invoke(self.bot.get_command("httpcat"), uid.status)
+            em=discord.Embed(description=f"I couldn't find a player with the name `{username}`", color=color(), timestamp=datetime.datetime.utcnow())
+            em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
+            await ctx.reply(embed=em, mention_author=False)
 
     @minecraft.command()
     @commands.cooldown(1,10,commands.BucketType.user)
@@ -1001,7 +1007,9 @@ UID: `{uid}`
             em.set_image(url=f"https://crafatar.com/renders/head/{uid}?default=MHF_Steve&overlay&scale=5")
             await ctx.reply(embed=em, mention_author=False)
         else:
-            await ctx.invoke(self.bot.get_command("httpcat"), uid.status)
+            em=discord.Embed(description=f"I couldn't find a player with the name `{username}`", color=color(), timestamp=datetime.datetime.utcnow())
+            em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
+            await ctx.reply(embed=em, mention_author=False)
 
     @minecraft.command()
     @commands.cooldown(1,10,commands.BucketType.user)
@@ -1033,7 +1041,9 @@ UUID: `{friend['uuid']}`
                 em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
                 await ctx.reply(embed=em, mention_author=False)
         else:
-            await ctx.invoke(self.bot.get_command("httpcat"), uid.status)
+            em=discord.Embed(description=f"I couldn't find a player with the name `{username}`", color=color(), timestamp=datetime.datetime.utcnow())
+            em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
+            await ctx.reply(embed=em, mention_author=False)
 
     @commands.command()
     @commands.cooldown(1, 5, commands.BucketType.user)
