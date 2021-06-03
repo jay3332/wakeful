@@ -345,6 +345,28 @@ class Image(commands.Cog):
 
     @commands.command()
     @commands.cooldown(1,10,commands.BucketType.user)
+    async def youtube(self, ctx, member : discord.Member, *, text):
+        async with ctx.typing():
+            img = await dagpi.image_process(asyncdagpi.ImageFeatures.youtube(), url=str(member.avatar_url_as(format="png")), username=member.display_name, text=text)
+            file=discord.File(img.image, f"{ctx.command.name}.png")
+            em=discord.Embed(color=color(), timestamp=datetime.datetime.utcnow())
+            em.set_image(url=f"attachment://{ctx.command.name}.png")
+            em.set_footer(text=f"Powered by dagpi.xyz • {ctx.author}", icon_url=ctx.author.avatar_url)
+        await ctx.send(file=file, embed=em)
+
+    @commands.command(name="discord")
+    @commands.cooldown(1,10,commands.BucketType.user)
+    async def _discord(self, ctx, member : discord.Member, *, text):
+        async with ctx.typing():
+            img = await dagpi.image_process(asyncdagpi.ImageFeatures.discord(), url=str(member.avatar_url_as(format="png")), username=member.display_name, text=text)
+            file=discord.File(img.image, f"{ctx.command.name}.png")
+            em=discord.Embed(color=color(), timestamp=datetime.datetime.utcnow())
+            em.set_image(url=f"attachment://{ctx.command.name}.png")
+            em.set_footer(text=f"Powered by dagpi.xyz • {ctx.author}", icon_url=ctx.author.avatar_url)
+        await ctx.send(file=file, embed=em)
+
+    @commands.command()
+    @commands.cooldown(1,10,commands.BucketType.user)
     async def jail(self, ctx, member : discord.Member = None):
         if member is None:
             if ctx.message.attachments:

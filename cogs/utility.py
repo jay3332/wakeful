@@ -818,7 +818,7 @@ Count: `{shard.shard_count}`
                 disabled = []
             cogs = []
             for cog in self.bot.cogs:
-                cog = self.bot.get_cog(cog)
+                cog = get_cog(self.bot, cog)
                 if not cog.qualified_name.lower() in ["jishaku"]:
                     if is_mod(self.bot, ctx.author):
                         cmds = [cmd for cmd in cog.get_commands()]
@@ -920,7 +920,7 @@ Count: `{shard.shard_count}`
                     pass
                 else:
                     disabled = disabled.split(",")
-                given_cog = self.bot.get_cog(str(command).title())
+                given_cog = get_cog(self.bot, command)
                 if given_cog is not None:
                     if is_mod(self.bot, ctx.author):
                         commands_ = [cmd for cmd in given_cog.walk_commands() if cmd.parent is None]
