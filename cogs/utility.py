@@ -239,7 +239,7 @@ class Utility(commands.Cog):
         res = await self.bot.session.get(f"https://api.github.com/repos/{username}/{repo}/commits")
         res = await res.json()
         print(res)
-        em = discord.Embed(title=f"Commits", description="\n".join(f"[`{commit['sha'][:6]}`]({commit['html_url']}) {commit['commit']['message']}" for commit in res[:5]), url=self.bot.github+"/commits")
+        em = discord.Embed(title=f"Commits", description="\n".join(f"[`{commit['sha'][:6]}`]({commit['html_url']}) {commit['commit']['message']}" for commit in res[:5]), url=self.bot.github+"/commits", color=color())
         em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
         await ctx.reply(embed=em, mention_author=False)
 
