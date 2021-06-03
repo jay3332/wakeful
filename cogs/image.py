@@ -7,11 +7,12 @@ from jishaku.functools import executor_function
 dagpi = asyncdagpi.Client(get_config("DAGPI"))
 
 @executor_function
-def rounden(img):
+def rounden(img, ellipse : tuple):
     from PIL import Image, ImageOps, ImageDraw
-    mask = Image.new('L', (1024, 1024), 255)
+    size = (1024, 1024)
+    mask = Image.new('L', size, 255)
     draw = ImageDraw.Draw(mask)
-    draw.ellipse((0, 0) + (1024, 1024), fill=0)
+    draw.ellipse(ellipse + size, fill=0)
     img = Image.open(img)
     output = ImageOps.fit(img, mask.size, centering=(0.5, 0.5))
     output.putalpha(500)
@@ -44,7 +45,7 @@ class Image(commands.Cog):
         async with ctx.typing():
             img = await self.bot.session.get(str(url))
             img = await img.read()
-            res = await rounden(io.BytesIO(img))
+            res = await rounden(io.BytesIO(img), (0,0))
             em=discord.Embed(color=color())
             em.set_image(url="attachment://circular.png")
         await ctx.reply(file=res, embed=em, mention_author=False)
