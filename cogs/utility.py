@@ -337,7 +337,7 @@ class Utility(commands.Cog):
                     except discord.HTTPException:
                         async with ctx.author.typing():
                             post = await mystbinn.post(src)
-                            em=discord.Embed(description=f"Note: most of the \" ' \" stand for a \" ` \"\nthe output was too long so it got uploaded to [mystbin]({post})", color=color(), timestamp=datetime.datetime.utcnow())
+                            em=discord.Embed(description=f"Note: most of the \" ' \" stand for a \" ` \"\nThe output was too long so it got uploaded to [mystbin]({post})", color=color(), timestamp=datetime.datetime.utcnow())
                             em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
                         await ctx.author.send(embed=em)
                     await ctx.message.add_reaction("✅")
@@ -595,7 +595,9 @@ Type: `{type}`
                 title="Help Page",
                 description=f'''
 ```diff
-+ Type "{ctx.prefix}help [command]" or "{ctx.prefix}help [cog]" for more information about a command or cog
+- Type "{ctx.prefix}help [command]" or "{ctx.prefix}help [cog]" for more information about a command or cog
++ [argument] for an optional argument
++ <argument> for a required argument
 ```
 [Developer](https://discord.com/users/{self.bot.ownersid}) | [Support]({self.bot.invite}) | [Invite](https://discord.com/api/oauth2/authorize?client_id={self.bot.user.id}&permissions=8&scope=bot)
 ''',
@@ -658,24 +660,32 @@ Type: `{type}`
                     if given_command.usage:
                         command_usage = given_command.usage
                     else:
-                        command_usage = " ".join(e for e in list(given_command.params) if not e in ["self", "ctx"])
+                        parameters = {}
+                        for param in list(given_command.params):
+                            if not param in ["self", "ctx"]:
+                                parameter = dict(given_command.params)[str(param)]
+                                if parameter.kind.name.lower() == "positional_or_keyword":
+                                    parameters[str(param)] = "required"
+                                else:
+                                    parameters[str(param)] = "optional"
+                        command_usage = " ".join(f"<{param}>" if dict(parameters)[param] == "required" else f"[{param}]" for param in list(parameters))
                     #---------------------------------------
                     em=discord.Embed(
                         title=given_command.name,
                         timestamp=datetime.datetime.utcnow(),
                         description=given_command.description,
                         color=color()
-                    ).set_footer(text=f"requested by {ctx.author}", icon_url=ctx.author.avatar_url)
-                    em.add_field(name="usage", value=f"{ctx.prefix}{command} {command_usage}", inline=False)
+                    ).set_footer(text=f"Rsequested by {ctx.author}", icon_url=ctx.author.avatar_url)
+                    em.add_field(name="Usage", value=f"{ctx.prefix}{command} {command_usage}", inline=False)
                     if given_command.aliases:
-                        em.add_field(name=f"aliases [{len(given_command.aliases)}]", value="> " + ", ".join(f"`{alias}`" for alias in given_command.aliases), inline=False)
+                        em.add_field(name=f"Aliases [{len(given_command.aliases)}]", value="> " + ", ".join(f"`{alias}`" for alias in given_command.aliases), inline=False)
                     else:
-                        em.add_field(name="aliases [0]", value="none", inline=False)
+                        em.add_field(name="Aliases [0]", value="None", inline=False)
                     try:
-                        em.add_field(name=f"subcommands [{len(given_command.commands)}]", value=command_subcommands, inline=False)
+                        em.add_field(name=f"Subcommands [{len(given_command.commands)}]", value=command_subcommands, inline=False)
                     except AttributeError:
-                        em.add_field(name=f"subcommands [0]", value=command_subcommands, inline=False)
-                    em.add_field(name="category", value=given_command.cog_name, inline=False)
+                        em.add_field(name=f"Subcommands [0]", value=command_subcommands, inline=False)
+                    em.add_field(name="Category", value=given_command.cog_name, inline=False)
                     em.set_footer(text=f"Requested by {ctx.author.name}#{ctx.author.discriminator}", icon_url=ctx.author.avatar_url)
                     await ctx.reply(embed=em, mention_author=False)
                 else:
@@ -698,7 +708,7 @@ Type: `{type}`
                     em.set_image(url=self.bot.banner)
                     await ctx.reply(embed=em, mention_author=False)
                 else:
-                    em=discord.Embed(description=f"there isn't a cog / command with the name `{command}`", color=color())
+                    em=discord.Embed(description=f"There isn't a cog / command with the name `{command}`", color=color())
                     em.set_footer(text=f"Requested by {ctx.author.name}#{ctx.author.discriminator}", icon_url=ctx.author.avatar_url)
                     await ctx.reply(embed=em, mention_author=False)
 
