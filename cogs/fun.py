@@ -119,7 +119,7 @@ class Fun(commands.Cog):
         file=discord.File(buf, filename=f"{code}.png")
         em=discord.Embed(color=color(), timestamp=datetime.datetime.utcnow())
         em.set_image(url=f"attachment://{code}.png")
-        em.set_footer(text=f"Powered by dagpi.xyz • {ctx.author}", icon_url=ctx.author.avatar_url)
+        em.set_footer(text=f"Powered by http.cat • {ctx.author}", icon_url=ctx.author.avatar_url)
         await ctx.send(embed=em, file=file)
 
     @commands.command()

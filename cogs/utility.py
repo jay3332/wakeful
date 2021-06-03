@@ -1,4 +1,4 @@
-import discord, datetime, async_cse, psutil, humanize, os, sys, inspect, mystbin, googletrans, asyncio, aiohttp, random, time, asyncdagpi, hashlib, asyncpg, io
+import discord, datetime, async_cse, psutil, humanize, os, sys, inspect, mystbin, googletrans, asyncio, aiohttp, random, time, asyncdagpi, hashlib, asyncpg, io, base64
 from discord.ext import commands
 from discord import Webhook, AsyncWebhookAdapter
 from utils.configs import color
@@ -939,6 +939,101 @@ Count: `{shard.shard_count}`
                     em=discord.Embed(description=f"There isn't a cog / command with the name `{command}`", color=color())
                     em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
                     await ctx.reply(embed=em, mention_author=False)
+
+    @commands.group(invoke_without_command=True)
+    @commands.cooldown(1,10,commands.BucketType.user)
+    async def minecraft(self, ctx, username):
+        uid = await self.bot.session.get(f"https://api.mojang.com/users/profiles/minecraft/{username}")
+        if uid.status == 200:
+            uid = await uid.json()
+            name = uid["name"]
+            uid = uid["id"]
+            em=discord.Embed(title=name, description=f"""
+Name: `{name}`
+UID: `{uid}`
+""", color=color(), timestamp=datetime.datetime.utcnow(), url=f"https://namemc.com/profile/{name}")
+            em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
+            em.set_thumbnail(url=f"https://crafatar.com/avatars/{uid}?default=MHF_Steve&overlay&size=256")
+            await ctx.reply(embed=em, mention_author=False)
+        else:
+            await ctx.invoke(self.bot.get_command("httpcat"), uid.status)
+
+    @minecraft.command()
+    @commands.cooldown(1,10,commands.BucketType.user)
+    async def avatar(self, ctx, username):
+        uid = await self.bot.session.get(f"https://api.mojang.com/users/profiles/minecraft/{username}")
+        if uid.status == 200:
+            uid = await uid.json()
+            name = uid["name"]
+            uid = uid["id"]
+            em=discord.Embed(title=f"{name}'s avatar", color=color(), timestamp=datetime.datetime.utcnow(), url=f"https://namemc.com/profile/{name}")
+            em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
+            em.set_image(url=f"https://crafatar.com/avatars/{uid}?default=MHF_Steve&overlay&size128")
+            await ctx.reply(embed=em, mention_author=False)
+        else:
+            await ctx.invoke(self.bot.get_command("httpcat"), uid.status)
+
+    @minecraft.command()
+    @commands.cooldown(1,10,commands.BucketType.user)
+    async def skin(self, ctx, username):
+        uid = await self.bot.session.get(f"https://api.mojang.com/users/profiles/minecraft/{username}")
+        if uid.status == 200:
+            uid = await uid.json()
+            name = uid["name"]
+            uid = uid["id"]
+            em=discord.Embed(title=f"{name}'s skin", color=color(), timestamp=datetime.datetime.utcnow(), url=f"https://namemc.com/profile/{name}")
+            em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
+            em.set_image(url=f"https://crafatar.com/renders/body/{uid}?default=MHF_Steve&overlay&scale=5")
+            await ctx.reply(embed=em, mention_author=False)
+        else:
+            await ctx.invoke(self.bot.get_command("httpcat"), uid.status)
+
+    @minecraft.command()
+    @commands.cooldown(1,10,commands.BucketType.user)
+    async def head(self, ctx, username):
+        uid = await self.bot.session.get(f"https://api.mojang.com/users/profiles/minecraft/{username}")
+        if uid.status == 200:
+            uid = await uid.json()
+            name = uid["name"]
+            uid = uid["id"]
+            em=discord.Embed(title=f"{name}'s head", color=color(), timestamp=datetime.datetime.utcnow(), url=f"https://namemc.com/profile/{name}")
+            em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
+            em.set_image(url=f"https://crafatar.com/renders/head/{uid}?default=MHF_Steve&overlay&scale=5")
+            await ctx.reply(embed=em, mention_author=False)
+        else:
+            await ctx.invoke(self.bot.get_command("httpcat"), uid.status)
+
+    @minecraft.command()
+    @commands.cooldown(1,10,commands.BucketType.user)
+    async def friends(self, ctx, username):
+        uid = await self.bot.session.get(f"https://api.mojang.com/users/profiles/minecraft/{username}")
+        if uid.status == 200:
+            uid = await uid.json()
+            name = uid["name"]
+            uid = uid["id"]
+            res = await self.bot.session.get(f"https://api.namemc.com/profile/{uid}/friends")
+            res = await res.json()
+            if res != []:
+                em=discord.Embed(title=f"{name}'s friends", color=color(), timestamp=datetime.datetime.utcnow(), url=f"https://namemc.com/profile/{name}")
+                em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
+                for friend in list(res):
+                    em.add_field(
+                        name=friend["name"],
+                        value=f"""
+Name: `{friend['name']}`
+UUID: `{friend['uuid']}`
+[NameMC](https://namemc.com/profile/{friend['name']})
+""",
+                        inline=True
+                    )
+                await ctx.reply(embed=em, mention_author=False)
+            else:
+                em=discord.Embed(description=f"`{name}` has no friends on namemc.com", color=color(), timestamp=datetime.datetime.utcnow(), url=f"https://namemc.com/profile/{name}")
+                em.set_thumbnail(url=f"https://crafatar.com/avatars/{uid}?default=MHF_Steve&overlay&size=256")
+                em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
+                await ctx.reply(embed=em, mention_author=False)
+        else:
+            await ctx.invoke(self.bot.get_command("httpcat"), uid.status)
 
     @commands.command()
     @commands.cooldown(1, 5, commands.BucketType.user)
