@@ -25,7 +25,7 @@ def typeracer(img, sentence):
     draw.text((0, 0),str(sentence),(0,0,0),font=font)
     array = io.BytesIO()
     img.save(array, format="png")
-    _file = discord.File(io.BytesIO(array.getvalue()), "typeracer.png")
+    return discord.File(io.BytesIO(array.getvalue()), "typeracer.png")
 
 class Fun(commands.Cog):
 
@@ -50,7 +50,7 @@ class Fun(commands.Cog):
             sentence = wonderwords.RandomSentence().sentence()
             img = await self.bot.session.get("https://media.discordapp.net/attachments/832746281335783426/850000934658244668/typeracer.jpg")
             _file = await typeracer(io.BytesIO(await img.read()), sentence)
-            em=discord.Embed(description="First one to type this sentence", color=color())
+            em=discord.Embed(description="First one to type this sentence wins", color=color())
             em.set_image(url="attachment://typeracer.jpg")
             msg = await ctx.send(embed=em, file=_file)
         try:
