@@ -41,11 +41,12 @@ class Image(commands.Cog):
                 url = ctx.author.avatar_url_as(format="png", size=1024)
         else:
             url = member.avatar_url_as(format="png", size=1024)
-        img = await self.bot.session.get(str(url))
-        img = await img.read()
-        res = await rounden(io.BytesIO(img))
-        em=discord.Embed(color=color())
-        em.set_image(url="attachment://circular.png")
+        async with ctx.typing():
+            img = await self.bot.session.get(str(url))
+            img = await img.read()
+            res = await rounden(io.BytesIO(img))
+            em=discord.Embed(color=color())
+            em.set_image(url="attachment://circular.png")
         await ctx.reply(file=res, embed=em, mention_author=False)
 
     @commands.command()
