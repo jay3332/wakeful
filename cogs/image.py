@@ -62,7 +62,7 @@ class Image(commands.Cog):
             em.set_image(url="attachment://circular.png")
         await ctx.reply(file=res, embed=em, mention_author=False)
 
-    @commands.command(aliases=["circle", "round", "circular"])
+    @commands.command()
     @commands.cooldown(1,15,commands.BucketType.user)
     async def rectangle(self, ctx, member : discord.Member = None):
         if member is None:
