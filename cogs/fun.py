@@ -44,9 +44,9 @@ class Fun(commands.Cog):
             draw = ImageDraw.Draw(img)
             font = ImageFont.truetype("data/font.ttf", 150)
             draw.text((0, 0),str(sentence),(0,0,0),font=font)
-            img = io.BytesIO(await draw.read())
-            file = discord.File(img, filename="typracer.jpg")
+            file = discord.File(img, filename="typeracer.jpg")
             em=discord.Embed(description="First one to type this sentence", color=color())
+            em.set_image(url="attachments://typeracer.jpg")
             msg = await ctx.send(embed=em, file=file)
         try:
             msg = await self.bot.wait_for("message", check=lambda message: message.content == str(sentence) and message.channel == ctx.channel, timeout=60)
