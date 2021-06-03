@@ -799,7 +799,7 @@ Count: `{shard.shard_count}`
                 disabled = []
             em.add_field(
                 name="Cogs",
-                value="\n".join(f"`{self.bot.get_cog(cog).qualified_name}`" for cog in self.bot.cogs if self.bot.get_cog(cog).qualified_name.lower() != "jishaku" and self.bot.get_cog(cog).get_commands() and len(self.bot.get_cog(cog).get_commands()) != 0),
+                value="\n".join(f"`{self.bot.get_cog(cog).qualified_name}`" for cog in self.bot.cogs if self.bot.get_cog(cog).qualified_name.lower() != "jishaku" and [cmd for cmd in self.bot.get_cog(cog).get_commands() if not cmd.hidden or cmd.name in disabled] != [] and len([cmd for cmd in self.bot.get_cog(cog).get_commands() if not cmd.hidden or cmd.name in disabled]) != 0),
                 inline=True
             )
             operating_system=None
