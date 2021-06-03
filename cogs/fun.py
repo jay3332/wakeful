@@ -51,18 +51,18 @@ class Fun(commands.Cog):
             img = await self.bot.session.get("https://media.discordapp.net/attachments/832746281335783426/850000934658244668/typeracer.jpg")
             _file = await typeracer(io.BytesIO(await img.read()), sentence)
             em=discord.Embed(description="First one to type this sentence wins", color=color())
-            em.set_image(url="attachment://typeracer.jpg")
-            msg = await ctx.send(embed=em, file=_file)
+            em.set_image(url="attachment://typeracer.png")
+            _msg = await ctx.reply(embed=em, file=_file, mention_author=False)
         try:
             msg = await self.bot.wait_for("message", check=lambda message: message.content == str(sentence) and message.channel == ctx.channel, timeout=60)
             delta = datetime.datetime.utcnow() - start_time
             hours, remainder = divmod(int(delta.total_seconds()), 3600)
             minutes, seconds = divmod(remainder, 60)
             em=discord.Embed(description=f"We have a winner! {msg.author.mention} has typed the sentence in `{seconds}` seconds", color=color())
-            await msg.edit(embed=em)
+            await _msg.edit(embed=em)
         except asyncio.TimeoutError:
             em=discord.Embed(description=f"No one sent the right sentence, it was `{sentence}`", color=color())
-            await msg.edit(embed=em)
+            await _msg.edit(embed=em)
 
     @commands.command(aliases=["gtl"])
     @commands.cooldown(1, 5, commands.BucketType.user)
