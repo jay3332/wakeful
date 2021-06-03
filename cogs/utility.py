@@ -484,6 +484,7 @@ class Utility(commands.Cog):
     @commands.cooldown(1,5,commands.BucketType.user)
     async def lettercount(self, ctx, *, text):
         em=discord.Embed(description=f"Your text is {len(text)} letters long", color=color())
+        em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
         await ctx.reply(embed=em, mention_author=False)
 
     @commands.command(aliases=["wc"])
@@ -491,6 +492,14 @@ class Utility(commands.Cog):
     async def wordcount(self, ctx, *, text):
         text_list = text.split(" ")
         em=discord.Embed(description=f"Your text is {len(text_list)} words long", color=color())
+        em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
+        await ctx.reply(embed=em, mention_author=False)
+
+    @commands.command()
+    @commands.cooldown(1,5,commands.BucketType.user)
+    async def invite(self, ctx):
+        em=discord.Embed(description=f"Here's my [invite](https://discord.com/api/oauth2/authorize?client_id={self.bot.user.id}&permissions=8&scope=bot)", color=color())
+        em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
         await ctx.reply(embed=em, mention_author=False)
 
     @commands.command(aliases=["botinfo", "about", "bi"])
