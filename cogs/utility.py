@@ -411,7 +411,7 @@ class Utility(commands.Cog):
             await msg.edit(embed=em)
         else:
             if suggestion.content.lower() != "cancel":
-                webhook = Webhook.from_url(str(self.bot.suggestions), adapter=AsyncWebhookAdapter(self.bot.session))
+                webhook = Webhook.from_url(str(get_config("SUGGESTIONS")), adapter=AsyncWebhookAdapter(self.bot.session))
                 em=discord.Embed(description=f"```{suggestion.clean_content}```", color=color())
                 em.set_footer(text=f"suggestion by {ctx.author} ({ctx.author.id})", icon_url=ctx.author.avatar_url)
                 attachment = None

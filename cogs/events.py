@@ -1,8 +1,10 @@
 import discord, difflib, asyncio
 from colorama import Fore
 from discord.ext import commands
+from discord import Webhook, AsyncWebhookAdapter
 from utils.configs import color
 from utils.checks import is_mod
+from utils.get import * 
 
 class Errors(commands.Cog):
 
@@ -74,6 +76,30 @@ class Errors(commands.Cog):
             em=discord.Embed(description=f"```{error}```", color=color())
             await ctx.reply(embed=em, mention_author=False)
             raise error
+
+    @commands.Cog.listener()
+    async def on_guild_join(self, guild):
+        webhook = Webhook.from_url(str(get_config("LOGS")), adapter=AsyncWebhookAdapter(self.bot.session))
+        em=discord.Embed(title="Join Guild", description=f"""
+Name: `{guild.name}`
+ID: `{guild.id}`
+Members: `{guild.member_count}`
+Owner: `{guild.owner}`
+""", color=color())
+        em.set_thumbnail(url=guild.icon_url)
+        await webhook.send(embed=em)
+
+    @commands.Cog.listener()
+    async def on_guild_leave(self, guild):
+        webhook = Webhook.from_url(str(get_config("LOGS")), adapter=AsyncWebhookAdapter(self.bot.session))
+        em=discord.Embed(title="Leave Guild", description=f"""
+Name: `{guild.name}`
+ID: `{guild.id}`
+Members: `{guild.member_count}`
+Owner: `{guild.owner}`
+""", color=color())
+        em.set_thumbnail(url=guild.icon_url)
+        await webhook.send(embed=em)
 
     @commands.Cog.listener()
     async def on_command_completion(self, ctx):

@@ -33,7 +33,6 @@ bot.uptime = datetime.datetime.utcnow()
 token = conf["TOKEN"]
 devtoken = conf["DEVTOKEN"]
 bot.github = "https://github.com/jottew/wakeful" # the github the bot is hosted on
-bot.suggestions = conf["SUGGESTIONS"] # this will be used as a webhook for suggestions
 bot.invite = "https://discord.gg/RkCqvMJsDY"
 bot.greenTick="✓"
 bot.redTick="x"
