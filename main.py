@@ -85,9 +85,12 @@ async def on_message(msg):
             if success:
                 commands = commands.split(",")
                 if command in commands and command != "":
-                    em=discord.Embed(description=f"This command has been disabled by the server administrators", color=color())
-                    await msg.channel.send(embed=em)
-                    return
+                    if is_mod(bot, msg.author):
+                        pass
+                    else:
+                        em=discord.Embed(description=f"This command has been disabled by the server administrators", color=color())
+                        await msg.channel.send(embed=em)
+                        return
                 else:
                     pass
             else:

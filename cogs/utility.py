@@ -1,3 +1,4 @@
+from utils.checks import is_mod
 import discord, datetime, async_cse, psutil, humanize, os, sys, inspect, mystbin, googletrans, asyncio, aiohttp, random, time, asyncdagpi, hashlib, asyncpg
 from discord.ext import commands
 from discord import Webhook, AsyncWebhookAdapter
@@ -797,9 +798,19 @@ Count: `{shard.shard_count}`
                     disabled = disabled.split(",")
             else:
                 disabled = []
+            cogs = []
+            for cog in self.bot.cogs:
+                cog = self.bot.get_cog(cog)
+                if not cog.qualified_name.lower() in ["jishaku"]:
+                    if is_mod(self.bot, ctx.author):
+                        cmds = [cmd for cmd in cog.get_commands()]
+                    else:
+                        cmds = [cmd for cmd in cog.get_commands() if not cmd.hidden and not cmd.name in disabled]
+                    if len(cmds) != 0 and cmds != []:
+                        cogs.append(cog)
             em.add_field(
                 name="Cogs",
-                value="\n".join(f"`{self.bot.get_cog(cog).qualified_name}`" for cog in self.bot.cogs if self.bot.get_cog(cog).qualified_name.lower() != "jishaku" and [cmd for cmd in self.bot.get_cog(cog).get_commands() if not cmd.hidden or cmd.name in disabled] != [] and len([cmd for cmd in self.bot.get_cog(cog).get_commands() if not cmd.hidden or cmd.name in disabled]) != 0),
+                value="\n".join(f"`{cog.qualified_name}`" for cog in cogs),
                 inline=True
             )
             operating_system=None
@@ -824,7 +835,7 @@ Count: `{shard.shard_count}`
             em.set_image(url=self.bot.banner)
             await ctx.reply(embed=em, mention_author=False)
         else:
-            if self.bot.get_command(str(command)):
+            if self.bot.get_command(str(command)) is not None:
                 given_command = self.bot.get_command(str(command))
                 disabled = await self.bot.db.fetchrow("SELECT commands FROM commands WHERE guild = $1", ctx.guild.id)
                 try:
@@ -864,8 +875,12 @@ Count: `{shard.shard_count}`
                         em.add_field(name=f"Aliases [{len(given_command.aliases)}]", value="> " + ", ".join(f"`{alias}`" for alias in given_command.aliases), inline=False)
                     else:
                         em.add_field(name="Aliases [0]", value="None", inline=False)
+                    if is_mod(self.bot, ctx.author):
+                        commands_ = [cmd for cmd in given_command.commands]
+                    else:
+                        commands_ = [cmd for cmd in given_command.commands if not cmd.hidden and not cmd.name in disabled]
                     try:
-                        em.add_field(name=f"Subcommands [{len([cmd for cmd in given_command.commands if not command.hidden or not command.name in disabled])}]", value=command_subcommands, inline=False)
+                        em.add_field(name=f"Subcommands [{len(commands_)}]", value=command_subcommands, inline=False)
                     except AttributeError:
                         em.add_field(name=f"Subcommands [0]", value="None", inline=False)
                     em.add_field(name="Category", value=given_command.cog_name, inline=False)
@@ -884,7 +899,10 @@ Count: `{shard.shard_count}`
                 else:
                     disabled = disabled.split(",")
                 given_cog = self.bot.get_cog(str(command).title())
-                commands_ = [cmd for cmd in given_cog.walk_commands() if not cmd.hidden and not cmd.name in disabled]
+                if is_mod(self.bot, ctx.author):
+                    commands_ = [cmd for cmd in given_cog.walk_commands() if cmd.parent is None]
+                else:
+                    commands_ = [cmd for cmd in given_cog.walk_commands() if not cmd.hidden and not cmd.name in disabled and cmd.parent is None]
                 if given_cog != None and commands_ is not None and commands_ != []:
                     em=discord.Embed(title=f"{given_cog.qualified_name} commands [{len(commands_)}]", description=f"{given_cog.description}\n\n> "+", ".join(f"`{cmd.name}`" for cmd in commands_), color=color())
                     em.set_footer(text=f"Requested by {ctx.author.name}#{ctx.author.discriminator}", icon_url=ctx.author.avatar_url)
