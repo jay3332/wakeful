@@ -99,7 +99,12 @@ class Admin(commands.Cog):
             self.bot.status = None
             await ctx.message.add_reaction("✅")
 
-    @commands.command(hidden=True)
+    @commands.group(invoke_without_command=True, hidden=True)
+    @commands.is_owner()
+    async def git(self, ctx):
+        await ctx.invoke(self.bot.get_command("help"), **{"command": ctx.command})
+
+    @git.command(hidden=True)
     @commands.is_owner()
     async def pull(self, ctx):
         proc = await asyncio.create_subprocess_shell("git pull", stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE)
