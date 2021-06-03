@@ -519,18 +519,10 @@ class Utility(commands.Cog):
             hours, remainder = divmod(int(delta_uptime.total_seconds()), 3600)
             minutes, seconds = divmod(remainder, 60)
             days, hours = divmod(hours, 24)
-            channels = {"all": 0, "category": 0, "text": 0, "voice": 0, "stage": 0}
+            channels = 0
             for guild in self.bot.guilds:
                 for channel in guild.channels:
-                    channels["all"] += 1
-                    if isinstance(channel, discord.CategoryChannel):
-                        channels["category"] +=1
-                    elif isinstance(channel, discord.TextChannel):
-                        channels["text"] += 1
-                    elif isinstance(channel, discord.VoiceChannel):
-                        channels["voice"] += 1
-                    elif isinstance(channel, discord.StageChannel):
-                        channels["stage"] += 1
+                    channels += 1
             cogs = []
             if ctx.guild is not None:
                 disabled = await self.bot.db.fetchrow("SELECT commands FROM commands WHERE guild = $1", ctx.guild.id)
@@ -552,7 +544,7 @@ class Utility(commands.Cog):
                     if len(cmds) != 0 and cmds != []:
                         cogs.append(cog)
             owner = self.bot.get_user(self.bot.ownersid)
-            em.add_field(name="system", value=f"""
+            em.add_field(name="System", value=f"""
 - **OS**: `{operating_system}`
 - **CPU**: `{process.cpu_percent()}`%
 - **Memory**: `{humanize.naturalsize(process.memory_full_info().rss)}`
@@ -561,22 +553,20 @@ class Utility(commands.Cog):
 - **Language**: `python`
 - **Python version**: `{version[0]}.{version[1]}.{version[2]}`
 - **discord.py version**: `{discord.__version__}`""", inline=True)
-            em.add_field(name="bot", value=f"""
+            em.add_field(name="Bot", value=f"""
 - **Guilds**: `{len(self.bot.guilds)}`
 - **Users**: `{len(self.bot.users)}`
-- **Channels**: `{channels["all"]}`:
-    - **Categories**: `{channels["category"]}`
-    - **Text**: `{channels["text"]}`
-    - **Voice**: `{channels["voice"]}`
-    - **Stage**: `{channels["stage"]}`
+- **Channels**: `{channels}`:
 - **Shards**: `{len(list(self.bot.shards))}`
 - **Commands**: `{len([cmd for cmd in self.bot.commands if not cmd.hidden])}`
 - **Commands executed**: `{self.bot.cmdsSinceRestart}`
 - **Cogs**: `{len(cogs)}`
-- **Uptime**: `{days}d {hours}h {minutes}m {seconds}s`
-- [Developer](https://discord.com/profile/{owner})
+- **Uptime**: `{days}d {hours}h {minutes}m {seconds}s`""", inline=True)
+            em.add_field(name="Links", value=f"""
+- [Developer](https://discord.com/users/{owner.id})
 - [Source]({self.bot.github})
-- [Invite](https://discord.com/api/oauth2/authorize?client_id={self.bot.user.id}&permissions=8&scope=bot)""", inline=True)
+- [Invite](https://discord.com/api/oauth2/authorize?client_id={self.bot.user.id}&permissions=8&scope=bot)
+""", inline=False)
             em.set_thumbnail(url=self.bot.user.avatar_url)
         em.set_footer(text=f"Made by {owner}", icon_url=owner.avatar_url)
         await ctx.send(embed=em)
