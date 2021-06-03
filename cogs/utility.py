@@ -243,12 +243,12 @@ class Utility(commands.Cog):
             if ctx.guild.is_icon_animated():
                 avatar_gif = ctx.guild.icon_url_as(format="gif")
             if ctx.guild.is_icon_animated():
-                embed=discord.Embed(description=f"[png]({avatar_png}) | [jpg]({avatar_jpg}) | [jpeg]({avatar_jpeg}) | [webp]({avatar_webp}) | [gif]({avatar_gif})", color=color(), timestamp=datetime.datetime.utcnow())
+                em=discord.Embed(description=f"[png]({avatar_png}) | [jpg]({avatar_jpg}) | [jpeg]({avatar_jpeg}) | [webp]({avatar_webp}) | [gif]({avatar_gif})", color=color(), timestamp=datetime.datetime.utcnow())
             else:
-                embed=discord.Embed(description=f"[png]({avatar_png}) | [jpg]({avatar_jpg}) | [jpeg]({avatar_jpeg}) | [webp]({avatar_webp})", color=color(), timestamp=datetime.datetime.utcnow())
-            embed.set_image(url=ctx.guild.icon_url)
-            embed.set_author(name=f"{ctx.guild.name}", icon_url=ctx.guild.icon_url)
-        await ctx.send(embed=embed)
+                em=discord.Embed(description=f"[png]({avatar_png}) | [jpg]({avatar_jpg}) | [jpeg]({avatar_jpeg}) | [webp]({avatar_webp})", color=color(), timestamp=datetime.datetime.utcnow())
+            em.set_image(url=ctx.guild.icon_url)
+            em.set_author(name=f"{ctx.guild.name}", icon_url=ctx.guild.icon_url)
+        await ctx.send(embed=em)
 
     @commands.command(aliases=["si", "guildinfo", "gi"])
     @commands.guild_only()
@@ -474,12 +474,12 @@ class Utility(commands.Cog):
             if member.is_avatar_animated():
                 avatar_gif = member.avatar_url_as(format="gif")
             if member.is_avatar_animated():
-                embed=discord.Embed(description=f"[png]({avatar_png}) | [jpg]({avatar_jpg}) | [jpeg]({avatar_jpeg}) | [webp]({avatar_webp}) | [gif]({avatar_gif})", color=color(), timestamp=datetime.datetime.utcnow())
+                em=discord.Embed(description=f"[png]({avatar_png}) | [jpg]({avatar_jpg}) | [jpeg]({avatar_jpeg}) | [webp]({avatar_webp}) | [gif]({avatar_gif})", color=color(), timestamp=datetime.datetime.utcnow())
             else:
-                embed=discord.Embed(description=f"[png]({avatar_png}) | [jpg]({avatar_jpg}) | [jpeg]({avatar_jpeg}) | [webp]({avatar_webp})", color=color(), timestamp=datetime.datetime.utcnow())
-            embed.set_image(url=member.avatar_url)
-            embed.set_author(name=f"{member}", icon_url=member.avatar_url)
-        await ctx.send(embed=embed)
+                em=discord.Embed(description=f"[png]({avatar_png}) | [jpg]({avatar_jpg}) | [jpeg]({avatar_jpeg}) | [webp]({avatar_webp})", color=color(), timestamp=datetime.datetime.utcnow())
+            em.set_image(url=member.avatar_url)
+            em.set_author(name=f"{member}", icon_url=member.avatar_url)
+        await ctx.send(embed=em)
 
     @commands.command(aliases=["lc"])
     @commands.cooldown(1,5,commands.BucketType.user)
@@ -514,7 +514,7 @@ class Utility(commands.Cog):
         async with ctx.typing():
             process = psutil.Process()
             version = sys.version_info
-            embed = discord.Embed(color=color())
+            em = discord.Embed(color=color())
             delta_uptime = datetime.datetime.utcnow() - self.bot.uptime
             hours, remainder = divmod(int(delta_uptime.total_seconds()), 3600)
             minutes, seconds = divmod(remainder, 60)
@@ -532,6 +532,16 @@ class Utility(commands.Cog):
                     elif isinstance(channel, discord.StageChannel):
                         channels["stage"] += 1
             cogs = []
+            if ctx.guild is not None:
+                disabled = await self.bot.db.fetchrow("SELECT commands FROM commands WHERE guild = $1", ctx.guild.id)
+                try:
+                    disabled = disabled["commands"]
+                except:
+                    pass
+                else:
+                    disabled = disabled.split(",")
+            else:
+                disabled = []
             for cog in self.bot.cogs:
                 cog = get_cog(self.bot, cog)
                 if not cog.qualified_name.lower() in ["jishaku"]:
@@ -541,7 +551,8 @@ class Utility(commands.Cog):
                         cmds = [cmd for cmd in cog.get_commands() if not cmd.hidden and not cmd.name in disabled]
                     if len(cmds) != 0 and cmds != []:
                         cogs.append(cog)
-            embed.add_field(name="system", value=f"""
+            owner = self.bot.get_user(self.bot.ownersid)
+            em.add_field(name="system", value=f"""
 - **OS**: `{operating_system}`
 - **CPU**: `{process.cpu_percent()}`%
 - **Memory**: `{humanize.naturalsize(process.memory_full_info().rss)}`
@@ -550,7 +561,7 @@ class Utility(commands.Cog):
 - **Language**: `python`
 - **Python version**: `{version[0]}.{version[1]}.{version[2]}`
 - **discord.py version**: `{discord.__version__}`""", inline=True)
-            embed.add_field(name="bot", value=f"""
+            em.add_field(name="bot", value=f"""
 - **Guilds**: `{len(self.bot.guilds)}`
 - **Users**: `{len(self.bot.users)}`
 - **Channels**: `{channels["all"]}`:
@@ -563,10 +574,12 @@ class Utility(commands.Cog):
 - **Commands executed**: `{self.bot.cmdsSinceRestart}`
 - **Cogs**: `{len(cogs)}`
 - **Uptime**: `{days}d {hours}h {minutes}m {seconds}s`
-- [source]({self.bot.github})
-- [invite](https://discord.com/api/oauth2/authorize?client_id={self.bot.user.id}&permissions=8&scope=bot)""", inline=True)
-            embed.set_thumbnail(url=self.bot.user.avatar_url)
-        await ctx.send(embed=embed)
+- [Developer](https://discord.com/profile/{owner})
+- [Source]({self.bot.github})
+- [Invite](https://discord.com/api/oauth2/authorize?client_id={self.bot.user.id}&permissions=8&scope=bot)""", inline=True)
+            em.set_thumbnail(url=self.bot.user.avatar_url)
+        em.set_footer(text=f"Made by {owner}", icon_url=owner.avatar_url)
+        await ctx.send(embed=em)
 
     @commands.command()
     @commands.cooldown(1,5,commands.BucketType.user)
@@ -574,13 +587,9 @@ class Utility(commands.Cog):
         if msg is None:
             if ctx.message.reference:
                 text = ctx.message.reference.resolved.clean_content
-            else:
-                em=discord.Embed(description="😐", color=color())
-                await ctx.reply(embed=em, mention_author=False)
-                return
         else:
             text = msg
-        await ctx.reply(text.replace("|", ""), mention_author=False)
+        await ctx.reply(text.replace("|", ""), mention_author=False, allowed_mentions=discord.AllowedMentions.none())
     
     @commands.command()
     @commands.cooldown(1,5,commands.BucketType.user)
@@ -588,13 +597,9 @@ class Utility(commands.Cog):
         if msg is None:
             if ctx.message.reference:
                 text = ctx.message.reference.resolved.clean_content
-            else:
-                em=discord.Embed(description="😐", color=color())
-                await ctx.reply(embed=em, mention_author=False)
-                return
         else:
             text = msg
-        await ctx.reply("".join(f"||{letter}||" for letter in text), mention_author=False)
+        await ctx.reply("".join(f"||{letter}||" for letter in text), mention_author=False, allowed_mentions=discord.AllowedMentions.none())
     
     @commands.command(aliases=["rp", "activity", "richpresence", "status"])
     @commands.cooldown(1,5,commands.BucketType.user)
@@ -1057,15 +1062,15 @@ UUID: `{friend['uuid']}`
     @commands.command()
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def ping(self, ctx):
-        embed=discord.Embed(color=color())
+        em=discord.Embed(color=color())
         dagpi_ping = round(await dagpi.image_ping(), 3) * 1000
-        embed.add_field(name="latency", value=f"""
+        em.add_field(name="latency", value=f"""
 - **Typing**: `pinging`
 - **Bot**: `{round(self.bot.latency*1000)}`ms
 - **Database**: `pinging`
 - **Dagpi**: `{dagpi_ping}`ms""", inline=False)
         start=time.perf_counter()
-        msg = await ctx.send(embed=embed)
+        msg = await ctx.send(embed=em)
         end=time.perf_counter()
         final=end-start
         api_latency = round(final*1000)

@@ -218,5 +218,15 @@ class Fun(commands.Cog):
             em.set_footer(text=f"Is this what you want? • Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
             await ctx.reply(embed=em, mention_author=False)
 
+    @commands.command()
+    @commands.cooldown(1,5,commands.BucketType.user)
+    async def mock(self, ctx, *, msg : str = None):
+        if msg is None:
+            if ctx.message.reference:
+                text = ctx.message.reference.resolved.clean_content
+        else:
+            text = msg
+        await ctx.reply("".join(letter.lower() if random.choice([1,2]) == 2 else letter.upper() for letter in text), mention_author=False, allowed_mentions=discord.AllowedMentions.none())
+
 def setup(bot):
     bot.add_cog(Fun(bot))
