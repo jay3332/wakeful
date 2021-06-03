@@ -59,10 +59,10 @@ class Fun(commands.Cog):
             hours, remainder = divmod(int(delta.total_seconds()), 3600)
             minutes, seconds = divmod(remainder, 60)
             em=discord.Embed(description=f"We have a winner! {msg.author.mention} has typed the sentence in `{seconds}` seconds", color=color())
-            await _msg.edit(embed=em, file=None)
+            await msg.reply(embed=em, mention_author=False)
         except asyncio.TimeoutError:
             em=discord.Embed(description=f"No one sent the right sentence, it was `{sentence}`", color=color())
-            await _msg.edit(embed=em, file=None)
+            await _msg.reply(embed=em)
 
     @commands.command(aliases=["gtl"])
     @commands.cooldown(1, 5, commands.BucketType.user)
