@@ -19,7 +19,7 @@ def do_tts(language, message):
 @executor_function
 def typeracer(img, sentence):
     from PIL import Image, ImageDraw, ImageFont
-    img = Image.open(io.BytesIO(await img.read()))
+    img = Image.open(img)
     draw = ImageDraw.Draw(img)
     font = ImageFont.truetype("data/font.ttf", 150)
     draw.text((0, 0),str(sentence),(0,0,0),font=font)
@@ -49,7 +49,7 @@ class Fun(commands.Cog):
             start_time = datetime.datetime.utcnow()
             sentence = wonderwords.RandomSentence().sentence()
             img = await self.bot.session.get("https://media.discordapp.net/attachments/832746281335783426/850000934658244668/typeracer.jpg")
-            _file = await typeracer(img, sentence)
+            _file = await typeracer(io.BytesIO(await img.read()), sentence)
             em=discord.Embed(description="First one to type this sentence", color=color())
             em.set_image(url="attachment://typeracer.jpg")
             msg = await ctx.send(embed=em, file=_file)
