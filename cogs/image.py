@@ -550,7 +550,7 @@ class Image(commands.Cog):
             em=discord.Embed(color=color(), timestamp=datetime.datetime.utcnow())
             em.set_image(url=image)
             em.set_footer(text=f"Powered by nekobot.xyz • {ctx.author}", icon_url=ctx.author.avatar_url)
-        await ctx.send(embed=em)
+        await ctx.reply(embed=em, mention_author=False)
 
 
 def setup(bot):

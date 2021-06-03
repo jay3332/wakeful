@@ -18,7 +18,7 @@ class API(commands.Cog):
         em=discord.Embed(color=color(), timestamp=datetime.datetime.utcnow())
         em.set_image(url=image)
         em.set_footer(text=f"Powered by thecatapi.com • {ctx.author}", icon_url=ctx.author.avatar_url)
-        await ctx.send(embed=em)
+        await ctx.reply(embed=em, mention_author=False)
 
     @commands.command()
     @commands.cooldown(1,5,commands.BucketType.user)
@@ -29,7 +29,7 @@ class API(commands.Cog):
         em=discord.Embed(color=color(), timestamp=datetime.datetime.utcnow())
         em.set_image(url=image)
         em.set_footer(text=f"Powered by dog.ceo • {ctx.author}", icon_url=ctx.author.avatar_url)
-        await ctx.send(embed=em)
+        await ctx.reply(embed=em, mention_author=False)
 
     @commands.command()
     @commands.cooldown(1,5,commands.BucketType.user)
@@ -40,7 +40,7 @@ class API(commands.Cog):
         em=discord.Embed(color=color(), timestamp=datetime.datetime.utcnow())
         em.set_image(url=image)
         em.set_footer(text=f"Powered by bunnies.io • {ctx.author}", icon_url=ctx.author.avatar_url)
-        await ctx.send(embed=em)
+        await ctx.reply(embed=em, mention_author=False)
 
     @commands.command()
     @commands.cooldown(1,5,commands.BucketType.user)
@@ -51,7 +51,7 @@ class API(commands.Cog):
         em=discord.Embed(color=color(), timestamp=datetime.datetime.utcnow())
         em.set_image(url=image)
         em.set_footer(text=f"Powered by random-d.uk • {ctx.author}", icon_url=ctx.author.avatar_url)
-        await ctx.send(embed=em)
+        await ctx.reply(embed=em, mention_author=False)
 
     @commands.command()
     @commands.cooldown(1,5,commands.BucketType.user)
@@ -62,7 +62,7 @@ class API(commands.Cog):
         em=discord.Embed(color=color(), timestamp=datetime.datetime.utcnow())
         em.set_image(url=image)
         em.set_footer(text=f"Powered by randomfox.ca • {ctx.author}", icon_url=ctx.author.avatar_url)
-        await ctx.send(embed=em)
+        await ctx.reply(embed=em, mention_author=False)
 
     @commands.command()
     @commands.cooldown(1,5,commands.BucketType.user)
@@ -73,7 +73,7 @@ class API(commands.Cog):
         em=discord.Embed(color=color(), timestamp=datetime.datetime.utcnow())
         em.set_image(url=image)
         em.set_footer(text=f"Powered by nekos.life • {ctx.author}", icon_url=ctx.author.avatar_url)
-        await ctx.send(embed=em)
+        await ctx.reply(embed=em, mention_author=False)
 
     @commands.command()
     @commands.cooldown(1,5,commands.BucketType.user)
@@ -84,7 +84,7 @@ class API(commands.Cog):
         em=discord.Embed(color=color(), timestamp=datetime.datetime.utcnow())
         em.set_image(url=image)
         em.set_footer(text=f"Powered by shibe.online • {ctx.author}", icon_url=ctx.author.avatar_url)
-        await ctx.send(embed=em)
+        await ctx.reply(embed=em, mention_author=False)
 
     @commands.command()
     @commands.cooldown(1,5,commands.BucketType.user)
@@ -95,7 +95,7 @@ class API(commands.Cog):
         em=discord.Embed(color=color(), timestamp=datetime.datetime.utcnow())
         em.set_image(url=image)
         em.set_footer(text=f"Powered by some-random-api.ml • {ctx.author}", icon_url=ctx.author.avatar_url)
-        await ctx.send(embed=em)
+        await ctx.reply(embed=em, mention_author=False)
 
     @commands.command()
     @commands.cooldown(1,5,commands.BucketType.user)
@@ -106,7 +106,7 @@ class API(commands.Cog):
         em=discord.Embed(color=color(), timestamp=datetime.datetime.utcnow())
         em.set_image(url=image)
         em.set_footer(text=f"Powered by some-random-api.ml • {ctx.author}", icon_url=ctx.author.avatar_url)
-        await ctx.send(embed=em)
+        await ctx.reply(embed=em, mention_author=False)
 
     @commands.command()
     @commands.cooldown(1,5,commands.BucketType.user)
@@ -117,7 +117,7 @@ class API(commands.Cog):
         em=discord.Embed(color=color(), timestamp=datetime.datetime.utcnow())
         em.set_image(url=image)
         em.set_footer(text=f"Powered by some-random-api.ml • {ctx.author}", icon_url=ctx.author.avatar_url)
-        await ctx.send(embed=em)
+        await ctx.reply(embed=em, mention_author=False)
 
     @commands.command()
     @commands.cooldown(1,5,commands.BucketType.user)
@@ -128,7 +128,7 @@ class API(commands.Cog):
         em=discord.Embed(color=color(), timestamp=datetime.datetime.utcnow())
         em.set_image(url=image)
         em.set_footer(text=f"Powered by some-random-api.ml • {ctx.author}", icon_url=ctx.author.avatar_url)
-        await ctx.send(embed=em)
+        await ctx.reply(embed=em, mention_author=False)
 
     @commands.group(invoke_without_command=True)
     async def fact(self, ctx):
@@ -142,7 +142,7 @@ class API(commands.Cog):
         fact = res["fact"]
         em=discord.Embed(description=fact, color=color(), timestamp=datetime.datetime.utcnow())
         em.set_footer(text=f"Powered by some-random-api.ml • {ctx.author}", icon_url=ctx.author.avatar_url)
-        await ctx.send(embed=em)
+        await ctx.reply(embed=em, mention_author=False)
 
     @fact.command(name="cat")
     @commands.cooldown(1,5,commands.BucketType.user)
@@ -152,7 +152,7 @@ class API(commands.Cog):
         fact = res["fact"]
         em=discord.Embed(description=fact, color=color(), timestamp=datetime.datetime.utcnow())
         em.set_footer(text=f"Powered by some-random-api.ml • {ctx.author}", icon_url=ctx.author.avatar_url)
-        await ctx.send(embed=em)
+        await ctx.reply(embed=em, mention_author=False)
     
     @fact.command(name="panda")
     @commands.cooldown(1,5,commands.BucketType.user)
@@ -162,7 +162,7 @@ class API(commands.Cog):
         fact = res["fact"]
         em=discord.Embed(description=fact, color=color(), timestamp=datetime.datetime.utcnow())
         em.set_footer(text=f"Powered by some-random-api.ml • {ctx.author}", icon_url=ctx.author.avatar_url)
-        await ctx.send(embed=em)
+        await ctx.reply(embed=em, mention_author=False)
     
     @fact.command(name="fox")
     @commands.cooldown(1,5,commands.BucketType.user)
@@ -172,7 +172,7 @@ class API(commands.Cog):
         fact = res["fact"]
         em=discord.Embed(description=fact, color=color(), timestamp=datetime.datetime.utcnow())
         em.set_footer(text=f"Powered by some-random-api.ml • {ctx.author}", icon_url=ctx.author.avatar_url)
-        await ctx.send(embed=em)
+        await ctx.reply(embed=em, mention_author=False)
     
     @fact.command(name="bird")
     @commands.cooldown(1,5,commands.BucketType.user)
@@ -182,7 +182,7 @@ class API(commands.Cog):
         fact = res["fact"]
         em=discord.Embed(description=fact, color=color(), timestamp=datetime.datetime.utcnow())
         em.set_footer(text=f"Powered by some-random-api.ml • {ctx.author}", icon_url=ctx.author.avatar_url)
-        await ctx.send(embed=em)
+        await ctx.reply(embed=em, mention_author=False)
     
     @fact.command(name="koala")
     @commands.cooldown(1,5,commands.BucketType.user)
@@ -192,7 +192,7 @@ class API(commands.Cog):
         fact = res["fact"]
         em=discord.Embed(description=fact, color=color(), timestamp=datetime.datetime.utcnow())
         em.set_footer(text=f"Powered by some-random-api.ml • {ctx.author}", icon_url=ctx.author.avatar_url)
-        await ctx.send(embed=em)
+        await ctx.reply(embed=em, mention_author=False)
     
 
 def setup(bot):

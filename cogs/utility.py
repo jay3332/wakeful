@@ -72,10 +72,10 @@ class Utility(commands.Cog):
                 url=url,
                 color=color()
             ).set_thumbnail(url="https://cdn.discordapp.com/attachments/381963689470984203/814267252437942272/pypi.png")
-            await ctx.send(embed=em)
+            await ctx.reply(embed=em, mention_author=False)
         except aiohttp.ContentTypeError:
             em=discord.Embed(description=f"this package wasn't found", color=color())
-            await ctx.send(embed=em)
+            await ctx.reply(embed=em, mention_author=False)
 
     @commands.command(aliases=["g"])
     @commands.cooldown(1, 5, commands.BucketType.user)
@@ -93,7 +93,8 @@ class Utility(commands.Cog):
                 title=f"Results for: `{term}`",
                 timestamp=datetime.datetime.utcnow(),
                 color=color()
-            ).set_footer(text=f"Requested by {ctx.author.name}#{ctx.author.discriminator} • Safe-Search: {safe_search}", icon_url=ctx.author.avatar_url)
+            )
+            em.set_footer(text=f"Requested by {ctx.author.name}#{ctx.author.discriminator} • Safe-Search: {safe_search}", icon_url=ctx.author.avatar_url)
             for result in results:
                 if not value > 4:
                     epic = results[int(value)]
@@ -103,7 +104,31 @@ class Utility(commands.Cog):
                         inline=False
                     )
                     value+=1
-        await ctx.send(embed=em)
+        await ctx.reply(embed=em, mention_author=False)
+
+    @commands.command(aliases=["gimage"])
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    async def googleimage(self, ctx, *, query):
+        if ctx.channel.is_nsfw():
+            safe_search_setting=False
+            safe_search="Disabled"
+        else:
+            safe_search_setting=True
+            safe_search="Enabled"
+        results = await google.search(query, safesearch=safe_search_setting)
+        image = None
+        for res in results:
+            if res.image_url.endswith("png") or res.image_url.endswith("jpg") or res.image_url.endswith("jpeg") or res.image_url.endswith("webp"):
+                image = res
+        if image is not None:
+            em=discord.Embed(title=f"Results for: `{query}`", description=f"[{image.title}]({image.url})", timestamp=datetime.datetime.utcnow(), color=color())
+            em.set_footer(text=f"Requested by {ctx.author.name}#{ctx.author.discriminator} • Safe-Search: {safe_search}", icon_url=ctx.author.avatar_url)
+            em.set_image(url=image.image_url)
+            await ctx.reply(embed=em, mention_author=False)
+        else:
+            em=discord.Embed(description=f"I couldn't find any images with the query `{query}`", color=color())
+            em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
+            await ctx.reply(embed=em, mention_author=False)
 
     @commands.command(aliases=["trans", "tr"])
     @commands.cooldown(1, 5, commands.BucketType.user)
@@ -114,7 +139,7 @@ class Utility(commands.Cog):
             em.add_field(name=f"Input [{translation.src.upper()}]", value=f"```{text}```", inline=False)
             em.add_field(name=f"Output [{translation.dest.upper()}]", value=f"```{translation.text}```", inline=False)
             em.set_author(name=ctx.author, icon_url=ctx.author.avatar_url)
-        await ctx.send(embed=em)
+        await ctx.reply(embed=em, mention_author=False)
 
     @commands.command(aliases=["guildav", "servericon", "serverav"])
     @commands.guild_only()
@@ -194,7 +219,7 @@ class Utility(commands.Cog):
             text=f"Requested by {ctx.author.name}#{ctx.author.discriminator}",
             icon_url=ctx.author.avatar_url
         )
-        await ctx.send(embed=em)
+        await ctx.reply(embed=em, mention_author=False)
 
     @commands.command(aliases=["ui", "whois"], description="A command to get information about the given member", usage="[@member]")
     @commands.guild_only()
@@ -280,7 +305,7 @@ class Utility(commands.Cog):
             text=f"Requested by {ctx.author.name}#{ctx.author.discriminator}",
             icon_url=ctx.author.avatar_url
         )
-        await ctx.send(embed=em)
+        await ctx.reply(embed=em, mention_author=False)
 
     @commands.command()
     @commands.cooldown(1,5,commands.BucketType.user)
@@ -288,7 +313,7 @@ class Utility(commands.Cog):
         cs = self.bot.session
         em=discord.Embed(description=f"Please now enter your suggestion below:", color=color())
         em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
-        msg = await ctx.send(embed=em)
+        msg = await ctx.reply(embed=em, mention_author=False)
         try:
             suggestion = await self.bot.wait_for("message", check=lambda msg: msg.channel == ctx.channel and msg.author == ctx.author, timeout=30)
         except asyncio.TimeoutError:
@@ -315,18 +340,18 @@ class Utility(commands.Cog):
     async def source(self, ctx, command_name : str = None):
         if command_name == None:
             em=discord.Embed(description=f"My source code can be found [here]({self.bot.github})", color=color())
-            await ctx.send(embed=em)
+            await ctx.reply(embed=em, mention_author=False)
         else:
             command = self.bot.get_command(command_name)
             if not command:
                 em=discord.Embed(description=f"Couldn't find command `{command_name}`", color=color())
-                await ctx.send(embed=em)
+                await ctx.reply(embed=em, mention_author=False)
             else:
                 try:
                     source_lines, _ = inspect.getsourcelines(command.callback)
                 except (TypeError, OSError):
                     em=discord.Embed(description=f"Couldn't retrieve source for `{command_name}`", color=color())
-                    await ctx.send(embed=em)
+                    await ctx.reply(embed=em, mention_author=False)
                 else:
                     source_lines = ''.join(source_lines).split('\n')
                     src = "\n".join(line for line in source_lines).replace("`", "'")
@@ -366,14 +391,14 @@ class Utility(commands.Cog):
     @commands.cooldown(1,5,commands.BucketType.user)
     async def lettercount(self, ctx, *, text):
         em=discord.Embed(description=f"Your text is {len(text)} letters long", color=color())
-        await ctx.send(embed=em)
+        await ctx.reply(embed=em, mention_author=False)
 
     @commands.command(aliases=["wc"])
     @commands.cooldown(1,5,commands.BucketType.user)
     async def wordcount(self, ctx, *, text):
         text_list = text.split(" ")
         em=discord.Embed(description=f"Your text is {len(text_list)} words long", color=color())
-        await ctx.send(embed=em)
+        await ctx.reply(embed=em, mention_author=False)
 
     @commands.command(aliases=["botinfo", "about", "bi"])
     @commands.cooldown(1, 5, commands.BucketType.user)
@@ -440,7 +465,7 @@ class Utility(commands.Cog):
                 text = ctx.message.reference.resolved.clean_content
             else:
                 em=discord.Embed(description="😐", color=color())
-                await ctx.send(embed=em)
+                await ctx.reply(embed=em, mention_author=False)
                 return
         else:
             text = msg
@@ -454,7 +479,7 @@ class Utility(commands.Cog):
                 text = ctx.message.reference.resolved.clean_content
             else:
                 em=discord.Embed(description="😐", color=color())
-                await ctx.send(embed=em)
+                await ctx.reply(embed=em, mention_author=False)
                 return
         else:
             text = msg
@@ -533,7 +558,7 @@ Type: `{type}`
                     inline=False
                 )
         em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
-        await ctx.send(embed=em)
+        await ctx.reply(embed=em, mention_author=False)
 
     @commands.command()
     @commands.cooldown(1,5,commands.BucketType.user)
@@ -543,12 +568,12 @@ Type: `{type}`
         except KeyError:
             em=discord.Embed(description=f"There's no message to snipe", color=color())
             em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
-            await ctx.send(embed=em)
+            await ctx.reply(embed=em, mention_author=False)
         else:
             em=discord.Embed(description=f"`{msg.content}`", color=color())
             em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
             em.set_author(name=f"{msg.author} ({msg.author.id})", icon_url=msg.author.avatar_url)
-            await ctx.send(embed=em)
+            await ctx.reply(embed=em, mention_author=False)
 
     @commands.command()
     @commands.cooldown(1,5, commands.BucketType.user)
@@ -558,17 +583,17 @@ Type: `{type}`
             res["commands"]
         except TypeError:
             em=discord.Embed(description=f"There are no disabled commands", color=color())
-            await ctx.send(embed=em)
+            await ctx.reply(embed=em, mention_author=False)
         else:
             commands = res["commands"]
             commands = commands.split(",")
             if len(commands) != 0 and commands != ['']:
                 em=discord.Embed(title="Disabled commands", description=", ".join(cmd for cmd in commands), color=color())
                 em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
-                await ctx.send(embed=em)
+                await ctx.reply(embed=em, mention_author=False)
             else:
                 em=discord.Embed(description=f"There are no disabled commands", color=color())
-                await ctx.send(embed=em)
+                await ctx.reply(embed=em, mention_author=False)
 
     @commands.command(aliases=["rtfd"])
     @commands.cooldown(1,5,commands.BucketType.user)
@@ -582,11 +607,49 @@ Type: `{type}`
         if nodes != {}:
             em=discord.Embed(description="\n".join(f"[`{e}`]({nodes[e]})" for e in nodes), color=color())
             em.set_footer(text=f"Powered by idevision.net • {ctx.author}", icon_url=ctx.author.avatar_url)
-            await ctx.send(embed=em)
+            await ctx.reply(embed=em, mention_author=False)
         else:
             em=discord.Embed(description=f"No results found for `{query}`", color=color())
             em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
-            await ctx.send(embed=em)
+            await ctx.reply(embed=em, mention_author=False)
+
+    @commands.command()
+    @commands.cooldown(1,5,commands.BucketType.user)
+    async def weather(self, ctx, state):
+        state = state.replace(" ", "%20")
+        async with ctx.typing():
+            location = await self.bot.session.get(f"https://www.metaweather.com/api/location/search/?query={state}")
+            location = await location.json()
+            try:
+                woeid = location[0]["woeid"]
+            except:
+                em=discord.Embed(description=f"I couldn't retrieve the weather for `{state}`", color=color())
+                em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
+                await ctx.reply(embed=em, mention_author=False)
+            else:
+                results = await google.search(location[0]["title"], safesearch=True)
+                image = None
+                for res in results:
+                    if res.image_url.endswith("png") or res.image_url.endswith("jpg") or res.image_url.endswith("jpeg") or res.image_url.endswith("webp"):
+                        image = res.image_url
+                res = await self.bot.session.get(f"https://www.metaweather.com/api/location/{woeid}")
+                res = await res.json()
+                res = res["consolidated_weather"][0]
+                em=discord.Embed(title=location[0]["title"], description=f"""
+Type: `{res["weather_state_name"]}`
+Wind Direction: `{res["wind_direction_compass"]}`
+Temperature: `{round(int(res["the_temp"]), 1)}`
+Minimum Temperature: `{round(int(res["min_temp"]), 1)}`
+Maximum Temperature: `{round(int(res["max_temp"]), 1)}`
+Wind Speed: `{round(int(res["wind_speed"]), 1)}`
+Air Pressure: `{round(int(res["air_pressure"]), 1)}`
+Humidity: `{res["humidity"]}`
+Visibility: `{round(int(res["visibility"]), 1)}`
+""", color=color())
+                if image is not None:
+                    em.set_thumbnail(url=image)
+                em.set_footer(text=f"Powered by metaweather.com • {ctx.author}", icon_url=ctx.author.avatar_url)
+                await ctx.reply(embed=em, mention_author=False)
 
     @commands.command(aliases=["shard", "shards"])
     @commands.cooldown(1,15,commands.BucketType.user)
@@ -654,7 +717,7 @@ Count: `{shard.shard_count}`
                 inline=True
             )
             em.set_image(url=self.bot.banner)
-            await ctx.send(embed=em)
+            await ctx.reply(embed=em, mention_author=False)
         else:
             if self.bot.get_command(str(command)):
                 given_command = self.bot.get_command(str(command))
@@ -706,7 +769,7 @@ Count: `{shard.shard_count}`
                 else:
                     em=discord.Embed(description=f"This command does not exist", color=color())
                     em.set_footer(text=f"Requested by {ctx.author.name}#{ctx.author.discriminator}", icon_url=ctx.author.avatar_url)
-                    await ctx.send(embed=em)
+                    await ctx.reply(embed=em, mention_author=False)
             else:
                 disabled = await self.bot.db.fetchrow("SELECT commands FROM commands WHERE guild = $1", ctx.guild.id)
                 try:
@@ -761,7 +824,7 @@ Count: `{shard.shard_count}`
         else:
             msg = f"okay, i've marked you as afk for `{reason}`"
         em=discord.Embed(description=msg, color=color())
-        await ctx.send(embed=em)
+        await ctx.reply(embed=em, mention_author=False)
         await asyncio.sleep(3)
         self.bot.afks[ctx.author.id] = {"reason": reason}
 

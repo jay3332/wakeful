@@ -32,14 +32,14 @@ class Admin(commands.Cog):
         if is_mod(self.bot, ctx.author):
             await self.bot.db.fetch("INSERT INTO blacklist (user_id) VALUES ($1)", user.id)
             em=discord.Embed(description=f"Successfully blacklisted {user.mention}", color=color())
-            await ctx.send(embed=em)
+            await ctx.reply(embed=em, mention_author=False)
 
     @blacklist.command(hidden=True)
     async def remove(self, ctx, user : discord.User):
         if is_mod(self.bot, ctx.author):
             await self.bot.db.fetch("DELETE FROM blacklist WHERE user_id = $1", user.id)
             em=discord.Embed(description=f"Successfully unblacklisted {user.mention}", color=color())
-            await ctx.send(embed=em)
+            await ctx.reply(embed=em, mention_author=False)
 
     @blacklist.command(hidden=True)
     async def check(self, ctx, user : discord.User):
@@ -49,10 +49,10 @@ class Admin(commands.Cog):
                 thing["user_id"]
             except TypeError:
                 em=discord.Embed(description=f"{user.mention} isn't blacklisted", color=color())
-                await ctx.send(embed=em)
+                await ctx.reply(embed=em, mention_author=False)
             else:
                 em=discord.Embed(description=f"{user.mention} is blacklisted", color=color())
-                await ctx.send(embed=em)
+                await ctx.reply(embed=em, mention_author=False)
 
     @commands.group(invoke_without_command=True, name="setstatus", aliases=["setrp", "setrichpresence", "setactivity"], hidden=True)
     async def status(self, ctx):
@@ -109,7 +109,7 @@ class Admin(commands.Cog):
         if stderr:
             shell = stderr.decode()
         em=discord.Embed(description=f"```sh\n{shell}```", color=color())
-        await ctx.send(embed=em)
+        await ctx.reply(embed=em, mention_author=False)
 
     @commands.command(hidden=True)
     @commands.is_owner()

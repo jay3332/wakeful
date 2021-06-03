@@ -74,7 +74,7 @@ class Fun(commands.Cog):
             joke = await dagpi.joke()
             em = discord.Embed(description=joke, color=color(), timestamp=datetime.datetime.utcnow())
             em.set_footer(text=f"Powered by dagpi.xyz • {ctx.author}", icon_url=ctx.author.avatar_url)
-        await ctx.send(embed=em)
+        await ctx.reply(embed=em, mention_author=False)
 
     @commands.command(name="8ball")
     @commands.cooldown(1, 5, commands.BucketType.user)
@@ -85,7 +85,7 @@ class Fun(commands.Cog):
             em.add_field(name="input", value=f"```\n{question}```", inline=False)
             em.add_field(name="output", value=f"```\n{response}```", inline=False)
             em.set_footer(text=f"Powered by dagpi.xyz • {ctx.author}", icon_url=ctx.author.avatar_url)
-        await ctx.send(embed=em)
+        await ctx.reply(embed=em, mention_author=False)
 
     @commands.command()
     @commands.cooldown(1, 5, commands.BucketType.user)
@@ -94,7 +94,7 @@ class Fun(commands.Cog):
             roast = await dagpi.roast()
             em = discord.Embed(description=roast, color=color(), timestamp=datetime.datetime.utcnow())
             em.set_footer(text=f"Powered by dagpi.xyz • {ctx.author}", icon_url=ctx.author.avatar_url)
-        await ctx.send(embed=em)
+        await ctx.reply(embed=em, mention_author=False)
 
     @commands.command(aliases=["ppsize"])
     @commands.cooldown(1,5,commands.BucketType.user)
@@ -103,7 +103,7 @@ class Fun(commands.Cog):
             member = ctx.author
         em=discord.Embed(title=f"{member.name}'s pp", description="8"+"".join("=" for x in range(random.randrange(0,10)))+"D", color=color())
         em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
-        await ctx.send(embed=em)
+        await ctx.reply(embed=em, mention_author=False)
 
     @commands.command()
     @commands.cooldown(1,5,commands.BucketType.user)
@@ -112,7 +112,7 @@ class Fun(commands.Cog):
             member = ctx.author
         em=discord.Embed(title=f"{member.name}'s gayrate", description=f"{member.name} is `{random.randrange(0,100)}`% gay", color=color())
         em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
-        await ctx.send(embed=em)
+        await ctx.reply(embed=em, mention_author=False)
 
     @commands.command(usage="[file]")
     @commands.cooldown(1, 5, commands.BucketType.user)
@@ -135,7 +135,7 @@ class Fun(commands.Cog):
             text = await res.text()
             em=discord.Embed(description=text, color=color())
             em.set_image(url=url)
-        await ctx.send(embed=em)
+        await ctx.reply(embed=em, mention_author=False)
 
     @commands.command()
     @commands.cooldown(1, 5, commands.BucketType.user)
@@ -153,15 +153,15 @@ class Fun(commands.Cog):
                 em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
                 em.add_field(name="Input", value=f"```{text}```", inline=False)
                 em.add_field(name="Output", value="".join(f":regional_indicator_{letter}:" if not letter == " " else " " for letter in letters), inline=False)
-                await ctx.send(embed=em)
+                await ctx.reply(embed=em, mention_author=False)
             except discord.HTTPException:
                 em=discord.Embed(description="The output was too long to be sent", color=color())
                 em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
-                await ctx.send(embed=em)
+                await ctx.reply(embed=em, mention_author=False)
         else:
             em=discord.Embed(description="​", color=color())
             em.set_footer(text=f"Is this what you want? • Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
-            await ctx.send(embed=em)
+            await ctx.reply(embed=em, mention_author=False)
 
 def setup(bot):
     bot.add_cog(Fun(bot))

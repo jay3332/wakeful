@@ -22,14 +22,14 @@ class Errors(commands.Cog):
     async def on_command_error(self, ctx, error):
         if isinstance(error, commands.CommandOnCooldown):
             if not is_mod(self.bot, ctx.author):
-                embed=discord.Embed(description=f"This command is on cooldown, try again in `{round(error.retry_after, 1)}` seconds.", color=color())
-                await ctx.send(embed=embed)
+                em=discord.Embed(description=f"This command is on cooldown, try again in `{round(error.retry_after, 1)}` seconds.", color=color())
+                await ctx.reply(embed=em, mention_author=False)
             else:
                 ctx.command.reset_cooldown(ctx)
                 await self.bot.process_commands(ctx.message)
         elif isinstance(error, commands.MissingRequiredArgument):
-            embed=discord.Embed(description=f"`{error.param}` is a required argument that is missing", color=color())
-            await ctx.send(embed=embed)
+            em=discord.Embed(description=f"`{error.param}` is a required argument that is missing", color=color())
+            await ctx.reply(embed=em, mention_author=False)
         elif isinstance(error, commands.CommandNotFound):
             cmd = ctx.invoked_with
             cmds = [cmd.name for cmd in self.bot.commands]
@@ -40,39 +40,39 @@ class Errors(commands.Cog):
                 command = None
             if command:
                 if not command.hidden:
-                    embed=discord.Embed(description=f"`{cmd}` is not a valid command, maybe you meant `{match[0]}`", color=color())
-                    m = await ctx.send(embed=embed)
+                    em=discord.Embed(description=f"`{cmd}` is not a valid command, maybe you meant `{match[0]}`", color=color())
+                    m = await ctx.reply(embed=em, mention_author=False)
                     await asyncio.sleep(3)
                     await m.delete()
             else:
-                embed=discord.Embed(description=f"`{cmd}` is not a valid command", color=color())
-                m = await ctx.send(embed=embed)
+                em=discord.Embed(description=f"`{cmd}` is not a valid command", color=color())
+                m = await ctx.reply(embed=em, mention_author=False)
                 await asyncio.sleep(3)
                 await m.delete()
         elif isinstance(error, commands.MemberNotFound):
-            embed=discord.Embed(description=f"Couldn't find member `{error.argument}`", color=color())
-            await ctx.send(embed=embed)
+            em=discord.Embed(description=f"Couldn't find member `{error.argument}`", color=color())
+            await ctx.reply(embed=em, mention_author=False)
         elif isinstance(error, commands.BotMissingPermissions):
-            embed=discord.Embed(description=f"I don't have permission to do this", color=color())
-            await ctx.send(embed=embed)
+            em=discord.Embed(description=f"I don't have permission to do this", color=color())
+            await ctx.reply(embed=em, mention_author=False)
         elif isinstance(error, commands.MissingPermissions):
-            embed=discord.Embed(description=f"You don't have permission to do this", color=color())
-            await ctx.send(embed=embed)
+            em=discord.Embed(description=f"You don't have permission to do this", color=color())
+            await ctx.reply(embed=em, mention_author=False)
         elif isinstance(error, commands.MissingAnyRole):
-            embed=discord.Embed(description=f"You don't have permission to do this", color=color())
-            await ctx.send(embed=embed)
+            em=discord.Embed(description=f"You don't have permission to do this", color=color())
+            await ctx.reply(embed=em, mention_author=False)
         elif isinstance(error, commands.CommandInvokeError):
             error = error.original
             if isinstance(error, discord.Forbidden):
-                embed=discord.Embed(description=f"I don't have permission to do this", color=color())
-                await ctx.send(embed=embed)
+                em=discord.Embed(description=f"I don't have permission to do this", color=color())
+                await ctx.reply(embed=em, mention_author=False)
             else:
-                embed=discord.Embed(description=f"```{error}```", color=color())
-                await ctx.send(embed=embed)
+                em=discord.Embed(description=f"```{error}```", color=color())
+                await ctx.reply(embed=em, mention_author=False)
                 raise error
         else:
-            embed=discord.Embed(description=f"```{error}```", color=color())
-            await ctx.send(embed=embed)
+            em=discord.Embed(description=f"```{error}```", color=color())
+            await ctx.reply(embed=em, mention_author=False)
             raise error
 
     @commands.Cog.listener()
