@@ -399,7 +399,6 @@ class Utility(commands.Cog):
     @commands.command()
     @commands.cooldown(1,5,commands.BucketType.user)
     async def suggest(self, ctx):
-        cs = self.bot.session
         em=discord.Embed(description=f"Please now enter your suggestion below:", color=color())
         em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
         msg = await ctx.reply(embed=em, mention_author=False)
@@ -411,12 +410,17 @@ class Utility(commands.Cog):
             await msg.edit(embed=em)
         else:
             if suggestion.content.lower() != "cancel":
-                webhook = Webhook.from_url(str(self.bot.suggestions), adapter=AsyncWebhookAdapter(cs))
+                webhook = Webhook.from_url(str(self.bot.suggestions), adapter=AsyncWebhookAdapter(self.bot.session))
                 em=discord.Embed(description=f"```{suggestion.clean_content}```", color=color())
                 em.set_footer(text=f"suggestion by {ctx.author} ({ctx.author.id})", icon_url=ctx.author.avatar_url)
+                attachment = None
+                if ctx.message.attachments:
+                    attachment = ctx.message.attachments[0].url
+                if attachment is not None:
+                    em.set_image(url=attachment)
                 await webhook.send(embed=em)
                 await suggestion.add_reaction("✅")
-                em=discord.Embed(description="Your suggestion has been sent to the admins\nnote: abuse may get you blacklisted", color=color())
+                em=discord.Embed(description="Your suggestion has been sent to the admins\nNote: abuse may get you blacklisted", color=color())
                 em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
                 await msg.edit(embed=em)
             else:

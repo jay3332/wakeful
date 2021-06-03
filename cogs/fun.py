@@ -1,4 +1,4 @@
-import discord, io, asyncdagpi, asyncio, datetime, aiohttp, string, random, json
+import discord, io, asyncdagpi, asyncio, datetime, aiohttp, string, random, json, wonderwords, time
 from discord.ext import commands
 from gtts import gTTS
 from jishaku.functools import executor_function
@@ -29,6 +29,33 @@ class Fun(commands.Cog):
         async with ctx.typing():
             file = await do_tts("en", message)
         await ctx.reply(file=file, mention_author=False)
+
+    @commands.command(aliases=["typerace"], description="Makes the bot send an image with text, which someone has to type in 20 seconds")
+    @commands.guild_only()
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    async def typeracer(self, ctx):
+        from PIL import Image, ImageDraw, ImageFont
+        async with ctx.typing():
+            start_time = datetime.datetime.utcnow()
+            sentence = wonderwords.RandomSentence().sentence()
+            img = Image.open("data/typeracer.jpg")
+            draw = ImageDraw.Draw(img)
+            font = ImageFont.truetype("data/font.ttf", 150)
+            draw.text((0, 0),str(sentence),(0,0,0),font=font)
+            img = io.BytesIO(await img.read())
+            file = discord.File(img, filename="typracer.jpg")
+            em=discord.Embed(description="First one to type this sentence", color=color())
+            msg = await ctx.send(embed=em, file=file)
+        try:
+            msg = await self.bot.wait_for("message", check=lambda message: message.content == str(sentence) and message.channel == ctx.channel, timeout=60)
+            delta = datetime.datetime.utcnow() - start_time
+            hours, remainder = divmod(int(delta.total_seconds()), 3600)
+            minutes, seconds = divmod(remainder, 60)
+            em=discord.Embed(description=f"We have a winner! {msg.author.mention} has typed the sentence in `{seconds}` seconds", color=color())
+            await msg.edit(embed=em)
+        except asyncio.TimeoutError:
+            em=discord.Embed(description=f"No one sent the right sentence, it was `{sentence}`", color=color())
+            await msg.edit(embed=em)
 
     @commands.command(aliases=["gtl"])
     @commands.cooldown(1, 5, commands.BucketType.user)
