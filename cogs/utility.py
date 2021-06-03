@@ -876,7 +876,7 @@ Count: `{shard.shard_count}`
                     disabled = disabled.split(",")
                 given_cog = self.bot.get_cog(str(command).title())
                 commands_ = [cmd for cmd in given_cog.walk_commands() if not cmd.hidden and not cmd.name in disabled]
-                if given_cog != None:
+                if given_cog != None and commands_ is not None and commands_ != []:
                     em=discord.Embed(title=f"{given_cog.qualified_name} commands [{len(commands_)}]", description=f"{given_cog.description}\n\n> "+", ".join(f"`{cmd.name}`" for cmd in commands_), color=color())
                     em.set_footer(text=f"Requested by {ctx.author.name}#{ctx.author.discriminator}", icon_url=ctx.author.avatar_url)
                     em.set_image(url=self.bot.banner)
