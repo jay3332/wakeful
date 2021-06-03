@@ -844,7 +844,7 @@ Count: `{shard.shard_count}`
                     pass
                 else:
                     disabled = disabled.split(",")
-                if not given_command.hidden == True and not given_command.name in disabled:
+                if not given_command.hidden == True and not given_command.name in disabled or is_mod(self.bot, ctx.author):
                     #-------------------------------------
                     try:
                         command_subcommands = "> " + ", ".join(f"`{command.name}`" for command in given_command.commands if not command.hidden or not command.name in disabled)
