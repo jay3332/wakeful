@@ -7,11 +7,11 @@ from jishaku.functools import executor_function
 dagpi = asyncdagpi.Client(get_config("DAGPI"))
 
 @executor_function
-def circular(img):
+def rounden(img):
     from PIL import Image, ImageOps, ImageDraw
-    mask = Image.new('L', (128, 128), 255)
+    mask = Image.new('L', (1024, 1024), 255)
     draw = ImageDraw.Draw(mask)
-    draw.ellipse((0, 0) + (128, 128), fill=0)
+    draw.ellipse((0, 0) + (1024, 1024), fill=0)
     img = Image.open(img)
     output = ImageOps.fit(img, mask.size, centering=(0.5, 0.5))
     output.putalpha(500)
@@ -28,9 +28,9 @@ class Image(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(aliases=["circle"])
-    @commands.cooldown(1,10,commands.BucketType.user)
-    async def circular(self, ctx, member : discord.Member = None):
+    @commands.command(aliases=["circle", "round", "circular"])
+    @commands.cooldown(1,15,commands.BucketType.user)
+    async def rounden(self, ctx, member : discord.Member = None):
         if member is None:
             if ctx.message.attachments:
                 if ctx.message.attachments[0].url.endswith("png") or ctx.message.attachments[0].url.endswith("jpg") or ctx.message.attachments[0].url.endswith("jpeg") or ctx.message.attachments[0].url.endswith("webp"):
@@ -43,7 +43,7 @@ class Image(commands.Cog):
             url = member.avatar_url_as(format="png", size=1024)
         img = await self.bot.session.get(str(url))
         img = await img.read()
-        res = await circular(io.BytesIO(img))
+        res = await rounden(io.BytesIO(img))
         em=discord.Embed(color=color())
         em.set_image(url="attachment://circular.png")
         await ctx.reply(file=res, embed=em, mention_author=False)
