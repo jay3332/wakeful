@@ -683,12 +683,12 @@ Type: `{type}`
     @commands.cooldown(1,5,commands.BucketType.user)
     async def screenshot(self, ctx, website):
         async with ctx.typing():
-            res = await self.bot.session.get(f"https://shot.screenshotapi.net/screenshot?&url={website}&output=image&file_type=png")
+            res = await self.bot.session.get(f"https://api.screenshotmachine.com?key={get_config('screenshot')}&url={website}&dimension=1280x720&user-agent=Mozilla/5.0 (Windows NT 10.0; rv:80.0) Gecko/20100101 Firefox/80.0")
             res = io.BytesIO(await res.read())
             em=discord.Embed(color=color(), timestamp=datetime.datetime.utcnow())
-            em.set_image(url="attachment://screenshot.png")
+            em.set_image(url="attachment://screenshot.jpg")
             em.set_footer(text=f"Powered by screenshotapi.net • {ctx.author}", icon_url=ctx.author.avatar_url)
-        msg = await ctx.reply(embed=em, file=discord.File(res, "screenshot.png"), mention_author=False)
+        msg = await ctx.reply(embed=em, file=discord.File(res, "screenshot.jpg"), mention_author=False)
         await msg.add_reaction("🚮")
         reaction, user = await self.bot.wait_for("reaction_add", check=lambda reaction, user: str(reaction.emoji) == "🚮" and reaction.message == msg and not user.bot)
         await msg.delete()
@@ -867,7 +867,7 @@ Count: `{shard.shard_count}`
                     try:
                         command_subcommands = "> " + ", ".join(f"`{command.name}`" for command in given_command.commands if not command.hidden or not command.name in disabled)
                     except:
-                        pass
+                        command_subcommands = "None"
                     #-------------------------------------
                     if given_command.usage:
                         command_usage = given_command.usage
@@ -887,16 +887,20 @@ Count: `{shard.shard_count}`
                         timestamp=datetime.datetime.utcnow(),
                         description=given_command.description,
                         color=color()
-                    ).set_footer(text=f"Rsequested by {ctx.author}", icon_url=ctx.author.avatar_url)
-                    em.add_field(name="Usage", value=f"{ctx.prefix}{command} {command_usage}", inline=False)
+                    )
+                    em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
+                    em.add_field(name="Usage", value=f"{ctx.prefix}{given_command.name} {command_usage}", inline=False)
                     if given_command.aliases:
                         em.add_field(name=f"Aliases [{len(given_command.aliases)}]", value="> " + ", ".join(f"`{alias}`" for alias in given_command.aliases), inline=False)
                     else:
                         em.add_field(name="Aliases [0]", value="None", inline=False)
-                    if is_mod(self.bot, ctx.author):
-                        commands_ = [cmd for cmd in given_command.commands]
-                    else:
-                        commands_ = [cmd for cmd in given_command.commands if not cmd.hidden and not cmd.name in disabled]
+                    try:
+                        if is_mod(self.bot, ctx.author):
+                            commands_ = [cmd for cmd in given_command.commands]
+                        else:
+                            commands_ = [cmd for cmd in given_command.commands if not cmd.hidden and not cmd.name in disabled]
+                    except:
+                        commands_ = "None"
                     try:
                         em.add_field(name=f"Subcommands [{len(commands_)}]", value=command_subcommands, inline=False)
                     except AttributeError:
