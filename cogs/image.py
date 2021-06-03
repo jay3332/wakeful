@@ -468,6 +468,90 @@ class Image(commands.Cog):
             em.set_footer(text=f"Powered by dagpi.xyz • {ctx.author}", icon_url=ctx.author.avatar_url)
         await ctx.send(file=file, embed=em)
 
+    @commands.command()
+    @commands.cooldown(1,5,commands.BucketType.user)
+    async def clyde(self, ctx, *, message):
+        message = message.replace(" ", "%20")
+        async with ctx.typing():
+            res = await self.bot.session.get(f"https://nekobot.xyz/api/imagegen?type=clyde&text={message}")
+            res = await res.json()
+            res = res["message"]
+            em=discord.Embed(color=color())
+            em.set_image(url=res)
+            em.set_footer(text=f"Powered by nekobot.xyz • {ctx.author}", icon_url=ctx.author.avatar_url)
+        await ctx.reply(embed=em, mention_author=False)
+
+    @commands.command()
+    @commands.cooldown(1,15,commands.BucketType.user)
+    async def stickbug(self, ctx, member : discord.Member = None):
+        if member is None:
+            if ctx.message.attachments:
+                if ctx.message.attachments[0].url.endswith("png") or ctx.message.attachments[0].url.endswith("jpg") or ctx.message.attachments[0].url.endswith("jpeg") or ctx.message.attachments[0].url.endswith("webp"):
+                    url = ctx.message.attachments[0].proxy_url or ctx.message.attachments[0].url
+                else:
+                    url = ctx.author.avatar_url_as(format="png", size=1024)
+            else:
+                url = ctx.author.avatar_url_as(format="png", size=1024)
+        else:
+            url = member.avatar_url_as(format="png", size=1024)
+        async with ctx.typing():
+            res = await self.bot.session.get(f"https://nekobot.xyz/api/imagegen?type=stickbug&url={url}")
+            res = await res.json()
+            res = res["message"]
+            img = await self.bot.session.get(res)
+            img = await img.read()
+            em=discord.Embed(color=color())
+            em.set_footer(text=f"Powered by nekobot.xyz • {ctx.author}", icon_url=ctx.author.avatar_url)
+        await ctx.reply(embed=em, file=discord.File(io.BytesIO(img), filename="stickbug.mp4"), mention_author=False)
+
+    @commands.command(aliases=["cmm"])
+    @commands.cooldown(1,5,commands.BucketType.user)
+    async def changemymind(self, ctx, *, message):
+        message = message.replace(" ", "%20")
+        async with ctx.typing():
+            res = await self.bot.session.get(f"https://nekobot.xyz/api/imagegen?type=changemymind&text={message}")
+            res = await res.json()
+            res = res["message"]
+            em=discord.Embed(color=color())
+            em.set_image(url=res)
+            em.set_footer(text=f"Powered by nekobot.xyz • {ctx.author}", icon_url=ctx.author.avatar_url)
+        await ctx.reply(embed=em, mention_author=False)
+
+    @commands.command(aliases=["phc", "pornhubcomment"])
+    @commands.cooldown(1,5,commands.BucketType.user)
+    async def phcomment(self, ctx, *, message):
+        message = message.replace(" ", "%20")
+        async with ctx.typing():
+            res = await self.bot.session.get(f"https://nekobot.xyz/api/imagegen?type=phcomment&image={ctx.author.avatar_url_as(format='png')}&username={ctx.author.display_name}&text={message}")
+            res = await res.json()
+            res = res["message"]
+            em=discord.Embed(color=color())
+            em.set_image(url=res)
+            em.set_footer(text=f"Powered by nekobot.xyz • {ctx.author}", icon_url=ctx.author.avatar_url)
+        await ctx.reply(embed=em, mention_author=False)
+
+    @commands.command(aliases=["iphonex"])
+    @commands.cooldown(1,5,commands.BucketType.user)
+    async def iphone(self, ctx, member : discord.Member = None):
+        if member is None:
+            if ctx.message.attachments:
+                if ctx.message.attachments[0].url.endswith("png") or ctx.message.attachments[0].url.endswith("jpg") or ctx.message.attachments[0].url.endswith("jpeg") or ctx.message.attachments[0].url.endswith("webp"):
+                    url = ctx.message.attachments[0].proxy_url or ctx.message.attachments[0].url
+                else:
+                    url = ctx.author.avatar_url_as(format="png", size=1024)
+            else:
+                url = ctx.author.avatar_url_as(format="png", size=1024)
+        else:
+            url = member.avatar_url_as(format="png", size=1024)
+        async with ctx.typing():
+            res = await self.bot.session.get(f"https://nekobot.xyz/api/imagegen?type=iphonex&url={url}")
+            res = await res.json()
+            image = res["message"]
+            em=discord.Embed(color=color(), timestamp=datetime.datetime.utcnow())
+            em.set_image(url=image)
+            em.set_footer(text=f"Powered by nekobot.xyz • {ctx.author}", icon_url=ctx.author.avatar_url)
+        await ctx.send(embed=em)
+
 
 def setup(bot):
     bot.add_cog(Image(bot))

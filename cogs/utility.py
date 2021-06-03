@@ -422,6 +422,7 @@ class Utility(commands.Cog):
     - **Text**: `{channels["text"]}`
     - **Voice**: `{channels["voice"]}`
     - **Stage**: `{channels["stage"]}`
+- **Shards**: `{len(list(self.bot.shards))}`
 - **Commands**: `{len([cmd for cmd in self.bot.commands if not cmd.hidden])}`
 - **Commands executed**: `{self.bot.cmdsSinceRestart}`
 - **Cogs**: `{len(self.bot.cogs)}`
@@ -587,6 +588,22 @@ Type: `{type}`
             em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
             await ctx.send(embed=em)
 
+    @commands.command(aliases=["shard", "shards"])
+    @commands.cooldown(1,15,commands.BucketType.user)
+    async def shardinfo(self, ctx, shard : int = None):
+        if shard is None:
+            em=discord.Embed(title="Shards", color=color())
+            for shard in list(self.bot.shards):
+                shard = dict(self.bot.shards)[shard]
+                em.add_field(
+                    name=f"Shard {shard.id+1}",
+                    value=f"""
+Latency: `{round(shard.latency, 1)}`ms
+Count: `{shard.shard_count}`
+""", inline=True
+                )
+            await ctx.reply(embed=em, mention_author=False)
+
     @commands.command()
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def help(self, ctx, *, command : str = None):
@@ -630,11 +647,9 @@ Type: `{type}`
             em.add_field(
                 name="Information",
                 value=f"""
-- **Uptime**: `{days}d {hours}h {minutes}m {seconds}s`
-- **Commands**: `{len([cmd for cmd in self.bot.commands if not cmd.hidden])}`
-- **Cogs**: `{len(self.bot.cogs)}`
-- **CPU**: `{process.cpu_percent()}`%
-- **Memory**: `{humanize.naturalsize(process.memory_full_info().rss)}`
+**Uptime**: `{days}d {hours}h {minutes}m {seconds}s`
+**Shards**: `{len(list(self.bot.shards))}`
+**Memory**: `{humanize.naturalsize(process.memory_full_info().rss)}`
 """,
                 inline=True
             )
