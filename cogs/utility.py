@@ -603,7 +603,7 @@ class Utility(commands.Cog):
                 try:
                     disabled = disabled["commands"]
                 except:
-                    pass
+                    disabled = []
                 else:
                     disabled = disabled.split(",")
             else:
@@ -888,7 +888,7 @@ Count: `{shard.shard_count}`
                 try:
                     disabled = disabled["commands"]
                 except:
-                    pass
+                    disabled = []
                 else:
                     disabled = disabled.split(",")
             else:
@@ -937,7 +937,7 @@ Count: `{shard.shard_count}`
                 try:
                     disabled = disabled["commands"]
                 except:
-                    pass
+                    disabled = []
                 else:
                     disabled = disabled.split(",")
                 if not given_command.hidden == True and not given_command.name in disabled or is_mod(self.bot, ctx.author):
@@ -995,7 +995,7 @@ Count: `{shard.shard_count}`
                 try:
                     disabled = disabled["commands"]
                 except:
-                    pass
+                    disabled = []
                 else:
                     disabled = disabled.split(",")
                 given_cog = get_cog(self.bot, command)
