@@ -4,9 +4,12 @@ def is_mod(bot, user):
     guild = bot.get_guild(bot.guild)
     role = guild.get_role(bot.mod_role)
     member = guild.get_member(user.id)
-    if role in member.roles:
-        return True
-    else:
+    try:
+        if role in member.roles:
+            return True
+        else:
+            return False
+    except:
         return False
 
 async def is_blacklisted(bot, user):
