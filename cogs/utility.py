@@ -825,8 +825,9 @@ Type: `{type}`
             em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
             await ctx.reply(embed=em, mention_author=False)
         else:
-            res = await self.bot.session.get(f"https://api.fortnitetracker.com/v1/profile/{platformm}/{username}", headers={"TRN-Api-Key":get_config("FORTNITE")})
-            res = await res.json()
+            async with ctx.typing():
+                res = await self.bot.session.get(f"https://api.fortnitetracker.com/v1/profile/{platformm}/{username}", headers={"TRN-Api-Key":get_config("FORTNITE")})
+                res = await res.json()
             try:
                 error = str(res["accountId"])
             except KeyError:
