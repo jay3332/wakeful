@@ -163,6 +163,16 @@ class API(commands.Cog):
         em=discord.Embed(description=fact, color=color(), timestamp=datetime.datetime.utcnow())
         em.set_footer(text=f"Powered by some-random-api.ml • {ctx.author}", icon_url=ctx.author.avatar_url)
         await ctx.reply(embed=em, mention_author=False)
+
+    @commands.command()
+    @commands.cooldown(1,5,commands.BucketType.user)
+    async def chucknorris(self, ctx):
+        res = await self.bot.session.get("https://api.chucknorris.io/jokes/random")
+        res = await res.json()
+        fact = res["value"]
+        em=discord.Embed(description=fact, color=color(), timestamp=datetime.datetime.utcnow())
+        em.set_footer(text=f"Powered by chucknorris.io • {ctx.author}", icon_url=ctx.author.avatar_url)
+        await ctx.reply(embed=em, mention_author=False)
     
     @fact.command(name="fox")
     @commands.cooldown(1,5,commands.BucketType.user)

@@ -793,7 +793,7 @@ Type: `{type}`
                 em=discord.Embed(description=f"There are no disabled commands", color=color())
                 await ctx.reply(embed=em, mention_author=False)
 
-    @commands.group(aliases=["rtfd"], invite_without_command=True)
+    @commands.group(aliases=["rtfd"], invoke_without_command=True)
     @commands.cooldown(1,5,commands.BucketType.user)
     async def rtfm(self, ctx, query):
         async with ctx.typing():
