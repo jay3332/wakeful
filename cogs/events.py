@@ -1,4 +1,4 @@
-import discord, difflib, asyncio
+import discord, difflib, asyncio, traceback
 from colorama import Fore
 from discord.ext import commands
 from discord import Webhook, AsyncWebhookAdapter
@@ -69,11 +69,15 @@ class Errors(commands.Cog):
                 em=discord.Embed(description=f"I don't have permission to do this", color=color())
                 await ctx.reply(embed=em, mention_author=False)
             else:
-                em=discord.Embed(description=f"```{error}```", color=color())
+                if is_mod(self.bot, ctx.author):
+                    error = "".join(traceback.format_exception(type(error), error, error.__traceback__))
+                em=discord.Embed(description=f"```py\n{error}```", color=color())
                 await ctx.reply(embed=em, mention_author=False)
                 raise error
         else:
-            em=discord.Embed(description=f"```{error}```", color=color())
+            if is_mod(self.bot, ctx.author):
+                error = "".join(traceback.format_exception(type(error), error, error.__traceback__))
+            em=discord.Embed(description=f"```py\n{error}```", color=color())
             await ctx.reply(embed=em, mention_author=False)
             raise error
 
