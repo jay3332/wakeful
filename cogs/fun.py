@@ -1,4 +1,4 @@
-import discord, io, asyncdagpi, asyncio, datetime, aiohttp, string, random, json, wonderwords, time
+import discord, io, asyncdagpi, asyncio, datetime, aiohttp, string, random, json, wonderwords, time, typing
 from discord.ext import commands
 from gtts import gTTS
 from jishaku.functools import executor_function
@@ -40,6 +40,25 @@ class Fun(commands.Cog):
         async with ctx.typing():
             file = await do_tts("en", message)
         await ctx.reply(file=file, mention_author=False)
+
+    @commands.command()
+    @commands.cooldown(1,5,commands.BucketType.user)
+    async def age(self, ctx, name : typing.Union[discord.Member, str]):
+        if isinstance(name, str):
+            res = await self.bot.session.get(f"https://api.agify.io?name={name.replace(' ', '')}")
+            res = await res.json()
+            age = res["age"]
+            em=discord.Embed(description=f"{name.title()}'s estimated age is {age}", color=color())
+            em.set_footer(text=f"Powered by agify.io • {ctx.author}", icon_url=ctx.author.avatar_url)
+            emsg = await ctx.send(embed=em)
+        elif isinstance(name, discord.Member):
+            res = await self.bot.session.get(f"https://api.agify.io?name={name.name.replace(' ', '')}")
+            res = await res.json()
+            age = res["age"]
+            em=discord.Embed(description=f"{name.mention}'s estimated age is {age}", color=color())
+            em.set_footer(text=f"Powered by agify.io • {ctx.author}", icon_url=ctx.author.avatar_url)
+            emsg = await ctx.send(embed=em)
+
 
     @commands.command()
     @commands.cooldown(1, 5, commands.BucketType.user)
@@ -94,10 +113,10 @@ class Fun(commands.Cog):
             brand = logo.brand
             hint = logo.hint
             question = logo.question
-            embed = discord.Embed(description=f"try guessing this logo in under 20 seconds - hint: ||`{hint}`||", color=color(), timestamp=datetime.datetime.utcnow())
-            embed.set_image(url=question)
-            embed.set_footer(text=f"Powered by dagpi.xyz • {ctx.author}", icon_url=ctx.author.avatar_url)
-        emsg = await ctx.send(embed=embed)
+            em = discord.Embed(description=f"try guessing this logo in under 20 seconds - hint: ||`{hint}`||", color=color(), timestamp=datetime.datetime.utcnow())
+            em.set_image(url=question)
+            em.set_footer(text=f"Powered by dagpi.xyz • {ctx.author}", icon_url=ctx.author.avatar_url)
+        emsg = await ctx.send(embed=em)
         try:
             brand = logo.brand
             msg = await self.bot.wait_for('message', check=lambda message: message.content.lower() == str(brand).lower() and message.channel == ctx.channel and message.author == ctx.author, timeout=20)
