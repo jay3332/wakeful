@@ -21,10 +21,6 @@ class Errors(commands.Cog):
                 self.bot.message_cache[msg.guild.id].pop(msg.channel.id)
 
     @commands.Cog.listener()
-    async def on_message_edit(self, before, after):
-        await self.bot.process_commands(after)
-
-    @commands.Cog.listener()
     async def on_command_error(self, ctx, error):
         if isinstance(error, commands.CommandOnCooldown):
             if not is_mod(self.bot, ctx.author):
