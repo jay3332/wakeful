@@ -43,22 +43,83 @@ class Fun(commands.Cog):
 
     @commands.command()
     @commands.cooldown(1,5,commands.BucketType.user)
-    async def age(self, ctx, name : typing.Union[discord.Member, str]):
+    async def age(self, ctx, name : typing.Union[discord.Member, str] = None):
+        if name is None:
+            name = ctx.author
         if isinstance(name, str):
             res = await self.bot.session.get(f"https://api.agify.io?name={name.replace(' ', '')}")
             res = await res.json()
             age = res["age"]
-            em=discord.Embed(description=f"{name.title()}'s estimated age is {age}", color=color())
+            em=discord.Embed(description=f"{name.title()}'s predicted age is {age}", color=color())
             em.set_footer(text=f"Powered by agify.io • {ctx.author}", icon_url=ctx.author.avatar_url)
-            emsg = await ctx.send(embed=em)
+            await ctx.send(embed=em)
         elif isinstance(name, discord.Member):
             res = await self.bot.session.get(f"https://api.agify.io?name={name.name.replace(' ', '')}")
             res = await res.json()
             age = res["age"]
             em=discord.Embed(description=f"{name.mention}'s estimated age is {age}", color=color())
             em.set_footer(text=f"Powered by agify.io • {ctx.author}", icon_url=ctx.author.avatar_url)
-            emsg = await ctx.send(embed=em)
+            await ctx.send(embed=em)
 
+    @commands.command()
+    @commands.cooldown(1,5,commands.BucketType.user)
+    async def gender(self, ctx, name : typing.Union[discord.Member, str] = None):
+        if name is None:
+            name = ctx.author
+        if isinstance(name, str):
+            res = await self.bot.session.get(f"https://api.genderize.io?name={name.replace(' ', '')}")
+            res = await res.json()
+            gender = res["gender"]
+            em=discord.Embed(description=f"{name.title()}'s predicted gender is {gender}", color=color())
+            em.set_footer(text=f"Powered by genderize.io • {ctx.author}", icon_url=ctx.author.avatar_url)
+            await ctx.send(embed=em)
+        elif isinstance(name, discord.Member):
+            res = await self.bot.session.get(f"https://api.genderize.io?name={name.name.replace(' ', '')}")
+            res = await res.json()
+            gender = res["gender"]
+            em=discord.Embed(description=f"{name.mention}'s predicted gender is {gender}", color=color())
+            em.set_footer(text=f"Powered by genderize.io • {ctx.author}", icon_url=ctx.author.avatar_url)
+            await ctx.send(embed=em)
+
+    @commands.command(aliases=["country"])
+    @commands.cooldown(1,5,commands.BucketType.user)
+    async def nation(self, ctx, name : typing.Union[discord.Member, str] = None):
+        if name is None:
+            name = ctx.author
+        if isinstance(name, str):
+            res = await self.bot.session.get(f"https://api.nationalize.io?name={name.replace(' ', '')}")
+            res = await res.json()
+            if res["country"] != []:
+                nation = res["country"][0]["country_id"]
+                em=discord.Embed(description=f"{name.title()}'s predicted nation is {nation}", color=color())
+                em.set_footer(text=f"Powered by nationalize.io • {ctx.author}", icon_url=ctx.author.avatar_url)
+                await ctx.send(embed=em)
+            else:
+                em=discord.Embed(description=f"I could not predict `{name.title()}`'s nation", color=color())
+                await ctx.send(embed=em)
+        elif isinstance(name, discord.Member):
+            res = await self.bot.session.get(f"https://api.nationalize.io?name={name.name.replace(' ', '')}")
+            res = await res.json()
+            if res["country"] != []:
+                nation = res["country"][0]["country_id"]
+                em=discord.Embed(description=f"{name.mention}'s predicted nation is {nation}", color=color())
+                em.set_footer(text=f"Powered by nationalize.io • {ctx.author}", icon_url=ctx.author.avatar_url)
+                await ctx.send(embed=em)
+            else:
+                em=discord.Embed(description=f"I could not predict {name.mention}'s nation", color=color())
+                await ctx.send(embed=em)
+
+    @commands.command()
+    @commands.cooldown(1,5,commands.BucketType.user)
+    async def bored(self, ctx):
+        res = await self.bot.session.get("https://www.boredapi.com/api/activity")
+        res = await res.json()
+        if res["link"] != "":
+            em=discord.Embed(title="Here's an activity to do", description=res["activity"], color=color(), url=res["link"])
+        else:
+            em=discord.Embed(title="Here's an activity to do", description=res["activity"], color=color())
+        em.set_footer(text=f"Powered by boredapi.com • {ctx.author}", icon_url=ctx.author.avatar_url)
+        await ctx.send(embed=em)
 
     @commands.command()
     @commands.cooldown(1, 5, commands.BucketType.user)
