@@ -702,7 +702,7 @@ Type: `{type}`
             res = io.BytesIO(await res.read())
             em=discord.Embed(color=color(), timestamp=datetime.datetime.utcnow())
             em.set_image(url="attachment://screenshot.jpg")
-            em.set_footer(text=f"Powered by screenshotapi.net • {ctx.author}", icon_url=ctx.author.avatar_url)
+            em.set_footer(text=f"Powered by screenshotmachine.com • {ctx.author}", icon_url=ctx.author.avatar_url)
         msg = await ctx.reply(embed=em, file=discord.File(res, "screenshot.jpg"), mention_author=False)
         await msg.add_reaction("🚮")
         reaction, user = await self.bot.wait_for("reaction_add", check=lambda reaction, user: str(reaction.emoji) == "🚮" and reaction.message == msg and not user.bot)

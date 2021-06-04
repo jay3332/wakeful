@@ -110,10 +110,10 @@ class Admin(commands.Cog):
         proc = await asyncio.create_subprocess_shell("git pull", stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE)
         stdout, stderr = await proc.communicate()
         if stdout:
-            shell = stdout.decode()
+            shell = f"[stdout]\n{stdout.decode()}"
         if stderr:
-            shell = stderr.decode()
-        em=discord.Embed(description=f"```sh\n{shell}```", color=color())
+            shell = f"[stderr]\n{stderr.decode()}"
+        em=discord.Embed(description=f"```sh\n$git pull\n{shell}```", color=color())
         await ctx.reply(embed=em, mention_author=False)
 
     @commands.command(hidden=True)
