@@ -793,13 +793,27 @@ Type: `{type}`
                 em=discord.Embed(description=f"There are no disabled commands", color=color())
                 await ctx.reply(embed=em, mention_author=False)
 
-    @commands.command(aliases=["rtfd"])
+    @commands.group(aliases=["rtfd"], invite_without_command=True)
     @commands.cooldown(1,5,commands.BucketType.user)
     async def rtfm(self, ctx, query):
         async with ctx.typing():
             res = await self.bot.session.get(f"https://idevision.net/api/public/rtfm?query={query}&location=https://discordpy.readthedocs.io/en/latest&show-labels=false&label-labels=false")
-            print(res.text)
-            print(res.status)
+            res = await res.json()
+            nodes = res["nodes"]
+        if nodes != {}:
+            em=discord.Embed(description="\n".join(f"[`{e}`]({nodes[e]})" for e in nodes), color=color())
+            em.set_footer(text=f"Powered by idevision.net • {ctx.author}", icon_url=ctx.author.avatar_url)
+            await ctx.reply(embed=em, mention_author=False)
+        else:
+            em=discord.Embed(description=f"No results found for `{query}`", color=color())
+            em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
+            await ctx.reply(embed=em, mention_author=False)
+
+    @rtfm.command(aliases=["py"])
+    @commands.cooldown(1,5,commands.BucketType.user)
+    async def python(self, ctx, query):
+        async with ctx.typing():
+            res = await self.bot.session.get(f"https://idevision.net/api/public/rtfm?query={query}&location=https://docs.python.org/3&show-labels=false&label-labels=false")
             res = await res.json()
             nodes = res["nodes"]
         if nodes != {}:
