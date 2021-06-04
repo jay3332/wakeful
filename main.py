@@ -23,10 +23,16 @@ with open('config.json') as f:
 
 devprefix = conf["DEVPREFIX"] # the prefix for the development version
 
+class wakeful(commands.AutoShardedBot):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+    async def on_ready(self):
+        logger.info(f"Logged in as: {bot.user.name}#{bot.user.discriminator} ({bot.user.id})")
+
 if pwd.getpwuid(os.getuid())[0] == "pi":
-    bot = commands.AutoShardedBot(command_prefix=get_prefix, case_insensitive=True, ShardCount=10, intents=discord.Intents.all())
+    bot = wakeful(command_prefix=get_prefix, case_insensitive=True, ShardCount=10, intents=discord.Intents.all())
 else:
-    bot = commands.AutoShardedBot(command_prefix=devprefix, case_insensitive=True, ShardCount=10, intents=discord.Intents.all())
+    bot = wakeful(command_prefix=devprefix, case_insensitive=True, ShardCount=10, intents=discord.Intents.all())
 bot.remove_command("help")
 
 bot.uptime = datetime.datetime.utcnow()
@@ -125,10 +131,6 @@ async def on_message(msg):
     elif msg.content.startswith(devprefix):
         if is_mod(bot, msg.author):
             await bot.process_commands(msg)
-
-@bot.event
-async def on_ready():
-    logger.info(f"Logged in as: {bot.user.name}#{bot.user.discriminator} ({bot.user.id})")
 
 for filename in os.listdir("./cogs"):
     if filename.endswith(".py"):
