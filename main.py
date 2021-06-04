@@ -34,8 +34,11 @@ token = conf["TOKEN"]
 devtoken = conf["DEVTOKEN"]
 bot.github = "https://github.com/jottew/wakeful" # the github the bot is hosted on
 bot.invite = "https://discord.gg/RkCqvMJsDY"
-bot.greenTick="✓"
-bot.redTick="x"
+bot.icons = {
+    "greentick": "<:checkmark:850294215727775754>",
+    "redtick": "<:crossmark:850294181184143421>",
+    "arrow": "<a:arrow:850290444327059456>"
+}
 bot.cmdsSinceRestart = 0
 bot.message_cache = {}
 bot.ownersid = 797044260196319282

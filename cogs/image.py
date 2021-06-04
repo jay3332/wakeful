@@ -62,6 +62,7 @@ class Image(commands.Cog):
             res = await rounden(io.BytesIO(img), (0,0))
             em=discord.Embed(color=color())
             em.set_image(url="attachment://circular.png")
+            em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
         await ctx.reply(file=res, embed=em, mention_author=False)
 
     @commands.command()

@@ -1,4 +1,4 @@
-import discord, datetime, async_cse, psutil, humanize, os, sys, inspect, mystbin, googletrans, asyncio, aiohttp, random, time, asyncdagpi, hashlib, asyncpg, io, base64
+import discord, datetime, async_cse, psutil, humanize, os, sys, inspect, mystbin, googletrans, asyncio, aiohttp, random, time, asyncdagpi, hashlib, asyncpg, io, base64, typing
 from discord.ext import commands
 from discord import Webhook, AsyncWebhookAdapter
 from utils.configs import color
@@ -55,6 +55,56 @@ class Utility(commands.Cog):
                     mseg = f"Hey! {obj.name} is currently marked as afk for `{data['reason']}`"
                 em=discord.Embed(description=mseg, color=color())
                 await msg.reply(embed=em)
+
+    @commands.command()
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    async def emojiinfo(self, ctx, emoji: typing.Union[discord.PartialEmoji, discord.Emoji]):
+        if emoji.animated:
+            emoji_animated=self.bot.icons['greentick']
+        else:
+            emoji_animated=self.bot.icons['redtick']
+        #-------------------------------------------------
+        try:
+            if emoji.available:
+                emoji_available=self.bot.icons['greentick']
+            else:
+                emoji_available=self.bot.icons['redtick']
+        except:
+            emoji_available=self.bot.icons['redtick']
+        #--------------------------------------------------
+        emoji_created_at = emoji.created_at.strftime("20%y/%m/%d at %H:%M:%S")
+        emoji_created = humanize.naturaltime(emoji.created_at)
+        #--------------------------------------------------
+        try:
+            if emoji.is_animated:
+                emoji_usage=f"<a:{str(emoji.name)}:{str(emoji.id)}>"
+            else:
+                emoji_usage=f"<:{str(emoji.name)}:{str(emoji.id)}>"
+        except:
+            if emoji.animated:
+                emoji_usage=f"<a:{str(emoji.name)}:{str(emoji.id)}>"
+            else:
+                emoji_usage=f"<:{str(emoji.name)}:{str(emoji.id)}>"
+        #--------------------------------------------------
+        try:
+            emoji_guild_name = emoji.guild.name
+        except:
+            emoji_guild_name = "None"
+        em=discord.Embed(
+            description=f"""
+**Name**: `{emoji.name}`
+**ID**: `{emoji.id}`
+**URL**: {emoji.url}
+**Usage**: `{emoji_usage}`
+**Created At**: {emoji_created_at} ({emoji_created})
+**Guild**: `{emoji_guild_name}`
+**Animated**: {emoji_animated}
+**Available**: {emoji_available}""",
+            timestamp=datetime.datetime.utcnow(),
+            color=color()
+        )
+        em.set_thumbnail(url=str(emoji.url))
+        await ctx.reply(embed=em, mention_author=False)
 
     @commands.Cog.listener()
     async def on_message(self, msg):
@@ -260,7 +310,7 @@ class Utility(commands.Cog):
                 em=discord.Embed(description=f"[png]({avatar_png}) | [jpg]({avatar_jpg}) | [jpeg]({avatar_jpeg}) | [webp]({avatar_webp})", color=color(), timestamp=datetime.datetime.utcnow())
             em.set_image(url=ctx.guild.icon_url)
             em.set_author(name=f"{ctx.guild.name}", icon_url=ctx.guild.icon_url)
-        await ctx.send(embed=em)
+        await ctx.reply(embed=em, mention_author=False)
 
     @commands.command(aliases=["si", "guildinfo", "gi"])
     @commands.guild_only()
@@ -286,7 +336,7 @@ class Utility(commands.Cog):
                 offline += 1
             elif member.raw_status == "Idle":
                 idle += 1
-        created_at = ctx.guild.created_at.strftime("20%y/%m/%d at %H:%M:%S")
+        created_at = ctx.guild.created_at.strftime("%d/%m/20%y at %H:%M:%S")
         em=discord.Embed(
             title=ctx.guild.name,
             description=f"{description}",
@@ -304,17 +354,17 @@ class Utility(commands.Cog):
             booster_role = "none"
         em.add_field(
             name="Boosts",
-            value=f"- Amount: `{ctx.guild.premium_subscription_count}`\n- Role: {booster_role}",
+            value=f"{self.bot.icons['arrow']} Amount: `{ctx.guild.premium_subscription_count}`\n{self.bot.icons['arrow']}Role: {booster_role}",
             inline=True
         )
         em.add_field(
             name="Channels",
-            value=f"- All `{len(ctx.guild.channels)}`\n- Text: `{len(ctx.guild.text_channels)}`\n- Voice: `{len(ctx.guild.voice_channels)}`",
+            value=f"{self.bot.icons['arrow']} All `{len(ctx.guild.channels)}`\n{self.bot.icons['arrow']}Text: `{len(ctx.guild.text_channels)}`\n{self.bot.icons['arrow']}Voice: `{len(ctx.guild.voice_channels)}`",
             inline=True
         )
         em.add_field(
             name="Other",
-            value=f"- Owner: {ctx.guild.owner.mention}\n- Roles: `{len(ctx.guild.roles)}`\n- Ŕegion: `{ctx.guild.region}`\n- Created at: `{created_at}` ({humanize.naturaltime(ctx.guild.created_at)})",
+            value=f"{self.bot.icons['arrow']} Owner: {ctx.guild.owner.mention}\n{self.bot.icons['arrow']}Roles: `{len(ctx.guild.roles)}`\n{self.bot.icons['arrow']}Ŕegion: `{ctx.guild.region}`\n{self.bot.icons['arrow']}Created at: `{created_at}` ({humanize.naturaltime(ctx.guild.created_at)})",
             inline=True
         )
         em.set_footer(
@@ -331,45 +381,56 @@ class Utility(commands.Cog):
             member = ctx.author
         #-----------------------------------------------------------
         if not "offline" == str(member.mobile_status):
-            mobile_status = self.bot.greenTick
+            mobile_status = self.bot.icons['greentick']
         else:
-            mobile_status = self.bot.redTick
+            mobile_status = self.bot.icons['redtick']
         #-----------------------------------------------------------
         if not "offline" == str(member.web_status):
-            web_status = self.bot.greenTick
+            web_status = self.bot.icons['greentick']
         else:
-            web_status = self.bot.redTick
+            web_status = self.bot.icons['redtick']
         #-----------------------------------------------------------
         if not "offline" == str(member.desktop_status):
-            desktop_status = self.bot.greenTick
+            desktop_status = self.bot.icons['greentick']
         else:
-            desktop_status = self.bot.redTick
+            desktop_status = self.bot.icons['redtick']
         #-----------------------------------------------------------
-        if member.id == 797044260196319282:
-            bot_owner = self.bot.greenTick
+        if member.id == self.bot.ownersid:
+            bot_owner = self.bot.icons['greentick']
         else:
-            bot_owner = self.bot.redTick
+            bot_owner = self.bot.icons['redtick']
         #-----------------------------------------------------------
         if member.id == ctx.guild.owner_id:
-            guild_owner = self.bot.greenTick
+            guild_owner = self.bot.icons['greentick']
         else:
-            guild_owner = self.bot.redTick
+            guild_owner = self.bot.icons['redtick']
         #-----------------------------------------------------------
         if member.bot == True:
-            member_bot = self.bot.greenTick
+            member_bot = self.bot.icons['greentick']
         else:
-            member_bot = self.bot.redTick
-        #-----------------------------------------------------------    
-        created_at = member.created_at.strftime("20%y/%m/%d at %H:%M:%S")
-        joined_at = member.joined_at.strftime("20%y/%m/%d at %H:%M:%S")
+            member_bot = self.bot.icons['redtick']
+        #----------------------------------------------------------{self.bot.icons['arrow']}   
+        created_at = member.created_at.strftime("%d/%m/20%y at %H:%M:%S")
+        joined_at = member.joined_at.strftime("%d/%m/20%y at %H:%M:%S")
         em=discord.Embed(
             title=member.name + "#" + member.discriminator,
             timestamp=datetime.datetime.utcnow(),
             color=color()
         )
         em.add_field(
-            name="info",
-            value=f"- Name: `{member.name}`\n- Tag: `{member.discriminator}`\n- Nickname: `{member.display_name}`\n- Mention: {member.mention}\n- ID: `{member.id}`\n- Status: `{member.raw_status}`\n- Bot: {member_bot}\n- Mobile: {mobile_status}\n- Web: {web_status}\n- Desktop: {desktop_status}\n- Created at: `{created_at}` ({humanize.naturaltime(member.created_at)})\n- Avatar: [click here]({member.avatar_url})",
+            name="Info",
+            value=f"""
+{self.bot.icons['arrow']}Name: {member.name}
+{self.bot.icons['arrow']}Tag: {member.discriminator}
+{self.bot.icons['arrow']}Nickname: {member.display_name}
+{self.bot.icons['arrow']}Mention: {member.mention}
+{self.bot.icons['arrow']}ID: {member.id}
+{self.bot.icons['arrow']}Status: {member.raw_status}
+{self.bot.icons['arrow']}Bot: {member_bot}
+{self.bot.icons['arrow']}Mobile: {mobile_status}
+{self.bot.icons['arrow']}Web: {web_status}
+{self.bot.icons['arrow']}Desktop: {desktop_status}
+{self.bot.icons['arrow']}Created at: {created_at} ({humanize.naturaltime(member.created_at)})""",
             inline=True
         )
         if member.top_role.name == "@everyone":
@@ -377,36 +438,37 @@ class Utility(commands.Cog):
         else:
             top_role=member.top_role.mention
         em.add_field(
-            name="guild",
-            value=f"- Owner: {guild_owner}\n- Roles: `{len(member.roles)}`\n- Top Role: {top_role}\n- Joined at: `{joined_at}` ({humanize.naturaltime(member.joined_at)})",
+            name="Guild",
+            value=f"""
+{self.bot.icons['arrow']}Owner: {guild_owner}
+{self.bot.icons['arrow']}Roles: {len(member.roles)}
+{self.bot.icons['arrow']}Top Role: {top_role}
+{self.bot.icons['arrow']}Joined at: {joined_at} ({humanize.naturaltime(member.joined_at)})""",
             inline=False
         )
-        if ctx.message.content.endswith("--roles"):
-            em.add_field(
-                name=f"roles ({len([e for e in ctx.author.roles if not e.name == '@everyone'])})",
-                value=", ".join(f"`{e.name}`" for e in reversed(ctx.author.roles) if not e.name == "@everyone"),
-                inline=False
-            )
-        if member.bot:
+        if not member.bot:
             try:
                 mutual_guilds=len(member.mutual_guilds)
             except AttributeError:
                 mutual_guilds=len(self.bot.guilds)
             em.add_field(
                 name="Other",
-                value=f"- Bot Owner: {bot_owner}\n- Mutual Guilds: `{mutual_guilds}`",
+                value=f"""
+{self.bot.icons['arrow']}Bot Owner: {bot_owner}
+{self.bot.icons['arrow']}Mutual Guilds: `{mutual_guilds}`""",
                 inline=False
             )
         else:
             em.add_field(
                 name="Other",
-                value=f"- Mutual guilds: `{len(member.mutual_guilds)}`",
+                value=f"{self.bot.icons['arrow']}Mutual Guilds: {len(member.mutual_guilds)}",
                 inline=False
             )
         em.set_footer(
             text=f"Requested by {ctx.author}",
             icon_url=ctx.author.avatar_url
         )
+        em.set_thumbnail(url=member.avatar_url)
         await ctx.reply(embed=em, mention_author=False)
 
     @commands.command()
@@ -491,7 +553,7 @@ class Utility(commands.Cog):
                 em=discord.Embed(description=f"[png]({avatar_png}) | [jpg]({avatar_jpg}) | [jpeg]({avatar_jpeg}) | [webp]({avatar_webp})", color=color(), timestamp=datetime.datetime.utcnow())
             em.set_image(url=member.avatar_url)
             em.set_author(name=f"{member}", icon_url=member.avatar_url)
-        await ctx.send(embed=em)
+        await ctx.reply(embed=em, mention_author=False)
 
     @commands.command(aliases=["lc"])
     @commands.cooldown(1,5,commands.BucketType.user)
@@ -557,31 +619,31 @@ class Utility(commands.Cog):
                         cogs.append(cog)
             owner = self.bot.get_user(self.bot.ownersid)
             em.add_field(name="System", value=f"""
-- **OS**: `{operating_system}`
-- **CPU**: `{process.cpu_percent()}`%
-- **Memory**: `{humanize.naturalsize(process.memory_full_info().rss)}`
-- **Process**: `{process.pid}`
-- **Threads**: `{process.num_threads()}`
-- **Language**: `Python`
-- **Python version**: `{version[0]}.{version[1]}.{version[2]}`
-- **discord.py version**: `{discord.__version__}`""", inline=True)
+{self.bot.icons['arrow']}**OS**: `{operating_system}`
+{self.bot.icons['arrow']}**CPU**: `{process.cpu_percent()}`%
+{self.bot.icons['arrow']}**Memory**: `{humanize.naturalsize(process.memory_full_info().rss)}`
+{self.bot.icons['arrow']}**Process**: `{process.pid}`
+{self.bot.icons['arrow']}**Threads**: `{process.num_threads()}`
+{self.bot.icons['arrow']}**Language**: `Python`
+{self.bot.icons['arrow']}**Python version**: `{version[0]}.{version[1]}.{version[2]}`
+{self.bot.icons['arrow']}**discord.py version**: `{discord.__version__}`""", inline=True)
             em.add_field(name="Bot", value=f"""
-- **Guilds**: `{len(self.bot.guilds)}`
-- **Users**: `{len(self.bot.users)}`
-- **Channels**: `{channels}`:
-- **Shards**: `{len(list(self.bot.shards))}`
-- **Commands**: `{len([cmd for cmd in self.bot.commands if not cmd.hidden])}`
-- **Commands executed**: `{self.bot.cmdsSinceRestart}`
-- **Cogs**: `{len(cogs)}`
-- **Uptime**: `{days}d {hours}h {minutes}m {seconds}s`""", inline=True)
+{self.bot.icons['arrow']}**Guilds**: `{len(self.bot.guilds)}`
+{self.bot.icons['arrow']}**Users**: `{len(self.bot.users)}`
+{self.bot.icons['arrow']}**Channels**: `{channels}`:
+{self.bot.icons['arrow']}**Shards**: `{len(list(self.bot.shards))}`
+{self.bot.icons['arrow']}**Commands**: `{len([cmd for cmd in self.bot.commands if not cmd.hidden])}`
+{self.bot.icons['arrow']}**Commands executed**: `{self.bot.cmdsSinceRestart}`
+{self.bot.icons['arrow']}**Cogs**: `{len(cogs)}`
+{self.bot.icons['arrow']}**Uptime**: `{days}d {hours}h {minutes}m {seconds}s`""", inline=True)
             em.add_field(name="Links", value=f"""
-- [Developer](https://discord.com/users/{owner.id})
-- [Source]({self.bot.github})
-- [Invite](https://discord.com/api/oauth2/authorize?client_id={self.bot.user.id}&permissions=8&scope=bot)
+{self.bot.icons['arrow']}[Developer](https://discord.com/users/{owner.id})
+{self.bot.icons['arrow']}[Source]({self.bot.github})
+{self.bot.icons['arrow']}[Invite](https://discord.com/api/oauth2/authorize?client_id={self.bot.user.id}&permissions=8&scope=bot)
 """, inline=False)
             em.set_thumbnail(url=self.bot.user.avatar_url)
         em.set_footer(text=f"Made by {owner}", icon_url=owner.avatar_url)
-        await ctx.send(embed=em)
+        await ctx.reply(embed=em, mention_author=False)
 
     @commands.command()
     @commands.cooldown(1,5,commands.BucketType.user)
@@ -1062,30 +1124,52 @@ UUID: `{friend['uuid']}`
             await ctx.reply(embed=em, mention_author=False)
 
     @commands.command()
+    @commands.cooldown(1,5,commands.BucketType.user)
+    async def inviteinfo(self, ctx, invite):
+        code = discord.utils.resolve_invite(invite)
+        invite = await self.bot.fetch_invite(invite)
+        guild = invite.guild
+        if guild.description is not None:
+            em=discord.Embed(title=guild.name,description=f"""
+> {guild.description}
+
+{self.bot.icons['arrow']}Created at: {guild.created_at.strftime('%d/%m/20%y at %H:%M:%S')} ({humanize.naturaltime(guild.created_at)})
+{self.bot.icons['arrow']}Verification Level: {str(guild.verification_level).title()}""", color=color(), timestamp=datetime.datetime.utcnow(), url=invite)
+        else:
+            em=discord.Embed(title=guild.name,description=f"""
+{self.bot.icons['arrow']}Created at: {guild.created_at.strftime('%d/%m/20%y at %H:%M:%S')} ({humanize.naturaltime(guild.created_at)})
+{self.bot.icons['arrow']}Verification Level: {str(guild.verification_level).title()}""", color=color(), timestamp=datetime.datetime.utcnow(), url=invite)
+        em.set_thumbnail(url=guild.icon_url)
+        em.set_footer(text=f"ID: {guild.id} • {ctx.author}", icon_url=ctx.author.avatar_url)
+        if guild.banner_url is not None:
+            em.set_image(url=guild.banner_url)
+        await ctx.reply(embed=em, mention_author=False)
+
+    @commands.command()
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def ping(self, ctx):
         em=discord.Embed(color=color())
         dagpi_ping = round(await dagpi.image_ping(), 3) * 1000
         em.add_field(name="latency", value=f"""
-- **Typing**: `pinging`
-- **Bot**: `{round(self.bot.latency*1000)}`ms
-- **Database**: `pinging`
-- **Dagpi**: `{dagpi_ping}`ms""", inline=False)
+{self.bot.icons['arrow']}**Typing**: `pinging`
+{self.bot.icons['arrow']}**Bot**: `{round(self.bot.latency*1000)}`ms
+{self.bot.icons['arrow']}**Database**: `pinging`
+{self.bot.icons['arrow']}**Dagpi**: `{dagpi_ping}`ms""", inline=False)
         start=time.perf_counter()
-        msg = await ctx.send(embed=em)
+        msg = await ctx.reply(embed=em, mention_author=False)
         end=time.perf_counter()
         final=end-start
         api_latency = round(final*1000)
         em=discord.Embed(color=color())
         poststart = time.perf_counter()
         await self.bot.db.fetch("SELECT 1")
-        postduration = (time.perf_counter() - poststart) * 1000
+        postduration = (time.perf_counter()-poststart) * 1000
         db_ping = round(postduration, 1)
         em.add_field(name="latency", value=f"""
-- **Typing**: `{api_latency}`ms
-- **Bot**: `{round(self.bot.latency*1000)}`ms
-- **Database**: `{db_ping}`ms
-- **Dagpi**: `{dagpi_ping}`ms""", inline=False)
+{self.bot.icons['arrow']}**Typing**: `{api_latency}`ms
+{self.bot.icons['arrow']}**Bot**: `{round(self.bot.latency*1000)}`ms
+{self.bot.icons['arrow']}**Database**: `{db_ping}`ms
+{self.bot.icons['arrow']}**Dagpi**: `{dagpi_ping}`ms""", inline=False)
         await msg.edit(embed=em)
 
     @commands.command()
