@@ -1124,6 +1124,17 @@ UUID: `{friend['uuid']}`
             await ctx.reply(embed=em, mention_author=False)
 
     @commands.command()
+    @commands.cooldown(1,30,commands.BucketType.user)
+    async def setprefix(self, ctx, prefix : str = "w,"):
+        try:
+            await self.bot.db.execute("INSERT INTO prefixes (guild, prefix) VALUES ($1, $2)", ctx.guild.id, prefix)
+        except asyncpg.UniqueViolationError:
+            await self.bot.db.execute("UPDATE prefixes SET prefix = $1 WHERE guild = $2", prefix, ctx.guild.id)
+        em=discord.Embed(description=f"Sucessfully set the prefix for `{ctx.guild.name}` to `{prefix}`", color=color())
+        em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
+        await ctx.reply(embed=em, mention_author=False)
+
+    @commands.command()
     @commands.cooldown(1,5,commands.BucketType.user)
     async def inviteinfo(self, ctx, invite):
         code = discord.utils.resolve_invite(invite)

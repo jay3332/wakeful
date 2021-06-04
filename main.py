@@ -7,16 +7,13 @@ from utils.checks import is_blacklisted, is_mod
 
 async def get_prefix(bot, message):
     await bot.wait_until_ready()
-    if message.guild is None:
-        return "!"
-    else:
-        try:
-            prefix = await bot.db.fetchrow("SELECT prefix FROM prefixes WHERE guild = $1", message.guild.id)
-            return prefix["prefix"]
-        except:
-            await bot.db.execute("INSERT INTO prefixes(guild, prefix) VALUES($1, $2)", message.guild.id, 'w,')
-            prefix = await bot.db.fetchrow("SELECT prefix FROM prefixes WHERE guild = $1", message.guild.id)
-            return prefix["prefix"]
+    try:
+        prefix = await bot.db.fetchrow("SELECT prefix FROM prefixes WHERE user_id = $1", message.author.id)
+        return prefix["prefix"]
+    except:
+        await bot.db.execute("INSERT INTO prefixes (user_id, prefix) VALUES($1, $2)", message.author.id, 'w,')
+        prefix = await bot.db.fetchrow("SELECT prefix FROM prefixes WHERE user_id = $1", message.author.id)
+        return prefix["prefix"]
 
 with open('config.json') as f:
     conf = json.load(f)
