@@ -1,4 +1,4 @@
-import discord, datetime, async_cse, psutil, humanize, os, sys, inspect, mystbin, googletrans, asyncio, aiohttp, random, time, asyncdagpi, hashlib, asyncpg, io, base64, typing
+import discord, datetime, async_cse, psutil, humanize, os, sys, inspect, mystbin, googletrans, asyncio, aiohttp, random, time, asyncdagpi, hashlib, asyncpg, io, base64, typing, gdshortener
 from discord.ext import commands
 from discord import Webhook, AsyncWebhookAdapter
 from utils.configs import color
@@ -20,6 +20,7 @@ google = async_cse.Search(get_config("GOOGLE"))
 mystbinn = mystbin.Client()
 dagpi = asyncdagpi.Client(get_config("DAGPI"))
 idevisionn = idevision.async_client(get_config("IDEVISION"))
+isgd = gdshortener.ISGDShortener()
 
 class Utility(commands.Cog):
 
@@ -55,6 +56,43 @@ class Utility(commands.Cog):
                     mseg = f"Hey! {obj.name} is currently marked as afk for `{data['reason']}`"
                 em=discord.Embed(description=mseg, color=color())
                 await msg.reply(embed=em)
+
+
+    @commands.Cog.listener()
+    async def on_message(self, msg):
+        if msg.author.bot:
+            return
+        if ";;" in msg.content:
+            emojis = msg.content.split(";;")
+            emoji_ = emojis[1]
+            if emoji_ != "" and not " " in emoji_:
+                res = await self.bot.db.fetchrow("SELECT commands FROM commands WHERE guild = $1", msg.guild.id)
+                try:
+                    res["commands"]
+                except TypeError:
+                    pass
+                else:
+                    commands = res["commands"]
+                    commands = commands.split(",")
+                    if len(commands) != 0 and commands != ['']:
+                        if "emojis" in commands:
+                            return
+                        else:
+                            pass
+                    else:
+                        pass
+                res = await self.bot.db.fetchrow("SELECT user_id FROM emojis WHERE user_id = $1", msg.author.id)
+                try:
+                    res["user_id"]
+                except TypeError:
+                    return
+                else:
+                    emoji = None
+                    for e in self.bot.emojis:
+                        if e.name.lower().startswith(emoji_.lower()):
+                            emoji = e
+                    if emoji is not None:
+                        await msg.reply(str(emoji), mention_author=False)
 
     @commands.command()
     @commands.cooldown(1, 5, commands.BucketType.user)
@@ -106,41 +144,31 @@ class Utility(commands.Cog):
         em.set_thumbnail(url=str(emoji.url))
         await ctx.reply(embed=em, mention_author=False)
 
-    @commands.Cog.listener()
-    async def on_message(self, msg):
-        if msg.author.bot:
-            return
-        if ";;" in msg.content:
-            emojis = msg.content.split(";;")
-            emoji_ = emojis[1]
-            if emoji_ != "" and not " " in emoji_:
-                res = await self.bot.db.fetchrow("SELECT commands FROM commands WHERE guild = $1", msg.guild.id)
-                try:
-                    res["commands"]
-                except TypeError:
-                    pass
-                else:
-                    commands = res["commands"]
-                    commands = commands.split(",")
-                    if len(commands) != 0 and commands != ['']:
-                        if "emojis" in commands:
-                            return
-                        else:
-                            pass
-                    else:
-                        pass
-                res = await self.bot.db.fetchrow("SELECT user_id FROM emojis WHERE user_id = $1", msg.author.id)
-                try:
-                    res["user_id"]
-                except TypeError:
-                    return
-                else:
-                    emoji = None
-                    for e in self.bot.emojis:
-                        if e.name.lower().startswith(emoji_.lower()):
-                            emoji = e
-                    if emoji is not None:
-                        await msg.reply(str(emoji), mention_author=False)
+    @commands.command(aliases=["shorten"])
+    @commands.cooldown(1,10, commands.BucketType.user)
+    async def shortener(self, ctx, url, custom_url = None):
+        async with ctx.typing():
+            if custom_url is None:
+                res = list(isgd.shorten(url=url))[0]
+            else:
+                res = list(isgd.shorten(url=url, custom_url=custom_url))[0]
+        em=discord.Embed(description=f"Here's your [shortened url]({res})", color=color(), timestamp=datetime.datetime.utcnow())
+        em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
+        await ctx.reply(embed=em, mention_author=False)
+
+    @commands.command()
+    @commands.cooldown(1,20,commands.BucketType.user)
+    async def lyrics(self, ctx, artist, *, title):
+        artistt = artist.replace(" ", "%20")
+        titlee = title.replace(" ", "%20")
+        async with ctx.typing():
+            res = await self.bot.session.get(f"https://api.lyrics.ovh/v1/{artistt}/{titlee}")
+        res = await res.json()
+        lyrics = res["lyrics"]
+        post = await mystbinn.post(lyrics)
+        em=discord.Embed(description=f"I've uploaded the lyrics for `{title}` by `{artist}` to [mystbin]({post})", color=color(), timestamp=datetime.datetime.utcnow())
+        em.set_footer(text=f"Powered by lyrics.ovh • {ctx.author}", icon_url=ctx.author.avatar_url)
+        await ctx.reply(embed=em, mention_author=False)
 
     @commands.group(invoke_without_command=True, aliases=["emoji"])
     @commands.cooldown(1,5,commands.BucketType.user)
@@ -276,8 +304,8 @@ class Utility(commands.Cog):
         async with ctx.typing():
             translation = await do_translate(output, text)
             em = discord.Embed(color=color())
-            em.add_field(name=f"Input [{translation.src.upper()}]", value=f"```{text}```", inline=False)
-            em.add_field(name=f"Output [{translation.dest.upper()}]", value=f"```{translation.text}```", inline=False)
+            em.add_field(name=f"Input [{translation.src.upper()}]", value=f"```{text}```", inline=True)
+            em.add_field(name=f"Output [{translation.dest.upper()}]", value=f"```{translation.text}```", inline=True)
             em.set_author(name=ctx.author, icon_url=ctx.author.avatar_url)
         await ctx.reply(embed=em, mention_author=False)
 
@@ -535,9 +563,9 @@ class Utility(commands.Cog):
                         await ctx.author.send(embed=em)
                     await ctx.message.add_reaction("✅")
 
-    @commands.command(aliases=["icon", "av"])
+    @commands.command(name="avatar", aliases=["icon", "av"])
     @commands.cooldown(1, 5, commands.BucketType.user)
-    async def avatar(self, ctx, member : discord.Member = None):
+    async def _avatar(self, ctx, member : discord.Member = None):
         async with ctx.typing():
             if not member:
                 member = ctx.author
@@ -688,7 +716,7 @@ Album: `{activity.album}`
 Album Cover: [url]({activity.album_cover_url})
 Duration: `{hours}`h `{minutes}`m `{seconds}`s
 """,
-                    inline=False
+                    inline=True
                 )
             elif isinstance(activity, discord.activity.CustomActivity):
                 if activity.emoji != None:
@@ -704,13 +732,13 @@ Text: `{activity.name}`
 Emoji Name: {emojiName}
 Emoji: {emoji}
 """,
-                    inline=False
+                    inline=True
                 )
             elif isinstance(activity, discord.activity.Game):
                 em.add_field(
                     name="Game",
                     value=f"Name: `{activity.name}`",
-                    inline=False
+                    inline=True
                 )
             elif isinstance(activity, discord.activity.Streaming):
                 em.add_field(
@@ -720,7 +748,7 @@ Title: `{activity.name}`
 Platform: `{activity.platform}`
 URL: [{activity.url.split("/")[3]}]({activity.url})
 """,
-                    inline=False
+                    inline=True
                 )
             else:
                 try:
@@ -735,10 +763,72 @@ Details: `{activity.details}`
 Emoji: `{activity.emoji}`
 Type: `{type}`
 """,
-                    inline=False
+                    inline=True
                 )
         em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
         await ctx.reply(embed=em, mention_author=False)
+
+    @commands.command(aliases=["fortnite", "fn", "fnstats"])
+    @commands.cooldown(1,5,commands.BucketType.user)
+    async def fortnitestats(self, ctx, username, *, platform):
+        platforms = {
+            "pc": "kbm",
+            "computer": "kbm",
+            "switch": "gamepad",
+            "nintendo switch": "gamepad",
+            "xbox": "gamepad",
+            "xbox one": "gamepad",
+            "playstation": "gamepad",
+            "playstation 4": "gamepad",
+            "ps":"gamepad",
+            "ps4": "gamepad",
+            "phone": "touch",
+            "android": "touch",
+            "iphone": "touch"
+        }
+        try:
+            platformm = platforms[platform.lower()]
+        except KeyError:
+            em=discord.Embed(description=f"I couldn't find the platform `{platform}`", color=color())
+            em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
+            await ctx.reply(embed=em, mention_author=False)
+        else:
+            res = await self.bot.session.get(f"https://api.fortnitetracker.com/v1/profile/{platformm}/{username}", headers={"TRN-Api-Key":get_config("FORTNITE")})
+            res = await res.json()
+            try:
+                error = str(res["accountId"])
+            except KeyError:
+                em=discord.Embed(description=res["error"], color=color())
+                em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
+                await ctx.reply(embed=em, mention_author=False)
+            else:
+                accid = res["accountId"]
+                avatar = res["avatar"]
+                name = res["epicUserHandle"]
+                recentMatches = res["recentMatches"]
+                em=discord.Embed(title=name, color=color())
+                em.set_footer(text=f"ID: {accid} • Powered by fortnitetracker.com • {ctx.author}", icon_url=ctx.author.avatar_url)
+                em.set_thumbnail(url=avatar)
+                amount = len(recentMatches)
+                if amount > 1:
+                    amount = 1
+                for x in range(amount):
+                    match = recentMatches[x]
+                    type_ = match["playlist"]
+                    kills = match["kills"]
+                    playTime = match["minutesPlayed"]
+                    score = match["score"]
+                    em.add_field(
+                        name=f"Latest Match",
+                        value=f"""
+Game Type: `{type_.title()}`
+Kills: `{kills}`
+Play Time: `{playTime}` minutes
+Score: `{score}`
+""",
+                        inline=True
+                    )
+                await ctx.reply(embed=em, mention_author=False)
 
     @commands.command()
     @commands.cooldown(1,5,commands.BucketType.user)
@@ -760,7 +850,7 @@ Type: `{type}`
     @commands.cooldown(1,5,commands.BucketType.user)
     async def screenshot(self, ctx, website):
         async with ctx.typing():
-            res = await self.bot.session.get(f"https://api.screenshotmachine.com?key={get_config('screenshot')}&url={website}&dimension=1280x720&user-agent=Mozilla/5.0 (Windows NT 10.0; rv:80.0) Gecko/20100101 Firefox/80.0")
+            res = await self.bot.session.get(f"https://api.screenshotmachine.com?key={get_config('SCREENSHOT')}&url={website}&dimension=1280x720&user-agent=Mozilla/5.0 (Windows NT 10.0; rv:80.0) Gecko/20100101 Firefox/80.0")
             res = io.BytesIO(await res.read())
             em=discord.Embed(color=color(), timestamp=datetime.datetime.utcnow())
             em.set_image(url="attachment://screenshot.jpg")
