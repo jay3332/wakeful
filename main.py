@@ -24,7 +24,7 @@ with open('config.json') as f:
 devprefix = conf["DEVPREFIX"] # the prefix for the development version
 
 if pwd.getpwuid(os.getuid())[0] == "pi":
-    bot = commands.AutoShardedBot(command_prefix=devprefix, case_insensitive=True, ShardCount=10, intents=discord.Intents.all())
+    bot = commands.AutoShardedBot(command_prefix=get_prefix, case_insensitive=True, ShardCount=10, intents=discord.Intents.all())
 else:
     bot = commands.AutoShardedBot(command_prefix=devprefix, case_insensitive=True, ShardCount=10, intents=discord.Intents.all())
 bot.remove_command("help")
@@ -70,7 +70,7 @@ async def presence():
 @bot.event
 async def on_message(msg):
     if pwd.getpwuid(os.getuid())[0] == "pi":
-        prefix = devprefix
+        prefix = await get_prefix(bot, msg)
     else:
         prefix = devprefix
 
