@@ -10,9 +10,10 @@ def is_mod(bot, user):
         return False
 
 async def is_blacklisted(bot, user):
+    blacklist = await bot.db.fetchrow("SELECT * FROM blacklist WHERE user_id = $1", user.id)
     try:
-        blacklist = await bot.db.fetchrow("SELECT * FROM blacklist WHERE user_id = $1", user.id)
         blacklist["user_id"]
-        return True
     except:
         return False
+    else:
+        return True
