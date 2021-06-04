@@ -154,6 +154,7 @@ class Utility(commands.Cog):
                 res = list(isgd.shorten(url=url, custom_url=custom_url))[0]
         em=discord.Embed(description=f"Here's your [shortened url]({res})", color=color(), timestamp=datetime.datetime.utcnow())
         em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
+        em.set_thumbnail(url="https://support.rebrandly.com/hc/article_attachments/360020801793/rebrandly_url_shortener_010.png")
         await ctx.reply(embed=em, mention_author=False)
 
     @commands.command()
@@ -168,6 +169,7 @@ class Utility(commands.Cog):
         post = await mystbinn.post(lyrics)
         em=discord.Embed(description=f"I've uploaded the lyrics for `{title}` by `{artist}` to [mystbin]({post})", color=color(), timestamp=datetime.datetime.utcnow())
         em.set_footer(text=f"Powered by lyrics.ovh • {ctx.author}", icon_url=ctx.author.avatar_url)
+        em.set_thumbnail(url="https://static.vecteezy.com/system/resources/thumbnails/001/200/758/small/music-note.png")
         await ctx.reply(embed=em, mention_author=False)
 
     @commands.group(invoke_without_command=True, aliases=["emoji"])
@@ -263,6 +265,7 @@ class Utility(commands.Cog):
                 color=color()
             )
             em.set_footer(text=f"Requested by {ctx.author} • Safe-Search: {safe_search}", icon_url=ctx.author.avatar_url)
+            em.set_thumbnail(url="https://img.icons8.com/color/452/google-logo.png")
             for result in results:
                 if not value > 4:
                     epic = results[int(value)]
@@ -307,6 +310,7 @@ class Utility(commands.Cog):
             em.add_field(name=f"Input [{translation.src.upper()}]", value=f"```{text}```", inline=True)
             em.add_field(name=f"Output [{translation.dest.upper()}]", value=f"```{translation.text}```", inline=True)
             em.set_author(name=ctx.author, icon_url=ctx.author.avatar_url)
+            em.set_thumbnail(url="https://upload.wikimedia.org/wikipedia/commons/d/db/Google_Translate_Icon.png")
         await ctx.reply(embed=em, mention_author=False)
 
     @commands.command()
@@ -319,6 +323,7 @@ class Utility(commands.Cog):
         res = await res.json()
         em = discord.Embed(title=f"Commits", description="\n".join(f"[`{commit['sha'][:6]}`]({commit['html_url']}) {commit['commit']['message']}" for commit in res[:5]), url=self.bot.github+"/commits", color=color())
         em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
+        em.set_thumbnail(url="https://image.flaticon.com/icons/png/512%2F25%2F25231.png")
         await ctx.reply(embed=em, mention_author=False)
 
     @commands.command(aliases=["guildav", "servericon", "serverav"])
