@@ -30,7 +30,9 @@ class Errors(commands.Cog):
                 ctx.command.reset_cooldown(ctx)
                 await self.bot.process_commands(ctx.message)
         elif isinstance(error, commands.MissingRequiredArgument):
-            em=discord.Embed(description=f"`{error.param}` is a required argument that is missing", color=color())
+            param = str(error.param).split(":")
+            param = param[0].replace(" ", "")
+            em=discord.Embed(description=f"`{param}` is a required argument that is missing", color=color())
             await ctx.reply(embed=em, mention_author=False)
         elif isinstance(error, commands.CommandNotFound):
             cmd = ctx.invoked_with
@@ -70,14 +72,18 @@ class Errors(commands.Cog):
                 await ctx.reply(embed=em, mention_author=False)
             else:
                 if is_mod(self.bot, ctx.author):
-                    error = "".join(traceback.format_exception(type(error), error, error.__traceback__))
-                em=discord.Embed(description=f"```py\n{error}```", color=color())
+                    errormsg = "".join(traceback.format_exception(type(error), error, error.__traceback__))
+                    em=discord.Embed(description=f"```py\n{errormsg}```", color=color())
+                else:
+                    em=discord.Embed(description=f"```py\n{error}```", color=color())
                 await ctx.reply(embed=em, mention_author=False)
                 raise error
         else:
             if is_mod(self.bot, ctx.author):
-                error = "".join(traceback.format_exception(type(error), error, error.__traceback__))
-            em=discord.Embed(description=f"```py\n{error}```", color=color())
+                errormsg = "".join(traceback.format_exception(type(error), error, error.__traceback__))
+                em=discord.Embed(description=f"```py\n{errormsg}```", color=color())
+            else:
+                em=discord.Embed(description=f"```py\n{error}```", color=color())
             await ctx.reply(embed=em, mention_author=False)
             raise error
 

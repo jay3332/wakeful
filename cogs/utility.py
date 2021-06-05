@@ -291,11 +291,12 @@ class Utility(commands.Cog):
         else:
             safe_search_setting=True
             safe_search="Enabled"
-        results = await google.search(query, safesearch=safe_search_setting)
-        image = None
-        for res in results:
-            if res.image_url.endswith("png") or res.image_url.endswith("jpg") or res.image_url.endswith("jpeg") or res.image_url.endswith("webp"):
-                image = res
+        async with ctx.typing():
+            results = await google.search(query, safesearch=safe_search_setting)
+            image = None
+            for res in results:
+                if res.image_url.endswith("png") or res.image_url.endswith("jpg") or res.image_url.endswith("jpeg") or res.image_url.endswith("webp"):
+                    image = res
         if image is not None:
             em=discord.Embed(title=f"Results for: `{query}`", description=f"[{image.title}]({image.url})", timestamp=datetime.datetime.utcnow(), color=color())
             em.set_footer(text=f"Requested by {ctx.author} • Safe-Search: {safe_search}", icon_url=ctx.author.avatar_url)
@@ -538,6 +539,24 @@ class Utility(commands.Cog):
                 await msg.edit(embed=em)
             else:
                 await msg.delete()
+
+    @commands.command(aliases=["gif"])
+    @commands.cooldown(1,5,commands.BucketType.user)
+    async def giphy(self, ctx, *, query : str):
+        query = query.replace(" ", "%20")
+        res = await self.bot.session.get(f"https://api.giphy.com/v1/gifs/search?api_key={get_config('GIPHY')}&q={query}&limit=50&offset=0&rating=g&lang=en")
+        res = await res.json()
+        if res["data"] != [] and len(res["data"]) != 0:
+            res = random.choice(res["data"])
+            image = res["images"]["original"]["url"]
+            em=discord.Embed(title=res["title"], url=res["url"], color=color())
+            em.set_image(url=image)
+            await ctx.reply(embed=em, mention_author=False)
+        else:
+            em=discord.Embed(description=f"I couldn't find any results with the query `{query}`", color=color())
+            em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
+            await ctx.reply(embed=em, mention_author=False)
+
 
     @commands.command(aliases=["urban"])
     @commands.cooldown(1,5,commands.BucketType.user)
