@@ -35,7 +35,7 @@ class Moderation(commands.Cog):
                         commands = ",".join(cmd for cmd in commands)
                         await self.bot.db.execute("UPDATE commands SET commands = $1 WHERE guild = $2", commands, ctx.guild.id)
                         em=discord.Embed(description=f"I've successfully disabled the `{command.name}` command", color=color())
-                        em.set_footer(text=f"requested by {ctx.author}", icon_url=ctx.author.avatar_url)
+                        em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
                         await ctx.reply(embed=em, mention_author=False)
                     else:
                         em=discord.Embed(description=f"That command is already disabled", color=color())
@@ -76,12 +76,12 @@ class Moderation(commands.Cog):
                     if len(commands) != 1:
                         await self.bot.db.execute("UPDATE commands SET commands = $1 WHERE guild = $2", commands, ctx.guild.id)
                         em=discord.Embed(description=f"I've successfully enabled the `{command.name}` command", color=color())
-                        em.set_footer(text=f"requested by {ctx.author}", icon_url=ctx.author.avatar_url)
+                        em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
                         await ctx.reply(embed=em, mention_author=False)
                     else:
                         await self.bot.db.fetch("DELETE FROM commands WHERE guild = $1", ctx.guild.id)
                         em=discord.Embed(description=f"I've successfully enabled the `{command.name}` command", color=color())
-                        em.set_footer(text=f"requested by {ctx.author}", icon_url=ctx.author.avatar_url)
+                        em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
                         await ctx.reply(embed=em, mention_author=False)
                 else:
                     em=discord.Embed(description=f"That command isn't disabled", color=color())
@@ -100,7 +100,7 @@ class Moderation(commands.Cog):
         else:
             await ctx.add_reaction(self.bot.icons["redtick"])
             em=discord.Embed(description=f"You can't moderate people that have a higher role position than you", color=color())
-            em.set_footer(text=f"requested by {ctx.author}", icon_url=ctx.author.avatar_url)
+            em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
             await ctx.reply(embed=em, mention_author=False)
 
     @commands.command()
