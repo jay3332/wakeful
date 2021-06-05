@@ -93,13 +93,12 @@ class Moderation(commands.Cog):
     @commands.cooldown(1,5,commands.BucketType.user)
     async def ban(self, ctx, member : discord.Member, *, reason : str = None):
         if ctx.author.top_role.position > member.top_role.position:
-            if reason != None:
-                reason = reason + " - Requested by {ctx.author} ({ctx.author.id})"
-            await member.ban(reason="".join(reason if reason != None else f"requested by {ctx.author} ({ctx.author.id})"))
-            em=discord.Embed(description=f"{member} has been successfully banned", color=color())
-            em.set_footer(text=f"requested by {ctx.author}", icon_url=ctx.author.avatar_url)
-            await ctx.reply(embed=em, mention_author=False)
+            if reason is not None:
+                reason = f"{reason} - Requested by {ctx.author} ({ctx.author.id})"
+            await member.ban(reason="".join(reason if reason != None else f"Requested by {ctx.author} ({ctx.author.id})"))
+            await ctx.add_reaction(self.bot.icons["greentick"])
         else:
+            await ctx.add_reaction(self.bot.icons["redtick"])
             em=discord.Embed(description=f"You can't moderate people that have a higher role position than you", color=color())
             em.set_footer(text=f"requested by {ctx.author}", icon_url=ctx.author.avatar_url)
             await ctx.reply(embed=em, mention_author=False)
@@ -110,13 +109,12 @@ class Moderation(commands.Cog):
     @commands.cooldown(1,5,commands.BucketType.user)
     async def kick(self, ctx, member : discord.Member, *, reason : str = None):
         if ctx.author.top_role.position > member.top_role.position:
-            if reason != None:
-                reason = reason + " - Requested by {ctx.author} ({ctx.author.id})"
-            await member.kick(reason="".join(reason if reason != None else f"requested by {ctx.author} ({ctx.author.id})"))
-            em=discord.Embed(description=f"{member} has been successfully kicked", color=color())
-            em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
-            await ctx.reply(embed=em, mention_author=False)
+            if reason is not None:
+                reason = reason + f"{reason} - Requested by {ctx.author} ({ctx.author.id})"
+            await member.kick(reason="".join(reason if reason is not None else f"Requested by {ctx.author} ({ctx.author.id})"))
+            await ctx.add_reaction(self.bot.icons["greentick"])
         else:
+            await ctx.add_reaction(self.bot.icons["redtick"])
             em=discord.Embed(description=f"You can't moderate people that have a higher role position than you", color=color())
             em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
             await ctx.reply(embed=em, mention_author=False)
@@ -125,21 +123,16 @@ class Moderation(commands.Cog):
     @commands.guild_only()
     @commands.has_guild_permissions(manage_messages=True)
     @commands.cooldown(1,5,commands.BucketType.user)
-    async def purge(self, ctx, amount : int = 10, member : discord.Member = None):
+    async def purge(self, ctx, amount : int = 10):
         if not amount > 100:
-            if member is None:
-                e = await ctx.channel.purge(limit=amount)
-            else:
-                e = await ctx.channel.purge(limit=amount, check=lambda message: message.author == member and message != ctx.message)
-            if member is None:
-                em=discord.Embed(description=f"I've successfully purged `{len(e)}` messages", color=color())
-            else:
-                em=discord.Embed(description=f"I've successfully purged `{len(e)}` messages from {member.mention}", color=color())
+            e = await ctx.channel.purge(limit=amount)
+            em=discord.Embed(description=f"I've successfully purged `{len(e)}` messages", color=color())
             em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
             msg = await ctx.reply(embed=em, mention_author=False)
             await asyncio.sleep(2)
             await msg.delete()
         else:
+            await ctx.add_reaction(self.bot.icons["redtick"])
             em=discord.Embed(description=f"The maximum amount you can purge is `100`", color=color())
             em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
             await ctx.reply(embed=em, mention_author=False)
@@ -149,12 +142,12 @@ class Moderation(commands.Cog):
     @commands.has_guild_permissions(manage_channels=True)
     @commands.cooldown(1,5,commands.BucketType.user)
     async def nuke(self, ctx, channel : discord.TextChannel = None):
-        if channel == None:
+        if channel is None:
             channel = ctx.channel
         em=discord.Embed(description="Are you sure you want to do this? this will delete all pins & messages", color=color())
         msg = await ctx.reply(embed=em, mention_author=False)
-        await msg.add_reaction("✅")
-        await msg.add_reaction("❌")
+        await msg.add_reaction(self.bot.icons["greentick"])
+        await msg.add_reaction(self.bot.icons["redtick"])
         reaction, user = await self.bot.wait_for("reaction_add", check=lambda reaction, user: user.guild_permissions.manage_channels and str(reaction.emoji) in ["✅", "❌"] and reaction.message == msg)
         if str(reaction.emoji) == "✅":
             new = await channel.clone()
@@ -172,10 +165,9 @@ class Moderation(commands.Cog):
     async def nickname(self, ctx, member : discord.Member, *, nickname : str = ""):
         if ctx.author.top_role.position > member.top_role.position:
             await member.edit(nick=nickname)
-            em=discord.Embed(description=f"Successfully changed {member}'s nickname to `{nickname}`", color=color())
-            em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
-            await ctx.reply(embed=em, mention_author=False)
+            await ctx.add_reaction(self.bot.icons["greentick"])
         else:
+            await ctx.add_reaction(self.bot.icons["redtick"])
             em=discord.Embed(description=f"You can't moderate people that have a higher role position than you", color=color())
             em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
             await ctx.reply(embed=em, mention_author=False)
@@ -191,50 +183,15 @@ class Moderation(commands.Cog):
                 if m.nick:
                     nicks.append(m.nick.lower())
             while True:
-                nickname = "moderated nickname "+"".join(random.choice(string.ascii_letters+string.digits) for x in range(5))
+                nickname = "Moderated Nickname "+"".join(random.choice(string.ascii_letters+string.digits) for x in range(5))
                 if not nickname in nicks:
                     await member.edit(nick=nickname)
                     break
-            em=discord.Embed(description=f"successfully changed {member}'s nickname to `{nickname}`", color=color())
-            em.set_footer(text=f"requested by {ctx.author}", icon_url=ctx.author.avatar_url)
-            await ctx.reply(embed=em, mention_author=False)
+            await ctx.add_reaction(self.bot.icons["greentick"])
         else:
+            await ctx.add_reaction(self.bot.icons["redtick"])
             em=discord.Embed(description=f"You can't moderate people that have a higher role position than you", color=color())
-            em.set_footer(text=f"requested by {ctx.author}", icon_url=ctx.author.avatar_url)
-            await ctx.reply(embed=em, mention_author=False)
-
-    @commands.command()
-    @commands.guild_only()
-    @commands.has_guild_permissions(manage_channels=True)
-    async def lock(self, ctx, channel : discord.TextChannel = None):
-        if channel != None:
-            await channel.set_permissions(ctx.guild.default_role, send_messages=False)
-            em=discord.Embed(description=f"successfully locked {channel.mention}", color=color())
-            em.set_footer(text=f"requested by {ctx.author}", icon_url=ctx.author.avatar_url)
-            await ctx.reply(embed=em, mention_author=False)
-            em=discord.Embed(description=f"this channel has been locked", color=color())
-            em.set_footer(text=f"locked by {ctx.author}", icon_url=ctx.author.avatar_url)
-            await channel.send(embed=em)
-        else:
-            await ctx.channel.set_permissions(ctx.guild.default_role, send_messages=False)
-            em=discord.Embed(description=f"successfully locked {ctx.channel.mention}", color=color())
-            await ctx.reply(embed=em, mention_author=False)
-
-    @commands.command()
-    @commands.guild_only()
-    @commands.has_guild_permissions(manage_channels=True)
-    async def unlock(self, ctx, channel : discord.TextChannel = None):
-        if channel != None:
-            await channel.set_permissions(ctx.guild.default_role, send_messages=True)
-            em=discord.Embed(description=f"successfully unlocked {channel.mention}", color=color())
-            em.set_footer(text=f"requested by {ctx.author}", icon_url=ctx.author.avatar_url)
-            await ctx.reply(embed=em, mention_author=False)
-            em=discord.Embed(description=f"this channel has been unlocked", color=color())
-            em.set_footer(text=f"unlocked by {ctx.author}", icon_url=ctx.author.avatar_url)
-            await channel.send(embed=em)
-        else:
-            await ctx.channel.set_permissions(ctx.guild.default_role, send_messages=True)
-            em=discord.Embed(description=f"successfully unlocked {ctx.channel.mention}", color=color())
+            em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
             await ctx.reply(embed=em, mention_author=False)
 
     @commands.command()
@@ -245,7 +202,7 @@ class Moderation(commands.Cog):
             await self.bot.db.execute("INSERT INTO prefixes (guild, prefix) VALUES ($1, $2)", ctx.guild.id, prefix)
         except asyncpg.UniqueViolationError:
             await self.bot.db.execute("UPDATE prefixes SET prefix = $1 WHERE guild = $2", prefix, ctx.guild.id)
-        em=discord.Embed(description=f"Sucessfully set the prefix for `{ctx.guild.name}` to `{prefix}`", color=color())
+        em=discord.Embed(description=f"I've set the prefix for `{ctx.guild.name}` to `{prefix}`", color=color())
         em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
         await ctx.reply(embed=em, mention_author=False)
 
