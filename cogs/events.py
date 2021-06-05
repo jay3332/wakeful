@@ -94,7 +94,7 @@ Owner: `{guild.owner}`
         await webhook.send(embed=em)
 
     @commands.Cog.listener()
-    async def on_guild_leave(self, guild):
+    async def on_guild_remove(self, guild):
         webhook = Webhook.from_url(str(get_config("LOGS")), adapter=AsyncWebhookAdapter(self.bot.session))
         em=discord.Embed(title="Leave Guild", description=f"""
 Name: `{guild.name}`
