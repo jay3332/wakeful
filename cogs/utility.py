@@ -544,21 +544,26 @@ class Utility(commands.Cog):
     async def urbandictionary(self, ctx, *, term):
         res = await self.bot.session.get("http://api.urbandictionary.com/v0/define", params={"term": term})
         res = await res.json()
-        res = res["list"][0]
-        definition = res["definition"].replace("[", "").replace("]", "")
-        permalink = res["permalink"]
-        upvotes = res["thumbs_up"]
-        author = res["author"]
-        example = res["example"].replace("[", "").replace("]", "")
-        word = res["word"]
-        em=discord.Embed(title=word, description=f"""
-{self.bot.icons['arrow']}**Definition**:
-{definition}
-{self.bot.icons['arrow']}**Example**:
-{example}
-""", url=permalink, color=color())
-        em.set_footer(text=f"👍 {upvotes} • 👤 {author} • {ctx.author}", icon_url=ctx.author.avatar_url)
-        await ctx.reply(embed=em, mention_author=False)
+        if res["list"] != [] and len(res["list"]) != 0:
+            res = res["list"][0]
+            definition = res["definition"].replace("[", "").replace("]", "")
+            permalink = res["permalink"]
+            upvotes = res["thumbs_up"]
+            author = res["author"]
+            example = res["example"].replace("[", "").replace("]", "")
+            word = res["word"]
+            em=discord.Embed(title=word, description=f"""
+    {self.bot.icons['arrow']}**Definition**:
+    {definition}
+    {self.bot.icons['arrow']}**Example**:
+    {example}
+    """, url=permalink, color=color())
+            em.set_footer(text=f"👍 {upvotes} • 👤 {author} • {ctx.author}", icon_url=ctx.author.avatar_url)
+            await ctx.reply(embed=em, mention_author=False)
+        else:
+            em=discord.Embed(description=f"I could not find any results for `{term}`", color=color())
+            em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
+            await ctx.reply(embed=em, mention_author=False)
 
     @commands.command(aliases=["src"])
     @commands.cooldown(1,5,commands.BucketType.user)
