@@ -259,13 +259,18 @@ class Utility(commands.Cog):
                 safe_search="Enabled"
             value=0
             results = await google.search(str(term), safesearch=safe_search_setting)
+            image = None
+            for res in results:
+                if res.image_url.endswith("png") or res.image_url.endswith("jpg") or res.image_url.endswith("jpeg") or res.image_url.endswith("webp"):
+                    image = res.image_url
             em=discord.Embed(
                 title=f"Results for: `{term}`",
                 timestamp=datetime.datetime.utcnow(),
                 color=color()
             )
             em.set_footer(text=f"Requested by {ctx.author} • Safe-Search: {safe_search}", icon_url=ctx.author.avatar_url)
-            em.set_thumbnail(url="https://img.icons8.com/color/452/google-logo.png")
+            if image is not None:
+                em.set_thumbnail(url=image)
             for result in results:
                 if not value > 4:
                     epic = results[int(value)]
@@ -538,7 +543,7 @@ class Utility(commands.Cog):
 
     @commands.command(aliases=["src"])
     @commands.cooldown(1,5,commands.BucketType.user)
-    async def source(self, ctx, command_name : str = None):
+    async def source(self, ctx, *, command_name : str = None):
         if command_name == None:
             em=discord.Embed(description=f"My source code can be found [here]({self.bot.github})", color=color())
             await ctx.reply(embed=em, mention_author=False)
