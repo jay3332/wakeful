@@ -96,9 +96,9 @@ class Moderation(commands.Cog):
             if reason is not None:
                 reason = f"{reason} - Requested by {ctx.author} ({ctx.author.id})"
             await member.ban(reason="".join(reason if reason != None else f"Requested by {ctx.author} ({ctx.author.id})"))
-            await ctx.add_reaction(self.bot.icons["greentick"])
+            await ctx.message.add_reaction(self.bot.icons["greentick"])
         else:
-            await ctx.add_reaction(self.bot.icons["redtick"])
+            await ctx.message.add_reaction(self.bot.icons["redtick"])
             em=discord.Embed(description=f"You can't moderate people that have a higher role position than you", color=color())
             em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
             await ctx.reply(embed=em, mention_author=False)
@@ -112,9 +112,9 @@ class Moderation(commands.Cog):
             if reason is not None:
                 reason = reason + f"{reason} - Requested by {ctx.author} ({ctx.author.id})"
             await member.kick(reason="".join(reason if reason is not None else f"Requested by {ctx.author} ({ctx.author.id})"))
-            await ctx.add_reaction(self.bot.icons["greentick"])
+            await ctx.message.add_reaction(self.bot.icons["greentick"])
         else:
-            await ctx.add_reaction(self.bot.icons["redtick"])
+            await ctx.message.add_reaction(self.bot.icons["redtick"])
             em=discord.Embed(description=f"You can't moderate people that have a higher role position than you", color=color())
             em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
             await ctx.reply(embed=em, mention_author=False)
@@ -132,7 +132,7 @@ class Moderation(commands.Cog):
             await asyncio.sleep(2)
             await msg.delete()
         else:
-            await ctx.add_reaction(self.bot.icons["redtick"])
+            await ctx.message.add_reaction(self.bot.icons["redtick"])
             em=discord.Embed(description=f"The maximum amount you can purge is `100`", color=color())
             em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
             await ctx.reply(embed=em, mention_author=False)
@@ -165,9 +165,9 @@ class Moderation(commands.Cog):
     async def nickname(self, ctx, member : discord.Member, *, nickname : str = ""):
         if ctx.author.top_role.position > member.top_role.position:
             await member.edit(nick=nickname)
-            await ctx.add_reaction(self.bot.icons["greentick"])
+            await ctx.message.add_reaction(self.bot.icons["greentick"])
         else:
-            await ctx.add_reaction(self.bot.icons["redtick"])
+            await ctx.message.add_reaction(self.bot.icons["redtick"])
             em=discord.Embed(description=f"You can't moderate people that have a higher role position than you", color=color())
             em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
             await ctx.reply(embed=em, mention_author=False)
@@ -187,9 +187,9 @@ class Moderation(commands.Cog):
                 if not nickname in nicks:
                     await member.edit(nick=nickname)
                     break
-            await ctx.add_reaction(self.bot.icons["greentick"])
+            await ctx.message.add_reaction(self.bot.icons["greentick"])
         else:
-            await ctx.add_reaction(self.bot.icons["redtick"])
+            await ctx.message.add_reaction(self.bot.icons["redtick"])
             em=discord.Embed(description=f"You can't moderate people that have a higher role position than you", color=color())
             em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
             await ctx.reply(embed=em, mention_author=False)
