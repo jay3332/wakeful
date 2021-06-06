@@ -65,6 +65,10 @@ class Errors(commands.Cog):
         elif isinstance(error, commands.MissingAnyRole):
             em=discord.Embed(description=f"You don't have permission to do this", color=color())
             await ctx.reply(embed=em, mention_author=False)
+        elif isinstance(error, commands.NotOwner):
+            msg = list(error.args)[0]
+            em=discord.Embed(description=msg, color=color())
+            await ctx.reply(embed=em, mention_author=False)
         elif isinstance(error, commands.CommandInvokeError):
             error = error.original
             if isinstance(error, discord.Forbidden):

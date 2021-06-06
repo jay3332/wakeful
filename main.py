@@ -1,9 +1,10 @@
-import discord, os, datetime, json, asyncio, aiohttp, pwd, asyncpg, logging, coloredlogs, discordTogether
+import discord, os, datetime, json, asyncio, aiohttp, pwd, asyncpg, logging, coloredlogs, discordTogether, discord_logging
 from discord.ext import commands, tasks
 from colorama import Fore
 from discord.flags import Intents
 from utils.configs import color
 from utils.checks import is_blacklisted, is_mod
+from utils.get import get_config
 
 async def get_prefix(bot, message):
     await bot.wait_until_ready()
@@ -143,7 +144,6 @@ for filename in os.listdir("./cogs"):
             logger.info(f"{Fore.RED}An error occured while loading cogs.{filename[:-3]}{Fore.RESET}")
             raise exc
 
-bot.load_extension("jishaku")
 presence.start()
 bot.db=bot.loop.run_until_complete(asyncpg.create_pool(host="localhost", port="5432", user=conf["dbuser"], password=conf["dbpw"], database="wakeful"))
 if pwd.getpwuid(os.getuid())[0] == "pi": # check if username is pi
