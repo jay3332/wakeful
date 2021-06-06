@@ -27,7 +27,6 @@ def typeracer(img, sentence):
     array = io.BytesIO()
     img.save(array, format="png")
     return discord.File(io.BytesIO(array.getvalue()), "typeracer.png")
-
 class Fun(commands.Cog):
 
     """Fun & games commands"""
@@ -60,6 +59,85 @@ class Fun(commands.Cog):
             age = res["age"]
             em=discord.Embed(description=f"{name.mention}'s estimated age is {age}", color=color())
             em.set_footer(text=f"Powered by agify.io • {ctx.author}", icon_url=ctx.author.avatar_url)
+            await ctx.send(embed=em)
+    @commands.group(name="together", invoke_without_command=True)
+    @commands.cooldown(1,5,commands.BucketType.user)
+    async def _together(self, ctx):
+        await ctx.invoke(self.bot.get_command("help"), **{"command": ctx.command.name})
+    
+    @_together.command(aliases=["yt"])
+    @commands.cooldown(1,5,commands.BucketType.user)
+    async def youtube(self, ctx):
+        try:
+            voice_channel = ctx.author.voice.channel.id
+        except AttributeError:
+            em=discord.Embed(description=f"You have to join a voice channel to use this command", color=color(), timestamp=datetime.datetime.utcnow())
+            em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
+            await ctx.send(embed=em)
+        else:
+            link = self.bot.together.create_link(voice_channel, ctx.command.name)
+            em=discord.Embed(description=f"Click this [link]({link}) to enable {ctx.command.name} together", color=color(), timestamp=datetime.datetime.utcnow())
+            em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
+            await ctx.send(embed=em)
+
+    @_together.command()
+    @commands.cooldown(1,5,commands.BucketType.user)
+    async def poker(self, ctx):
+        try:
+            voice_channel = ctx.author.voice.channel.id
+        except AttributeError:
+            em=discord.Embed(description=f"You have to join a voice channel to use this command", color=color(), timestamp=datetime.datetime.utcnow())
+            em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
+            await ctx.send(embed=em)
+        else:
+            link = self.bot.together.create_link(voice_channel, ctx.command.name)
+            em=discord.Embed(description=f"Click this [link]({link}) to enable {ctx.command.name} together", color=color(), timestamp=datetime.datetime.utcnow())
+            em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
+            await ctx.send(embed=em)
+
+    @_together.command()
+    @commands.cooldown(1,5,commands.BucketType.user)
+    async def chess(self, ctx):
+        try:
+            voice_channel = ctx.author.voice.channel.id
+        except AttributeError:
+            em=discord.Embed(description=f"You have to join a voice channel to use this command", color=color(), timestamp=datetime.datetime.utcnow())
+            em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
+            await ctx.send(embed=em)
+        else:
+            link = self.bot.together.create_link(voice_channel, ctx.command.name)
+            em=discord.Embed(description=f"Click this [link]({link}) to enable {ctx.command.name} together", color=color(), timestamp=datetime.datetime.utcnow())
+            em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
+            await ctx.send(embed=em)
+
+    @_together.command()
+    @commands.cooldown(1,5,commands.BucketType.user)
+    async def betrayal(self, ctx):
+        try:
+            voice_channel = ctx.author.voice.channel.id
+        except AttributeError:
+            em=discord.Embed(description=f"You have to join a voice channel to use this command", color=color(), timestamp=datetime.datetime.utcnow())
+            em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
+            await ctx.send(embed=em)
+        else:
+            link = self.bot.together.create_link(voice_channel, ctx.command.name)
+            em=discord.Embed(description=f"Click this [link]({link}) to enable {ctx.command.name} together", color=color(), timestamp=datetime.datetime.utcnow())
+            em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
+            await ctx.send(embed=em)
+
+    @_together.command()
+    @commands.cooldown(1,5,commands.BucketType.user)
+    async def fishing(self, ctx):
+        try:
+            voice_channel = ctx.author.voice.channel.id
+        except AttributeError:
+            em=discord.Embed(description=f"You have to join a voice channel to use this command", color=color(), timestamp=datetime.datetime.utcnow())
+            em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
+            await ctx.send(embed=em)
+        else:
+            link = self.bot.together.create_link(voice_channel, ctx.command.name)
+            em=discord.Embed(description=f"Click this [link]({link}) to enable {ctx.command.name} together", color=color(), timestamp=datetime.datetime.utcnow())
+            em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
             await ctx.send(embed=em)
 
     @commands.command()

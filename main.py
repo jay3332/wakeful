@@ -1,4 +1,4 @@
-import discord, os, datetime, json, asyncio, aiohttp, pwd, asyncpg, logging, coloredlogs
+import discord, os, datetime, json, asyncio, aiohttp, pwd, asyncpg, logging, coloredlogs, discordTogether
 from discord.ext import commands, tasks
 from colorama import Fore
 from discord.flags import Intents
@@ -46,6 +46,7 @@ bot.icons = {
     "arrow": "<a:arrow:850290444327059456>",
     "loading": "<a:loading:851078515436027905>"
 }
+bot.together = discordTogether.DiscordTogether(bot)
 bot.cmdsSinceRestart = 0
 bot.message_cache = {}
 bot.ownersid = 797044260196319282
