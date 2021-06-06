@@ -128,9 +128,9 @@ class Admin(commands.Cog):
             await msg.add_reaction(reaction)
         reaction, user = await self.bot.wait_for("reaction_add", check=lambda reaction, user: user == ctx.author and str(reaction.emoji) in reactions and reaction.message == msg)
         if str(reaction.emoji) == self.bot.icons['greentick']:
-            for reaction in reactions:
+            for reaction_ in reactions:
                 try:
-                    await msg.remove_reaction(reaction)
+                    await msg.clear_reactions()
                 except:
                     pass
             em=discord.Embed(description=f"Now restarting... {self.bot.icons['loading']}", color=color())
