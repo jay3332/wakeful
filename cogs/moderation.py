@@ -197,7 +197,7 @@ class Moderation(commands.Cog):
     @commands.command()
     @commands.guild_only()
     @commands.has_guild_permissions(manage_guild=True)
-    async def setprefix(self, ctx, prefix : str = "w,"):
+    async def setprefix(self, ctx, prefix : str):
         try:
             await self.bot.db.execute("INSERT INTO prefixes (guild, prefix) VALUES ($1, $2)", ctx.guild.id, prefix)
         except asyncpg.UniqueViolationError:
