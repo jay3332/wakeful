@@ -4,6 +4,7 @@ from gtts import gTTS
 from jishaku.functools import executor_function
 from utils.get import get_config
 from utils.configs import color
+from utils.functions import getFile
 
 dagpi = asyncdagpi.Client(get_config("DAGPI"))
 
@@ -135,7 +136,7 @@ class Fun(commands.Cog):
             permalink = meme["permalink"]
             upvotes = meme["ups"]
             comments = meme["num_comments"]
-            em = discord.Embed(title=title, url="https://reddit.com"+permalink, color=color())
+            em = discord.Embed(title=title, url=f"https://reddit.com{permalink}", color=color())
             em.set_footer(text=f"👍 {upvotes}• 💬 {comments} • {ctx.author}", icon_url=ctx.author.avatar_url)
             em.set_image(url=url)
             await ctx.reply(embed=em, mention_author=False)
@@ -282,20 +283,15 @@ class Fun(commands.Cog):
             else:
                 if letter == " ":
                     letters.append(" ")
-        if letters != []:
+        if letters != [] and len(letters) != 0:
+            res = "".join(f":regional_indicator_{letter}:" if not letter == " " else " " for letter in letters)
             try:
-                em=discord.Embed(timestamp=datetime.datetime.utcnow(), color=color())
-                em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
-                em.add_field(name="Input", value=f"```{text}```", inline=False)
-                em.add_field(name="Output", value="".join(f":regional_indicator_{letter}:" if not letter == " " else " " for letter in letters), inline=False)
-                await ctx.reply(embed=em, mention_author=False)
+                await ctx.reply(res, mention_author=False, allowed_mentions=discord.AllowedMentions.none())
             except discord.HTTPException:
-                em=discord.Embed(description="The output was too long to be sent", color=color())
-                em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
-                await ctx.reply(embed=em, mention_author=False)
+                await ctx.reply(mention_author=False, file=getFile(res))
         else:
-            em=discord.Embed(description="​", color=color())
-            em.set_footer(text=f"Is this what you want? • Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
+            em=discord.Embed(description="​I couldn't find any ascii letters in your text", color=color())
+            em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
             await ctx.reply(embed=em, mention_author=False)
 
     @commands.command()

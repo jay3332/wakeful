@@ -148,14 +148,14 @@ class Moderation(commands.Cog):
         msg = await ctx.reply(embed=em, mention_author=False)
         await msg.add_reaction(self.bot.icons["greentick"])
         await msg.add_reaction(self.bot.icons["redtick"])
-        reaction, user = await self.bot.wait_for("reaction_add", check=lambda reaction, user: user.guild_permissions.manage_channels and str(reaction.emoji) in ["✅", "❌"] and reaction.message == msg)
-        if str(reaction.emoji) == "✅":
+        reaction, user = await self.bot.wait_for("reaction_add", check=lambda reaction, user: user.guild_permissions.manage_channels and str(reaction.emoji) in [self.bot.icons['redtick'], self.bot.icons['greentick']] and reaction.message == msg)
+        if str(reaction.emoji) == self.bot.icons['greentick']:
             new = await channel.clone()
             await channel.delete()
             em=discord.Embed(description="This channel has been nuked", color=color())
             em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
             await new.send(embed=em)
-        elif str(reaction.emoji) == "❌":
+        elif str(reaction.emoji) == self.bot.icons['redtick']:
             await msg.delete()
 
     @commands.command(aliases=["nick"])

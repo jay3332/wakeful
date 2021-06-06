@@ -43,7 +43,8 @@ bot.invite = "https://discord.gg/RkCqvMJsDY"
 bot.icons = {
     "greentick": "<:checkmark:850294215727775754>",
     "redtick": "<:crossmark:850294181184143421>",
-    "arrow": "<a:arrow:850290444327059456>"
+    "arrow": "<a:arrow:850290444327059456>",
+    "loading": "<a:loading:851078515436027905>"
 }
 bot.cmdsSinceRestart = 0
 bot.message_cache = {}

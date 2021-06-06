@@ -1,4 +1,5 @@
-import json
+import json, datetime, discord
+from utils.configs import color
 
 def get_config(string : str):
     with open("config.json", "r") as f:

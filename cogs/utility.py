@@ -1,9 +1,11 @@
+from re import escape
 import discord, datetime, async_cse, psutil, humanize, os, sys, inspect, mystbin, googletrans, asyncio, aiohttp, random, time, asyncdagpi, hashlib, asyncpg, io, base64, typing, gdshortener, pathlib
 from discord.ext import commands
 from discord import Webhook, AsyncWebhookAdapter
 from utils.configs import color
 from utils.get import *
 from utils.checks import *
+from utils.functions import * 
 from jishaku.functools import executor_function
 import idevision
 
@@ -44,7 +46,7 @@ class Utility(commands.Cog):
     async def on_message(self, msg):
         if msg.author.id in list(self.bot.afks):
             self.bot.afks.pop(msg.author.id)
-            em=discord.Embed(description=f"Welcome back, {msg.author.mention}, I've unmarked you as afk", color=color())
+            em=discord.Embed(description=f"Welcome back, {msg.author.mention}, I've unmarked you as afk", color=color(), timestamp=datetime.datetime.utcnow())
             await msg.channel.send(embed=em)
         for user in list(self.bot.afks):
             data = self.bot.afks[user]
@@ -54,8 +56,7 @@ class Utility(commands.Cog):
                     mseg = f"Hey! {obj.name} is currently marked as afk"
                 else:
                     mseg = f"Hey! {obj.name} is currently marked as afk for `{data['reason']}`"
-                em=discord.Embed(description=mseg, color=color())
-                await msg.reply(embed=em)
+                await msg.channel.reply(embed=em, mention_author=False)
 
 
     @commands.Cog.listener()
@@ -96,53 +97,53 @@ class Utility(commands.Cog):
 
     @commands.command()
     @commands.cooldown(1, 5, commands.BucketType.user)
-    async def emojiinfo(self, ctx, emoji: typing.Union[discord.PartialEmoji, discord.Emoji]):
-        if emoji.animated:
-            emoji_animated=self.bot.icons['greentick']
-        else:
-            emoji_animated=self.bot.icons['redtick']
-        #-------------------------------------------------
-        try:
-            if emoji.available:
-                emoji_available=self.bot.icons['greentick']
-            else:
-                emoji_available=self.bot.icons['redtick']
-        except:
-            emoji_available=self.bot.icons['redtick']
-        #--------------------------------------------------
-        emoji_created_at = emoji.created_at.strftime("20%y/%m/%d at %H:%M:%S")
-        emoji_created = humanize.naturaltime(emoji.created_at)
-        #--------------------------------------------------
-        try:
-            if emoji.is_animated:
-                emoji_usage=f"<a:{str(emoji.name)}:{str(emoji.id)}>"
-            else:
-                emoji_usage=f"<:{str(emoji.name)}:{str(emoji.id)}>"
-        except:
-            if emoji.animated:
-                emoji_usage=f"<a:{str(emoji.name)}:{str(emoji.id)}>"
-            else:
-                emoji_usage=f"<:{str(emoji.name)}:{str(emoji.id)}>"
-        #--------------------------------------------------
-        try:
-            emoji_guild_name = emoji.guild.name
-        except:
-            emoji_guild_name = "None"
-        em=discord.Embed(
-            description=f"""
-**Name**: `{emoji.name}`
-**ID**: `{emoji.id}`
-**URL**: {emoji.url}
-**Usage**: `{emoji_usage}`
-**Created At**: {emoji_created_at} ({emoji_created})
-**Guild**: `{emoji_guild_name}`
-**Animated**: {emoji_animated}
-**Available**: {emoji_available}""",
-            timestamp=datetime.datetime.utcnow(),
-            color=color()
-        )
-        em.set_thumbnail(url=str(emoji.url))
-        await ctx.reply(embed=em, mention_author=False)
+    async def emojiinfo(self, ctx, emoji: typing.Union[discord.PartialEmoji, discord.Emoji, str]):
+        if isinstance(emoji, discord.PartialEmoji):
+            em=discord.Embed(title=emoji.name, color=color(), timestamp=datetime.datetime.utcnow())
+            em.add_field(
+                name="Created At",
+                value=f"{emoji.created_at.strftime('%d/%m/20%y at %H:%M:%S')} ({humanize.naturaltime(emoji.created_at)})",
+                inline=True
+            )
+            em.add_field(
+                name="Animated?",
+                value="".join(self.bot.icons['greentick'] if emoji.animated == True else self.bot.icons['redtick']),
+                inline=True
+            )
+            em.set_thumbnail(url=str(emoji.url)+"?size=1024")
+            em.set_footer(text=f"ID: {emoji.id} • {ctx.author}", icon_url=ctx.author.avatar_url)
+            await ctx.reply(embed=em, mention_author=False)
+        elif isinstance(emoji, discord.Emoji):
+            em=discord.Embed(title=emoji.name, color=color(), timestamp=datetime.datetime.utcnow())
+            em.add_field(
+                name="Guild",
+                value=f"""
+{self.bot.icons['arrow']}Name: {emoji.guild.name}
+> {emoji.guild.description}
+
+{self.bot.icons['arrow']}Created At: {emoji.guild.created_at.strftime('%d/%m/20%y at %H:%M:%S')} ({humanize.naturaltime(emoji.guild.created_at)})
+{self.bot.icons['arrow']}Verification Level: {str(emoji.guild.verification_level).title()}
+""", inline=True
+            )
+            em.add_field(
+                name="Created At",
+                value=f"{emoji.created_at.strftime('%d/%m/20%y at %H:%M:%S')} ({humanize.naturaltime(emoji.created_at)})",
+                inline=True
+            )
+            em.add_field(
+                name="Animated?",
+                value="".join(self.bot.icons['greentick'] if emoji.animated == True else self.bot.icons['redtick']),
+                inline=True
+            )
+            em.set_thumbnail(url=str(emoji.url)+"?size=1024")
+            em.set_footer(text=f"ID: {emoji.id} • {ctx.author}", icon_url=ctx.author.avatar_url)
+            await ctx.reply(embed=em, mention_author=False)
+        elif isinstance(emoji, str):
+            await ctx.message.add_reaction(self.bot.icons['redtick'])
+            em=discord.Embed(description=f"This command does not support default emojis, please input a custom emoji", color=color(), timestamp=datetime.datetime.utcnow())
+            em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
+            await ctx.reply(embed=em, mention_author=False)
+
 
     @commands.command(aliases=["shorten"])
     @commands.cooldown(1,10, commands.BucketType.user)
@@ -157,21 +158,6 @@ class Utility(commands.Cog):
         em.set_thumbnail(url="https://support.rebrandly.com/hc/article_attachments/360020801793/rebrandly_url_shortener_010.png")
         await ctx.reply(embed=em, mention_author=False)
 
-    @commands.command()
-    @commands.cooldown(1,20,commands.BucketType.user)
-    async def lyrics(self, ctx, artist, *, title):
-        artistt = artist.replace(" ", "%20")
-        titlee = title.replace(" ", "%20")
-        async with ctx.typing():
-            res = await self.bot.session.get(f"https://api.lyrics.ovh/v1/{artistt}/{titlee}")
-        res = await res.json()
-        lyrics = res["lyrics"]
-        post = await mystbinn.post(lyrics)
-        em=discord.Embed(description=f"I've uploaded the lyrics for `{title}` by `{artist}` to [mystbin]({post})", color=color(), timestamp=datetime.datetime.utcnow())
-        em.set_footer(text=f"Powered by lyrics.ovh • {ctx.author}", icon_url=ctx.author.avatar_url)
-        em.set_thumbnail(url="https://static.vecteezy.com/system/resources/thumbnails/001/200/758/small/music-note.png")
-        await ctx.reply(embed=em, mention_author=False)
-
     @commands.group(invoke_without_command=True, aliases=["emoji"])
     @commands.cooldown(1,5,commands.BucketType.user)
     async def emojis(self, ctx):
@@ -183,11 +169,11 @@ class Utility(commands.Cog):
         try:
             await self.bot.db.execute("INSERT INTO emojis (user_id) VALUES ($1)", ctx.author.id)
         except asyncpg.UniqueViolationError:
-            em=discord.Embed(description=f"You've already opted into the emojis program", color=color())
+            em=discord.Embed(description=f"You've already opted into the emojis program", color=color(), timestamp=datetime.datetime.utcnow())
             em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
             await ctx.reply(embed=em, mention_author=False)
         else:
-            em=discord.Embed(description=f"Alright! I've successfully opted you into the emojis program", color=color())
+            em=discord.Embed(description=f"Alright! I've successfully opted you into the emojis program", color=color(), timestamp=datetime.datetime.utcnow())
             em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
             await ctx.reply(embed=em, mention_author=False)
 
@@ -198,11 +184,11 @@ class Utility(commands.Cog):
         try:
             res["user_id"]
         except TypeError:
-            em=discord.Embed(description=f"You aren't opted into the emojis program", color=color())
+            em=discord.Embed(description=f"You aren't opted into the emojis program", color=color(), timestamp=datetime.datetime.utcnow())
             em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
             await ctx.reply(embed=em, mention_author=False)
         else:
-            em=discord.Embed(description=f"Alright! I've successfully opted you out of the emojis program", color=color())
+            em=discord.Embed(description=f"Alright! I've successfully opted you out of the emojis program", color=color(), timestamp=datetime.datetime.utcnow())
             em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
             await ctx.reply(embed=em, mention_author=False)
 
@@ -210,7 +196,7 @@ class Utility(commands.Cog):
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def _sha(self, ctx, *, message):
         res = hashlib.sha256(message.encode()).hexdigest()
-        await ctx.reply(f"`{message}` -> `{res}`", mention_author=False)
+        await ctx.reply(res, mention_author=False, allowed_mentions=discord.AllowedMentions.none())
 
     @commands.command()
     @commands.cooldown(1, 5, commands.BucketType.user)
@@ -236,7 +222,15 @@ class Utility(commands.Cog):
             keywords = json["info"]["keywords"] or "None"
             em=discord.Embed(
                 title=name,
-                description=f"{description}\n**Author**: {author}\n**Author Email**: {author_email}\n\n**Website**: {website}\n**Documentation**: {documentation}\n**Keywords**: {keywords}\n**License**: {license_}",
+                description=f"""
+{description}
+{self.bot.icons['arrow']}**Author**: {author}
+{self.bot.icons['arrow']}**Author Email**: {author_email}
+
+{self.bot.icons['arrow']}**Website**: {website}
+{self.bot.icons['arrow']}**Documentation**: {documentation}
+{self.bot.icons['arrow']}**Keywords**: {keywords}
+{self.bot.icons['arrow']}**License**: {license_}""",
                 url=url,
                 color=color()
             )
@@ -244,7 +238,7 @@ class Utility(commands.Cog):
             em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
             await ctx.reply(embed=em, mention_author=False)
         except aiohttp.ContentTypeError:
-            em=discord.Embed(description=f"this package wasn't found", color=color())
+            em=discord.Embed(description=f"This package wasn't found", color=color(), timestamp=datetime.datetime.utcnow())
             await ctx.reply(embed=em, mention_author=False)
 
     @commands.command(aliases=["g"])
@@ -298,12 +292,12 @@ class Utility(commands.Cog):
                 if res.image_url.endswith("png") or res.image_url.endswith("jpg") or res.image_url.endswith("jpeg") or res.image_url.endswith("webp"):
                     image = res
         if image is not None:
-            em=discord.Embed(title=f"Results for: `{query}`", description=f"[{image.title}]({image.url})", timestamp=datetime.datetime.utcnow(), color=color())
+            em=discord.Embed(title=f"Results for: `{query}`", description=f"[{image.title}]({image.url})", color=color(), timestamp=datetime.datetime.utcnow())
             em.set_footer(text=f"Requested by {ctx.author} • Safe-Search: {safe_search}", icon_url=ctx.author.avatar_url)
             em.set_image(url=image.image_url)
             await ctx.reply(embed=em, mention_author=False)
         else:
-            em=discord.Embed(description=f"I couldn't find any images with the query `{query}`", color=color())
+            em=discord.Embed(description=f"I couldn't find any images with the query `{query}`", color=color(), timestamp=datetime.datetime.utcnow())
             em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
             await ctx.reply(embed=em, mention_author=False)
 
@@ -312,7 +306,7 @@ class Utility(commands.Cog):
     async def translate(self, ctx, output : str, *, text : str):
         async with ctx.typing():
             translation = await do_translate(output, text)
-            em = discord.Embed(color=color())
+            em = discord.Embed(color=color(), timestamp=datetime.datetime.utcnow())
             em.add_field(name=f"Input [{translation.src.upper()}]", value=f"```{text}```", inline=True)
             em.add_field(name=f"Output [{translation.dest.upper()}]", value=f"```{translation.text}```", inline=True)
             em.set_author(name=ctx.author, icon_url=ctx.author.avatar_url)
@@ -327,12 +321,12 @@ class Utility(commands.Cog):
         repo = github[1]
         res = await self.bot.session.get(f"https://api.github.com/repos/{username}/{repo}/commits")
         res = await res.json()
-        em = discord.Embed(title=f"Commits", description="\n".join(f"[`{commit['sha'][:6]}`]({commit['html_url']}) {commit['commit']['message']}" for commit in res[:5]), url=self.bot.github+"/commits", color=color())
+        em = discord.Embed(title=f"Commits", description="\n".join(f"[`{commit['sha'][:6]}`]({commit['html_url']}) {commit['commit']['message']}" for commit in res[:5]), url=self.bot.github+"/commits", color=color(), timestamp=datetime.datetime.utcnow())
         em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
         em.set_thumbnail(url="https://image.flaticon.com/icons/png/512%2F25%2F25231.png")
         await ctx.reply(embed=em, mention_author=False)
 
-    @commands.command(aliases=["guildav", "servericon", "serverav"])
+    @commands.command(aliases=["guildav", "servericon", "serverav", "sav", "srvav"])
     @commands.guild_only()
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def serveravatar(self, ctx, member : discord.Member = None):
@@ -355,61 +349,51 @@ class Utility(commands.Cog):
     @commands.guild_only()
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def serverinfo(self, ctx):
-        online = 0
-        dnd = 0
-        idle = 0
-        offline = 0
-        bots = 0
-        if ctx.guild.description == None:
+        if ctx.guild.description is None:
             description=""
         else:
             description = ctx.guild.description
+        
+        bots = online = dnd = idle = offline = 0
         for member in ctx.guild.members:
             if member.bot:
                 bots+=1
-            elif member.raw_status == "Online":
+            elif member.raw_status == "online":
                 online += 1
-            elif member.raw_status == "Dnd":
+            elif member.raw_status == "dnd":
                 dnd += 1
-            elif member.raw_status == "Offline":
+            elif member.raw_status == "offline":
                 offline += 1
-            elif member.raw_status == "Idle":
+            elif member.raw_status == "idle":
                 idle += 1
-        created_at = ctx.guild.created_at.strftime("%d/%m/20%y at %H:%M:%S")
-        em=discord.Embed(
-            title=ctx.guild.name,
-            description=f"{description}",
-            timestamp=datetime.datetime.utcnow(),
-            color=color()
-        ).set_image(url=ctx.guild.banner_url).set_thumbnail(url=ctx.guild.icon_url)
-        em.add_field(
-            name="members",
-            value=f"Online: `{online}`\nDND: `{dnd}`\nIdle: `{idle}`\nOffline: `{offline}`\nBots: `{bots}`",
-            inline=True
-        )
+        
         try:
-            booster_role = ctx.guild.premium_subscriber_role.mention or "none"
+            booster_role = ctx.guild.premium_subscriber_role.mention 
         except AttributeError:
-            booster_role = "none"
-        em.add_field(
-            name="Boosts",
-            value=f"{self.bot.icons['arrow']} Amount: `{ctx.guild.premium_subscription_count}`\n{self.bot.icons['arrow']}Role: {booster_role}",
-            inline=True
-        )
-        em.add_field(
-            name="Channels",
-            value=f"{self.bot.icons['arrow']} All `{len(ctx.guild.channels)}`\n{self.bot.icons['arrow']}Text: `{len(ctx.guild.text_channels)}`\n{self.bot.icons['arrow']}Voice: `{len(ctx.guild.voice_channels)}`",
-            inline=True
-        )
-        em.add_field(
-            name="Other",
-            value=f"{self.bot.icons['arrow']} Owner: {ctx.guild.owner.mention}\n{self.bot.icons['arrow']}Roles: `{len(ctx.guild.roles)}`\n{self.bot.icons['arrow']}Ŕegion: `{ctx.guild.region}`\n{self.bot.icons['arrow']}Created at: `{created_at}` ({humanize.naturaltime(ctx.guild.created_at)})",
-            inline=True
-        )
-        em.set_footer(
-            text=f"Requested by {ctx.author}",
-            icon_url=ctx.author.avatar_url
-        )
+            booster_role = "None"
+        created_at = ctx.guild.created_at.strftime("%d/%m/20%y at %H:%M:%S")
+        em=discord.Embed(title=ctx.guild.name, description=f"{description}", color=color(), timestamp=datetime.datetime.utcnow())
+        em.set_image(url=ctx.guild.banner_url)
+        em.set_thumbnail(url=ctx.guild.icon_url)
+        em.add_field(name="Members", value=f"""
+{self.bot.icons['arrow']}Online: `{online}`
+{self.bot.icons['arrow']}DND: `{dnd}`
+{self.bot.icons['arrow']}Idle: `{idle}`
+{self.bot.icons['arrow']}Offline: `{offline}`
+{self.bot.icons['arrow']}Bots: `{bots}`""", inline=True)
+        em.add_field(name="Boosts", value=f"""
+{self.bot.icons['arrow']} Amount: `{ctx.guild.premium_subscription_count}`
+{self.bot.icons['arrow']}Role: {booster_role}""",inline=True)
+        em.add_field(name="Channels", value=f"""
+{self.bot.icons['arrow']} All `{len(ctx.guild.channels)}`
+{self.bot.icons['arrow']}Text: `{len(ctx.guild.text_channels)}`
+{self.bot.icons['arrow']}Voice: `{len(ctx.guild.voice_channels)}`""", inline=True)
+        em.add_field(name="Other", value=f"""
+{self.bot.icons['arrow']} Owner: {ctx.guild.owner.mention}
+{self.bot.icons['arrow']}Roles: `{len(ctx.guild.roles)}`
+{self.bot.icons['arrow']}Region: `{ctx.guild.region}`
+{self.bot.icons['arrow']}Created at: `{created_at}` ({humanize.naturaltime(ctx.guild.created_at)})""", inline=True)
+        em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
         await ctx.reply(embed=em, mention_author=False)
 
     @commands.command(aliases=["ui", "whois"], description="A command to get information about the given member", usage="[@member]")
@@ -418,115 +402,59 @@ class Utility(commands.Cog):
     async def userinfo(self, ctx, member : discord.Member = None):
         if member == None:
             member = ctx.author
-        #-----------------------------------------------------------
-        if not "offline" == str(member.mobile_status):
-            mobile_status = self.bot.icons['greentick']
+            
+        if "offline" != str(member.mobile_status):
+            platform = "Desktop"
+        elif "offline" != str(member.desktop_status):
+            platform = "Desktop"
+        elif "offline" != str(member.web_status):
+            platform = "Web"
         else:
-            mobile_status = self.bot.icons['redtick']
-        #-----------------------------------------------------------
-        if not "offline" == str(member.web_status):
-            web_status = self.bot.icons['greentick']
-        else:
-            web_status = self.bot.icons['redtick']
-        #-----------------------------------------------------------
-        if not "offline" == str(member.desktop_status):
-            desktop_status = self.bot.icons['greentick']
-        else:
-            desktop_status = self.bot.icons['redtick']
-        #-----------------------------------------------------------
-        if member.id == self.bot.ownersid:
-            bot_owner = self.bot.icons['greentick']
-        else:
-            bot_owner = self.bot.icons['redtick']
-        #-----------------------------------------------------------
-        if member.id == ctx.guild.owner_id:
-            guild_owner = self.bot.icons['greentick']
-        else:
-            guild_owner = self.bot.icons['redtick']
-        #-----------------------------------------------------------
-        if member.bot == True:
-            member_bot = self.bot.icons['greentick']
-        else:
-            member_bot = self.bot.icons['redtick']
-        #----------------------------------------------------------{self.bot.icons['arrow']}   
+            platform = "None"
+
         created_at = member.created_at.strftime("%d/%m/20%y at %H:%M:%S")
         joined_at = member.joined_at.strftime("%d/%m/20%y at %H:%M:%S")
-        em=discord.Embed(
-            title=member.name + "#" + member.discriminator,
-            timestamp=datetime.datetime.utcnow(),
-            color=color()
-        )
-        em.add_field(
-            name="Info",
-            value=f"""
-{self.bot.icons['arrow']}Name: {member.name}
-{self.bot.icons['arrow']}Tag: {member.discriminator}
-{self.bot.icons['arrow']}Nickname: {member.display_name}
-{self.bot.icons['arrow']}Mention: {member.mention}
-{self.bot.icons['arrow']}ID: {member.id}
-{self.bot.icons['arrow']}Status: {member.raw_status}
-{self.bot.icons['arrow']}Bot: {member_bot}
-{self.bot.icons['arrow']}Mobile: {mobile_status}
-{self.bot.icons['arrow']}Web: {web_status}
-{self.bot.icons['arrow']}Desktop: {desktop_status}
-{self.bot.icons['arrow']}Created at: {created_at} ({humanize.naturaltime(member.created_at)})""",
-            inline=True
-        )
+
         if member.top_role.name == "@everyone":
             top_role="none"
         else:
             top_role=member.top_role.mention
-        em.add_field(
-            name="Guild",
-            value=f"""
-{self.bot.icons['arrow']}Owner: {guild_owner}
+
+        join_position = sum(member.joined_at > m.joined_at if m.joined_at is not None else "1" for m in ctx.guild.members)
+
+        em=discord.Embed(title=str(member), color=color(), timestamp=datetime.datetime.utcnow())
+        em.add_field(name="Info", value=f"""
+{self.bot.icons['arrow']}Name: {member.name}
+{self.bot.icons['arrow']}Nickname: {member.nick}
+{self.bot.icons['arrow']}Status: {member.raw_status}
+{self.bot.icons['arrow']}Platform: `{platform}`
+{self.bot.icons['arrow']}Created at: {created_at} ({humanize.naturaltime(member.created_at)})""", inline=True)
+        em.add_field(name="Guild", value=f"""
 {self.bot.icons['arrow']}Roles: {len(member.roles)}
 {self.bot.icons['arrow']}Top Role: {top_role}
-{self.bot.icons['arrow']}Joined at: {joined_at} ({humanize.naturaltime(member.joined_at)})""",
-            inline=False
-        )
-        if not member.bot:
-            try:
-                mutual_guilds=len(member.mutual_guilds)
-            except AttributeError:
-                mutual_guilds=len(self.bot.guilds)
-            em.add_field(
-                name="Other",
-                value=f"""
-{self.bot.icons['arrow']}Bot Owner: {bot_owner}
-{self.bot.icons['arrow']}Mutual Guilds: `{mutual_guilds}`""",
-                inline=False
-            )
-        else:
-            em.add_field(
-                name="Other",
-                value=f"{self.bot.icons['arrow']}Mutual Guilds: {len(member.mutual_guilds)}",
-                inline=False
-            )
-        em.set_footer(
-            text=f"Requested by {ctx.author}",
-            icon_url=ctx.author.avatar_url
-        )
+{self.bot.icons['arrow']}Join Position: {join_position}
+{self.bot.icons['arrow']}Joined at: {joined_at} ({humanize.naturaltime(member.joined_at)})""", inline=True)
+        em.set_footer(text=f"ID: {member.id} • {ctx.author}", icon_url=ctx.author.avatar_url)
         em.set_thumbnail(url=member.avatar_url)
         await ctx.reply(embed=em, mention_author=False)
 
     @commands.command()
     @commands.cooldown(1,5,commands.BucketType.user)
     async def suggest(self, ctx):
-        em=discord.Embed(description=f"Please now enter your suggestion below:", color=color())
+        em=discord.Embed(description=f"Please now enter your suggestion below:", color=color(), timestamp=datetime.datetime.utcnow())
         em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
         msg = await ctx.reply(embed=em, mention_author=False)
         try:
             suggestion = await self.bot.wait_for("message", check=lambda msg: msg.channel == ctx.channel and msg.author == ctx.author, timeout=30)
         except asyncio.TimeoutError:
-            em=discord.Embed(description="You took too long to respond, now ignoring next messages", color=color())
+            em=discord.Embed(description="You took too long to respond, now ignoring next messages", color=color(), timestamp=datetime.datetime.utcnow())
             em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
             await msg.edit(embed=em)
         else:
             if suggestion.content.lower() != "cancel":
                 webhook = Webhook.from_url(str(get_config("SUGGESTIONS")), adapter=AsyncWebhookAdapter(self.bot.session))
-                em=discord.Embed(description=f"```{suggestion.clean_content}```", color=color())
-                em.set_footer(text=f"suggestion by {ctx.author} ({ctx.author.id})", icon_url=ctx.author.avatar_url)
+                em=discord.Embed(description=f"```{suggestion.clean_content}```", color=color(), timestamp=datetime.datetime.utcnow())
+                em.set_footer(text=f"Suggestion by {ctx.author} ({ctx.author.id})", icon_url=ctx.author.avatar_url)
                 attachment = None
                 if ctx.message.attachments:
                     attachment = ctx.message.attachments[0].url
@@ -534,7 +462,7 @@ class Utility(commands.Cog):
                     em.set_image(url=attachment)
                 await webhook.send(embed=em)
                 await suggestion.add_reaction("✅")
-                em=discord.Embed(description="Your suggestion has been sent to the admins\nNote: abuse may get you blacklisted", color=color())
+                em=discord.Embed(description="Your suggestion has been sent to the admins\nNote: abuse may get you blacklisted", color=color(), timestamp=datetime.datetime.utcnow())
                 em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
                 await msg.edit(embed=em)
             else:
@@ -549,11 +477,11 @@ class Utility(commands.Cog):
         if res["data"] != [] and len(res["data"]) != 0:
             res = random.choice(res["data"])
             image = res["images"]["original"]["url"]
-            em=discord.Embed(title=res["title"], url=res["url"], color=color())
+            em=discord.Embed(title=res["title"], url=res["url"], color=color(), timestamp=datetime.datetime.utcnow())
             em.set_image(url=image)
             await ctx.reply(embed=em, mention_author=False)
         else:
-            em=discord.Embed(description=f"I couldn't find any results with the query `{query}`", color=color())
+            em=discord.Embed(description=f"I couldn't find any results with the query `{query}`", color=color(), timestamp=datetime.datetime.utcnow())
             em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
             await ctx.reply(embed=em, mention_author=False)
 
@@ -572,15 +500,14 @@ class Utility(commands.Cog):
             example = res["example"].replace("[", "").replace("]", "")
             word = res["word"]
             em=discord.Embed(title=word, description=f"""
-    {self.bot.icons['arrow']}**Definition**:
-    {definition}
-    {self.bot.icons['arrow']}**Example**:
-    {example}
-    """, url=permalink, color=color())
+{self.bot.icons['arrow']}**Definition**:
+{definition}
+{self.bot.icons['arrow']}**Example**:
+{example}""", url=permalink, color=color(), timestamp=datetime.datetime.utcnow())
             em.set_footer(text=f"👍 {upvotes} • 👤 {author} • {ctx.author}", icon_url=ctx.author.avatar_url)
             await ctx.reply(embed=em, mention_author=False)
         else:
-            em=discord.Embed(description=f"I could not find any results for `{term}`", color=color())
+            em=discord.Embed(description=f"I could not find any results for `{term}`", color=color(), timestamp=datetime.datetime.utcnow())
             em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
             await ctx.reply(embed=em, mention_author=False)
 
@@ -588,18 +515,18 @@ class Utility(commands.Cog):
     @commands.cooldown(1,5,commands.BucketType.user)
     async def source(self, ctx, *, command_name : str = None):
         if command_name == None:
-            em=discord.Embed(description=f"My source code can be found [here]({self.bot.github})", color=color())
+            em=discord.Embed(description=f"My source code can be found [here]({self.bot.github})", color=color(), timestamp=datetime.datetime.utcnow())
             await ctx.reply(embed=em, mention_author=False)
         else:
             command = self.bot.get_command(command_name)
             if not command:
-                em=discord.Embed(description=f"Couldn't find command `{command_name}`", color=color())
+                em=discord.Embed(description=f"Couldn't find command `{command_name}`", color=color(), timestamp=datetime.datetime.utcnow())
                 await ctx.reply(embed=em, mention_author=False)
             else:
                 try:
                     source_lines, _ = inspect.getsourcelines(command.callback)
                 except (TypeError, OSError):
-                    em=discord.Embed(description=f"Couldn't retrieve source for `{command_name}`", color=color())
+                    em=discord.Embed(description=f"Couldn't retrieve source for `{command_name}`", color=color(), timestamp=datetime.datetime.utcnow())
                     await ctx.reply(embed=em, mention_author=False)
                 else:
                     source_lines = ''.join(source_lines).split('\n')
@@ -610,10 +537,9 @@ class Utility(commands.Cog):
                         await ctx.author.send(embed=em)
                     except discord.HTTPException:
                         async with ctx.author.typing():
-                            post = await mystbinn.post(src)
-                            em=discord.Embed(description=f"Note: most of the \" ' \" stand for a \" ` \"\nThe output was too long so it got uploaded to [mystbin]({post})", color=color(), timestamp=datetime.datetime.utcnow())
+                            em=discord.Embed(description=f"Note: most of the \" ' \" stand for a \" ` \"", color=color(), timestamp=datetime.datetime.utcnow())
                             em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
-                        await ctx.author.send(embed=em)
+                        await ctx.author.send(embed=em, file=await getFile(src, "py"))
                     await ctx.message.add_reaction("✅")
 
     @commands.command(name="avatar", aliases=["icon", "av"])
@@ -639,7 +565,7 @@ class Utility(commands.Cog):
     @commands.command(aliases=["lc"])
     @commands.cooldown(1,5,commands.BucketType.user)
     async def lettercount(self, ctx, *, text):
-        em=discord.Embed(description=f"Your text is {len(text)} letters long", color=color())
+        em=discord.Embed(description=f"Your text is {len(text)} letters long", color=color(), timestamp=datetime.datetime.utcnow())
         em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
         await ctx.reply(embed=em, mention_author=False)
 
@@ -647,14 +573,14 @@ class Utility(commands.Cog):
     @commands.cooldown(1,5,commands.BucketType.user)
     async def wordcount(self, ctx, *, text):
         text_list = text.split(" ")
-        em=discord.Embed(description=f"Your text is {len(text_list)} words long", color=color())
+        em=discord.Embed(description=f"Your text is {len(text_list)} words long", color=color(), timestamp=datetime.datetime.utcnow())
         em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
         await ctx.reply(embed=em, mention_author=False)
 
     @commands.command()
     @commands.cooldown(1,5,commands.BucketType.user)
     async def invite(self, ctx):
-        em=discord.Embed(description=f"Here's my [invite](https://discord.com/api/oauth2/authorize?client_id={self.bot.user.id}&permissions=8&scope=bot)", color=color())
+        em=discord.Embed(description=f"Here's my [invite](https://discord.com/api/oauth2/authorize?client_id={self.bot.user.id}&permissions=8&scope=bot)", color=color(), timestamp=datetime.datetime.utcnow())
         em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
         await ctx.reply(embed=em, mention_author=False)
 
@@ -670,7 +596,7 @@ class Utility(commands.Cog):
             process = psutil.Process()
             p = pathlib.Path('./')
             version = sys.version_info
-            em = discord.Embed(color=color())
+            em = discord.Embed(color=color(), timestamp=datetime.datetime.utcnow())
             # Uptime
             delta_uptime = datetime.datetime.utcnow() - self.bot.uptime
             hours, remainder = divmod(int(delta_uptime.total_seconds()), 3600)
@@ -790,11 +716,11 @@ class Utility(commands.Cog):
                 em.add_field(
                     name="Spotify",
                     value=f"""
-Title: `{activity.title}`
-Artists: `{artists}`
-Album: `{activity.album}`
-Album Cover: [url]({activity.album_cover_url})
-Duration: `{hours}`h `{minutes}`m `{seconds}`s
+{self.bot.icons['arrow']}Title: `{activity.title}`
+{self.bot.icons['arrow']}Artists: `{artists}`
+{self.bot.icons['arrow']}Album: `{activity.album}`
+{self.bot.icons['arrow']}Album Cover: [url]({activity.album_cover_url})
+{self.bot.icons['arrow']}Duration: `{hours}`h `{minutes}`m `{seconds}`s
 """,
                     inline=True
                 )
@@ -808,9 +734,9 @@ Duration: `{hours}`h `{minutes}`m `{seconds}`s
                 em.add_field(
                     name="Custom",
                     value=f"""
-Text: `{activity.name}`
-Emoji Name: {emojiName}
-Emoji: {emoji}
+{self.bot.icons['arrow']}Text: `{activity.name}`
+{self.bot.icons['arrow']}Emoji Name: {emojiName}
+{self.bot.icons['arrow']}Emoji: {emoji}
 """,
                     inline=True
                 )
@@ -824,9 +750,9 @@ Emoji: {emoji}
                 em.add_field(
                     name="Stream",
                     value=f"""
-Title: `{activity.name}`
-Platform: `{activity.platform}`
-URL: [{activity.url.split("/")[3]}]({activity.url})
+{self.bot.icons['arrow']}Title: `{activity.name}`
+{self.bot.icons['arrow']}Platform: `{activity.platform}`
+{self.bot.icons['arrow']}URL: [{activity.url.split("/")[3]}]({activity.url})
 """,
                     inline=True
                 )
@@ -838,10 +764,10 @@ URL: [{activity.url.split("/")[3]}]({activity.url})
                 em.add_field(
                     name="Unknown",
                     value=f"""
-Name: `{activity.name}`
-Details: `{activity.details}`
-Emoji: `{activity.emoji}`
-Type: `{type}`
+{self.bot.icons['arrow']}Name: `{activity.name}`
+{self.bot.icons['arrow']}Details: `{activity.details}`
+{self.bot.icons['arrow']}Emoji: `{activity.emoji}`
+{self.bot.icons['arrow']}Type: `{type}`
 """,
                     inline=True
                 )
@@ -857,7 +783,7 @@ Type: `{type}`
     @commands.cooldown(1,5,commands.BucketType.user)
     async def _create(self, ctx, *, text):
         text = text.replace(" " ,"%20")
-        em=discord.Embed(color=color())
+        em=discord.Embed(color=color(), timestamp=datetime.datetime.utcnow())
         em.set_footer(text=f"Powered by qrserver.com • {ctx.author}", icon_url=ctx.author.avatar_url)
         em.set_image(url=f"https://api.qrserver.com/v1/create-qr-code/?data={text}&size=200x200")
         await ctx.reply(embed=em, mention_author=False)
@@ -869,10 +795,10 @@ Type: `{type}`
             if ctx.message.attachments[0].url.endswith("png") or ctx.message.attachments[0].url.endswith("jpg") or ctx.message.attachments[0].url.endswith("jpeg") or ctx.message.attachments[0].url.endswith("webp"):
                 attachment = ctx.message.attachments[0].url
             else:
-                em=discord.Embed(description=f"Please attach a png, jpg, jpeg or webp file", color=color())
+                em=discord.Embed(description=f"Please attach a png, jpg, jpeg or webp file", color=color(), timestamp=datetime.datetime.utcnow())
                 return await ctx.reply(embed=em, mention_author=False)
         else:
-            em=discord.Embed(description=f"Please attach a png, jpg, jpeg or webp file", color=color())
+            em=discord.Embed(description=f"Please attach a png, jpg, jpeg or webp file", color=color(), timestamp=datetime.datetime.utcnow())
             return await ctx.reply(embed=em, mention_author=False)
         res = await self.bot.session.get(f"http://api.qrserver.com/v1/read-qr-code/?fileurl={attachment}")
         res = await res.json()
@@ -880,7 +806,7 @@ Type: `{type}`
         if res["error"] is None:
             await ctx.reply(res["data"], mention_author=False, allowed_mentions=discord.AllowedMentions.none())
         else:
-            em=discord.Embed(description=res["error"], color=color())
+            em=discord.Embed(description=res["error"], color=color(), timestamp=datetime.datetime.utcnow())
             em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
             await ctx.reply(embed=em, mention_author=False)
 
@@ -905,7 +831,7 @@ Type: `{type}`
         try:
             platformm = platforms[platform.lower()]
         except KeyError:
-            em=discord.Embed(description=f"I couldn't find the platform `{platform}`", color=color())
+            em=discord.Embed(description=f"I couldn't find the platform `{platform}`", color=color(), timestamp=datetime.datetime.utcnow())
             em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
             await ctx.reply(embed=em, mention_author=False)
         else:
@@ -915,7 +841,7 @@ Type: `{type}`
             try:
                 error = str(res["accountId"])
             except KeyError:
-                em=discord.Embed(description=res["error"], color=color())
+                em=discord.Embed(description=res["error"], color=color(), timestamp=datetime.datetime.utcnow())
                 em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
                 await ctx.reply(embed=em, mention_author=False)
             else:
@@ -923,7 +849,7 @@ Type: `{type}`
                 avatar = res["avatar"]
                 name = res["epicUserHandle"]
                 recentMatches = res["recentMatches"]
-                em=discord.Embed(title=name, color=color())
+                em=discord.Embed(title=name, color=color(), timestamp=datetime.datetime.utcnow())
                 em.set_footer(text=f"ID: {accid} • Powered by fortnitetracker.com • {ctx.author}", icon_url=ctx.author.avatar_url)
                 em.set_thumbnail(url=avatar)
                 amount = len(recentMatches)
@@ -938,10 +864,10 @@ Type: `{type}`
                     em.add_field(
                         name=f"Latest Match",
                         value=f"""
-Game Type: `{type_.title()}`
-Kills: `{kills}`
-Play Time: `{playTime}` minutes
-Score: `{score}`
+{self.bot.icons['arrow']}Game Type: `{type_.title()}`
+{self.bot.icons['arrow']}Kills: `{kills}`
+{self.bot.icons['arrow']}Play Time: `{playTime}` minutes
+{self.bot.icons['arrow']}Score: `{score}`
 """,
                         inline=True
                     )
@@ -953,11 +879,11 @@ Score: `{score}`
         try:
             msg = self.bot.message_cache[ctx.guild.id][ctx.channel.id]
         except KeyError:
-            em=discord.Embed(description=f"There's no message to snipe", color=color())
+            em=discord.Embed(description=f"There's no message to snipe", color=color(), timestamp=datetime.datetime.utcnow())
             em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
             await ctx.reply(embed=em, mention_author=False)
         else:
-            em=discord.Embed(description=f"`{msg.content}`", color=color())
+            em=discord.Embed(description=f"`{msg.content}`", color=color(), timestamp=datetime.datetime.utcnow())
             em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
             em.set_author(name=f"{msg.author} ({msg.author.id})", icon_url=msg.author.avatar_url)
             await ctx.reply(embed=em, mention_author=False)
@@ -987,17 +913,17 @@ Score: `{score}`
         try:
             res["commands"]
         except TypeError:
-            em=discord.Embed(description=f"There are no disabled commands", color=color())
+            em=discord.Embed(description=f"There are no disabled commands", color=color(), timestamp=datetime.datetime.utcnow())
             await ctx.reply(embed=em, mention_author=False)
         else:
             commands = res["commands"]
             commands = commands.split(",")
             if len(commands) != 0 and commands != ['']:
-                em=discord.Embed(title="Disabled commands", description=", ".join(cmd for cmd in commands if cmd != ""), color=color())
+                em=discord.Embed(title="Disabled commands", description=", ".join(cmd for cmd in commands if cmd != ""), color=color(), timestamp=datetime.datetime.utcnow())
                 em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
                 await ctx.reply(embed=em, mention_author=False)
             else:
-                em=discord.Embed(description=f"There are no disabled commands", color=color())
+                em=discord.Embed(description=f"There are no disabled commands", color=color(), timestamp=datetime.datetime.utcnow())
                 await ctx.reply(embed=em, mention_author=False)
 
     @commands.group(aliases=["rtfd"], invoke_without_command=True)
@@ -1008,11 +934,11 @@ Score: `{score}`
             res = await res.json()
             nodes = res["nodes"]
         if nodes != {}:
-            em=discord.Embed(description="\n".join(f"[`{e}`]({nodes[e]})" for e in nodes), color=color())
+            em=discord.Embed(description="\n".join(f"[`{e}`]({nodes[e]})" for e in nodes), color=color(), timestamp=datetime.datetime.utcnow())
             em.set_footer(text=f"Powered by idevision.net • {ctx.author}", icon_url=ctx.author.avatar_url)
             await ctx.reply(embed=em, mention_author=False)
         else:
-            em=discord.Embed(description=f"No results found for `{query}`", color=color())
+            em=discord.Embed(description=f"No results found for `{query}`", color=color(), timestamp=datetime.datetime.utcnow())
             em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
             await ctx.reply(embed=em, mention_author=False)
 
@@ -1024,11 +950,11 @@ Score: `{score}`
             res = await res.json()
             nodes = res["nodes"]
         if nodes != {}:
-            em=discord.Embed(description="\n".join(f"[`{e}`]({nodes[e]})" for e in nodes), color=color())
+            em=discord.Embed(description="\n".join(f"[`{e}`]({nodes[e]})" for e in nodes), color=color(), timestamp=datetime.datetime.utcnow())
             em.set_footer(text=f"Powered by idevision.net • {ctx.author}", icon_url=ctx.author.avatar_url)
             await ctx.reply(embed=em, mention_author=False)
         else:
-            em=discord.Embed(description=f"No results found for `{query}`", color=color())
+            em=discord.Embed(description=f"No results found for `{query}`", color=color(), timestamp=datetime.datetime.utcnow())
             em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
             await ctx.reply(embed=em, mention_author=False)
 
@@ -1042,7 +968,7 @@ Score: `{score}`
             try:
                 woeid = location[0]["woeid"]
             except:
-                em=discord.Embed(description=f"I couldn't retrieve the weather for `{state}`", color=color())
+                em=discord.Embed(description=f"I couldn't retrieve the weather for `{state}`", color=color(), timestamp=datetime.datetime.utcnow())
                 em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
                 await ctx.reply(embed=em, mention_author=False)
             else:
@@ -1055,16 +981,16 @@ Score: `{score}`
                 res = await res.json()
                 res = res["consolidated_weather"][0]
                 em=discord.Embed(title=location[0]["title"], description=f"""
-Type: `{res["weather_state_name"]}`
-Wind Direction: `{res["wind_direction_compass"]}`
-Temperature: `{round(int(res["the_temp"]), 1)}`
-Minimum Temperature: `{round(int(res["min_temp"]), 1)}`
-Maximum Temperature: `{round(int(res["max_temp"]), 1)}`
-Wind Speed: `{round(int(res["wind_speed"]), 1)}`
-Air Pressure: `{round(int(res["air_pressure"]), 1)}`
-Humidity: `{res["humidity"]}`
-Visibility: `{round(int(res["visibility"]), 1)}`
-""", color=color())
+{self.bot.icons['arrow']}Type: `{res["weather_state_name"]}`
+{self.bot.icons['arrow']}Wind Direction: `{res["wind_direction_compass"]}`
+{self.bot.icons['arrow']}Temperature: `{round(int(res["the_temp"]), 1)}`
+{self.bot.icons['arrow']}Minimum Temperature: `{round(int(res["min_temp"]), 1)}`
+{self.bot.icons['arrow']}Maximum Temperature: `{round(int(res["max_temp"]), 1)}`
+{self.bot.icons['arrow']}Wind Speed: `{round(int(res["wind_speed"]), 1)}`
+{self.bot.icons['arrow']}Air Pressure: `{round(int(res["air_pressure"]), 1)}`
+{self.bot.icons['arrow']}Humidity: `{res["humidity"]}`
+{self.bot.icons['arrow']}Visibility: `{round(int(res["visibility"]), 1)}`
+""", color=color(), timestamp=datetime.datetime.utcnow())
                 if image is not None:
                     em.set_thumbnail(url=image)
                 em.set_footer(text=f"Powered by metaweather.com • {ctx.author}", icon_url=ctx.author.avatar_url)
@@ -1074,14 +1000,14 @@ Visibility: `{round(int(res["visibility"]), 1)}`
     @commands.cooldown(1,15,commands.BucketType.user)
     async def shardinfo(self, ctx, shard : int = None):
         if shard is None:
-            em=discord.Embed(title="Shards", color=color())
+            em=discord.Embed(title="Shards", color=color(), timestamp=datetime.datetime.utcnow())
             for shard in list(self.bot.shards):
                 shard = dict(self.bot.shards)[shard]
                 em.add_field(
                     name=f"Shard {shard.id+1}",
                     value=f"""
-Latency: `{round(shard.latency, 1)}`ms
-Count: `{shard.shard_count}`
+{self.bot.icons['arrow']}Latency: `{round(shard.latency, 1)}`ms
+{self.bot.icons['arrow']}Count: `{shard.shard_count}`
 """, inline=True
                 )
             await ctx.reply(embed=em, mention_author=False)
@@ -1129,11 +1055,6 @@ Count: `{shard.shard_count}`
                 value="\n".join(f"`{cog.qualified_name}`" for cog in cogs),
                 inline=True
             )
-            operating_system=None
-            if os.name == "nt":
-                operating_system = "Windows"
-            elif os.name == "posix":
-                operating_system = "Linux"
             process = psutil.Process()
             delta_uptime = datetime.datetime.utcnow() - self.bot.uptime
             hours, remainder = divmod(int(delta_uptime.total_seconds()), 3600)
@@ -1208,7 +1129,7 @@ Count: `{shard.shard_count}`
                     em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
                     await ctx.reply(embed=em, mention_author=False)
                 else:
-                    em=discord.Embed(description=f"This command does not exist", color=color())
+                    em=discord.Embed(description=f"This command does not exist", color=color(), timestamp=datetime.datetime.utcnow())
                     em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
                     await ctx.reply(embed=em, mention_author=False)
             else:
@@ -1226,18 +1147,26 @@ Count: `{shard.shard_count}`
                     else:
                         commands_ = [cmd for cmd in given_cog.walk_commands() if not cmd.hidden and not cmd.name in disabled and cmd.parent is None]
                     if commands_ is not None and commands_ != []:
-                        em=discord.Embed(title=f"{given_cog.qualified_name} commands [{len(commands_)}]", description=f"{given_cog.description}\n\n> "+", ".join(f"`{cmd.name}`" for cmd in commands_), color=color())
+                        em=discord.Embed(title=f"{given_cog.qualified_name} commands [{len(commands_)}]", description=f"{given_cog.description}\n\n> "+", ".join(f"`{cmd.name}`" for cmd in commands_), color=color(), timestamp=datetime.datetime.utcnow())
                         em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
                         em.set_image(url=self.bot.banner)
                         await ctx.reply(embed=em, mention_author=False)
                     else:
-                        em=discord.Embed(description=f"There isn't a cog / command with the name `{command}`", color=color())
+                        em=discord.Embed(description=f"There isn't a cog / command with the name `{command}`", color=color(), timestamp=datetime.datetime.utcnow())
                         em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
                         await ctx.reply(embed=em, mention_author=False)
                 else:
-                    em=discord.Embed(description=f"There isn't a cog / command with the name `{command}`", color=color())
+                    em=discord.Embed(description=f"There isn't a cog / command with the name `{command}`", color=color(), timestamp=datetime.datetime.utcnow())
                     em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
                     await ctx.reply(embed=em, mention_author=False)
+
+    @commands.command(name="file", aliases=["makefile", "createfile"])
+    @commands.cooldown(1,5,commands.BucketType.user)
+    async def _file_(self, ctx, *, content):
+        f = await getFile(content)
+        em=discord.Embed(color=color(), timestamp=datetime.datetime.utcnow())
+        em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
+        await ctx.reply(embed=em, file=f, mention_author=False)
 
     @commands.group(invoke_without_command=True)
     @commands.cooldown(1,10,commands.BucketType.user)
@@ -1248,8 +1177,8 @@ Count: `{shard.shard_count}`
             name = uid["name"]
             uid = uid["id"]
             em=discord.Embed(title=name, description=f"""
-Name: `{name}`
-UID: `{uid}`
+{self.bot.icons['arrow']}Name: `{name}`
+{self.bot.icons['arrow']}UID: `{uid}`
 """, color=color(), timestamp=datetime.datetime.utcnow(), url=f"https://namemc.com/profile/{name}")
             em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
             em.set_thumbnail(url=f"https://crafatar.com/avatars/{uid}?default=MHF_Steve&overlay&size=256")
@@ -1327,9 +1256,9 @@ UID: `{uid}`
                     em.add_field(
                         name=friend["name"],
                         value=f"""
-Name: `{friend['name']}`
-UUID: `{friend['uuid']}`
-[NameMC](https://namemc.com/profile/{friend['name']})
+{self.bot.icons['arrow']}Name: `{friend['name']}`
+{self.bot.icons['arrow']}UUID: `{friend['uuid']}`
+{self.bot.icons['arrow']}[NameMC](https://namemc.com/profile/{friend['name']})
 """,
                         inline=True
                     )
@@ -1369,7 +1298,7 @@ UUID: `{friend['uuid']}`
     @commands.command()
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def ping(self, ctx):
-        em=discord.Embed(color=color())
+        em=discord.Embed(color=color(), timestamp=datetime.datetime.utcnow())
         dagpi_ping = round(await dagpi.image_ping(), 3) * 1000
         em.add_field(name="latency", value=f"""
 {self.bot.icons['arrow']}**Typing**: `pinging`
@@ -1381,7 +1310,7 @@ UUID: `{friend['uuid']}`
         end=time.perf_counter()
         final=end-start
         api_latency = round(final*1000)
-        em=discord.Embed(color=color())
+        em=discord.Embed(color=color(), timestamp=datetime.datetime.utcnow())
         poststart = time.perf_counter()
         await self.bot.db.fetch("SELECT 1")
         postduration = (time.perf_counter()-poststart) * 1000
@@ -1399,7 +1328,7 @@ UUID: `{friend['uuid']}`
             msg = f"Okay, I've marked you as afk"
         else:
             msg = f"Okay, I've marked you as afk for `{reason}`"
-        em=discord.Embed(description=msg, color=color())
+        em=discord.Embed(description=msg, color=color(), timestamp=datetime.datetime.utcnow())
         await ctx.reply(embed=em, mention_author=False)
         await asyncio.sleep(3)
         self.bot.afks[ctx.author.id] = {"reason": reason}
@@ -1439,11 +1368,11 @@ UUID: `{friend['uuid']}`
             res = await idevisionn.ocr(image, filetype=filetype)
 
         if res != "":
-            em=discord.Embed(description=f"`{res}`", color=color())
+            em=discord.Embed(color=color(), timestamp=datetime.datetime.utcnow())
             em.set_footer(text=f"Powered by idevision.net • {ctx.author}", icon_url=ctx.author.avatar_url)
-            await ctx.reply(embed=em, mention_author=False)
+            await ctx.reply(embed=em, mention_author=False, file=getFile(res))
         else:
-            em=discord.Embed(description=f"I couldn't read what your image says", color=color())
+            em=discord.Embed(description=f"I couldn't read what your image says", color=color(), timestamp=datetime.datetime.utcnow())
             await ctx.reply(embed=em, mention_author=False)
 
 def setup(bot):

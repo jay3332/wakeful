@@ -91,24 +91,24 @@ class Errors(commands.Cog):
     async def on_guild_join(self, guild):
         webhook = Webhook.from_url(str(get_config("LOGS")), adapter=AsyncWebhookAdapter(self.bot.session))
         em=discord.Embed(title="Join Guild", description=f"""
-Name: `{guild.name}`
-ID: `{guild.id}`
-Members: `{guild.member_count}`
-Owner: `{guild.owner}`
+{self.bot.icons['arrow']}Name: `{guild.name}`
+{self.bot.icons['arrow']}Members: `{guild.member_count}`
+{self.bot.icons['arrow']}Owner: `{guild.owner}`
 """, color=color())
         em.set_thumbnail(url=guild.icon_url)
+        em.set_footer(text=f"ID: {guild.id}")
         await webhook.send(embed=em)
 
     @commands.Cog.listener()
     async def on_guild_remove(self, guild):
         webhook = Webhook.from_url(str(get_config("LOGS")), adapter=AsyncWebhookAdapter(self.bot.session))
         em=discord.Embed(title="Leave Guild", description=f"""
-Name: `{guild.name}`
-ID: `{guild.id}`
-Members: `{guild.member_count}`
-Owner: `{guild.owner}`
+{self.bot.icons['arrow']}Name: `{guild.name}`
+{self.bot.icons['arrow']}Members: `{guild.member_count}`
+{self.bot.icons['arrow']}Owner: `{guild.owner}`
 """, color=color())
         em.set_thumbnail(url=guild.icon_url)
+        em.set_footer(text=f"ID: {guild.id}")
         await webhook.send(embed=em)
 
     @commands.Cog.listener()

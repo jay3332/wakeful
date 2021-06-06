@@ -1,4 +1,4 @@
-import discord, json, asyncio, importlib
+import discord, json, asyncio, datetime
 from discord.ext import commands
 from utils.configs import color
 from utils.checks import is_mod
@@ -115,6 +115,27 @@ class Admin(commands.Cog):
             shell = f"[stderr]\n{stderr.decode()}"
         em=discord.Embed(description=f"```sh\n$git pull\n{shell}```", color=color())
         await ctx.reply(embed=em, mention_author=False)
+
+    @commands.command(hidden=True, aliases=["rs"])
+    @commands.is_owner()
+    async def restart(self, ctx):
+        em=discord.Embed(description="Are you sure you want to execute this command?", color=color())
+        msg = await ctx.reply(embed=em, mention_author=False)
+        reactions = [self.bot.icons['greentick'], self.bot.icons['redtick']]
+        for reaction in reactions:
+            await msg.add_reaction(reaction)
+        reaction, user = await self.bot.wait_for("reaction_add", check=lambda reaction, user: user == ctx.author and str(reaction.emoji) in reactions and reaction.message == msg)
+        if str(reaction.emoji) == self.bot.icons['greentick']:
+            for reaction in reactions:
+                try:
+                    await msg.remove_reaction(reaction)
+                except:
+                    pass
+            em=discord.Embed(description=f"Now restarting... {self.bot.icons['loading']}", color=color())
+            await msg.edit(embed=em)
+            await self.bot.close()
+        elif str(reaction.emoji) == self.bot.icons['redtick']:
+            await msg.delete()
 
     @commands.command(hidden=True)
     @commands.is_owner()
