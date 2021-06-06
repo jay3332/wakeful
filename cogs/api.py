@@ -12,7 +12,8 @@ class API(commands.Cog):
     @commands.command()
     @commands.cooldown(1,5,commands.BucketType.user)
     async def cat(self, ctx):
-        res = await self.bot.session.get("https://api.thecatapi.com/v1/images/search")
+        async with ctx.typing():
+            res = await self.bot.session.get("https://api.thecatapi.com/v1/images/search")
         res = await res.json()
         image = res[0]["url"]
         em=discord.Embed(color=color(), timestamp=datetime.datetime.utcnow())
@@ -23,7 +24,8 @@ class API(commands.Cog):
     @commands.command()
     @commands.cooldown(1,5,commands.BucketType.user)
     async def dog(self, ctx):
-        res = await self.bot.session.get("https://dog.ceo/api/breeds/image/random")
+        async with ctx.typing():
+            res = await self.bot.session.get("https://dog.ceo/api/breeds/image/random")
         res = await res.json()
         image = res["message"]
         em=discord.Embed(color=color(), timestamp=datetime.datetime.utcnow())
@@ -34,7 +36,8 @@ class API(commands.Cog):
     @commands.command()
     @commands.cooldown(1,5,commands.BucketType.user)
     async def bunny(self, ctx):
-        res = await self.bot.session.get("https://api.bunnies.io/v2/loop/random/?media=gif")
+        async with ctx.typing():
+            res = await self.bot.session.get("https://api.bunnies.io/v2/loop/random/?media=gif")
         res = await res.json()
         image = res["media"]["gif"]
         em=discord.Embed(color=color(), timestamp=datetime.datetime.utcnow())
@@ -45,7 +48,8 @@ class API(commands.Cog):
     @commands.command()
     @commands.cooldown(1,5,commands.BucketType.user)
     async def duck(self, ctx):
-        res = await self.bot.session.get("https://random-d.uk/api/v1/random?type=png")
+        async with ctx.typing():
+            res = await self.bot.session.get("https://random-d.uk/api/v1/random?type=png")
         res = await res.json()
         image = res["url"]
         em=discord.Embed(color=color(), timestamp=datetime.datetime.utcnow())
@@ -56,7 +60,8 @@ class API(commands.Cog):
     @commands.command()
     @commands.cooldown(1,5,commands.BucketType.user)
     async def fox(self, ctx):
-        res = await self.bot.session.get("https://randomfox.ca/floof/")
+        async with ctx.typing():
+            res = await self.bot.session.get("https://randomfox.ca/floof/")
         res = await res.json()
         image = res["image"]
         em=discord.Embed(color=color(), timestamp=datetime.datetime.utcnow())
@@ -67,7 +72,8 @@ class API(commands.Cog):
     @commands.command()
     @commands.cooldown(1,5,commands.BucketType.user)
     async def lizard(self, ctx):
-        res = await self.bot.session.get("https://nekos.life/api/v2/img/lizard")
+        async with ctx.typing():
+            res = await self.bot.session.get("https://nekos.life/api/v2/img/lizard")
         res = await res.json()
         image = res["url"]
         em=discord.Embed(color=color(), timestamp=datetime.datetime.utcnow())
@@ -78,7 +84,8 @@ class API(commands.Cog):
     @commands.command()
     @commands.cooldown(1,5,commands.BucketType.user)
     async def shiba(self, ctx):
-        res = await self.bot.session.get("http://shibe.online/api/shibes")
+        async with ctx.typing():
+            res = await self.bot.session.get("http://shibe.online/api/shibes")
         res = await res.json()
         image = res[0]
         em=discord.Embed(color=color(), timestamp=datetime.datetime.utcnow())
@@ -89,7 +96,8 @@ class API(commands.Cog):
     @commands.command()
     @commands.cooldown(1,5,commands.BucketType.user)
     async def koala(self, ctx):
-        res = await self.bot.session.get("https://some-random-api.ml/img/koala")
+        async with ctx.typing():
+            res = await self.bot.session.get("https://some-random-api.ml/img/koala")
         res = await res.json()
         image = res["link"]
         em=discord.Embed(color=color(), timestamp=datetime.datetime.utcnow())
@@ -100,7 +108,8 @@ class API(commands.Cog):
     @commands.command()
     @commands.cooldown(1,5,commands.BucketType.user)
     async def panda(self, ctx):
-        res = await self.bot.session.get("https://some-random-api.ml/img/panda")
+        async with ctx.typing():
+            res = await self.bot.session.get("https://some-random-api.ml/img/panda")
         res = await res.json()
         image = res["link"]
         em=discord.Embed(color=color(), timestamp=datetime.datetime.utcnow())
@@ -111,7 +120,8 @@ class API(commands.Cog):
     @commands.command()
     @commands.cooldown(1,5,commands.BucketType.user)
     async def bird(self, ctx):
-        res = await self.bot.session.get("https://some-random-api.ml/img/bird")
+        async with ctx.typing():
+            res = await self.bot.session.get("https://some-random-api.ml/img/bird")
         res = await res.json()
         image = res["link"]
         em=discord.Embed(color=color(), timestamp=datetime.datetime.utcnow())
@@ -122,7 +132,8 @@ class API(commands.Cog):
     @commands.command()
     @commands.cooldown(1,5,commands.BucketType.user)
     async def pikachu(self, ctx):
-        res = await self.bot.session.get("https://some-random-api.ml/img/pikachu")
+        async with ctx.typing():
+            res = await self.bot.session.get("https://some-random-api.ml/img/pikachu")
         res = await res.json()
         image = res["link"]
         em=discord.Embed(color=color(), timestamp=datetime.datetime.utcnow())
@@ -137,7 +148,8 @@ class API(commands.Cog):
     @fact.command(name="dog")
     @commands.cooldown(1,5,commands.BucketType.user)
     async def _dog(self, ctx):
-        res = await self.bot.session.get("https://some-random-api.ml/facts/dog")
+        async with ctx.typing():
+            res = await self.bot.session.get("https://some-random-api.ml/facts/dog")
         res = await res.json()
         fact = res["fact"]
         em=discord.Embed(description=fact, color=color(), timestamp=datetime.datetime.utcnow())
@@ -147,7 +159,8 @@ class API(commands.Cog):
     @fact.command(name="cat")
     @commands.cooldown(1,5,commands.BucketType.user)
     async def _cat(self, ctx):
-        res = await self.bot.session.get("https://some-random-api.ml/facts/cat")
+        async with ctx.typing():
+            res = await self.bot.session.get("https://some-random-api.ml/facts/cat")
         res = await res.json()
         fact = res["fact"]
         em=discord.Embed(description=fact, color=color(), timestamp=datetime.datetime.utcnow())
@@ -157,7 +170,8 @@ class API(commands.Cog):
     @fact.command(name="panda")
     @commands.cooldown(1,5,commands.BucketType.user)
     async def _panda(self, ctx):
-        res = await self.bot.session.get("https://some-random-api.ml/facts/panda")
+        async with ctx.typing():
+            res = await self.bot.session.get("https://some-random-api.ml/facts/panda")
         res = await res.json()
         fact = res["fact"]
         em=discord.Embed(description=fact, color=color(), timestamp=datetime.datetime.utcnow())
@@ -167,7 +181,8 @@ class API(commands.Cog):
     @commands.command()
     @commands.cooldown(1,5,commands.BucketType.user)
     async def chucknorris(self, ctx):
-        res = await self.bot.session.get("https://api.chucknorris.io/jokes/random")
+        async with ctx.typing():
+            res = await self.bot.session.get("https://api.chucknorris.io/jokes/random")
         res = await res.json()
         fact = res["value"]
         em=discord.Embed(description=fact, color=color(), timestamp=datetime.datetime.utcnow())
@@ -177,7 +192,8 @@ class API(commands.Cog):
     @fact.command(name="fox")
     @commands.cooldown(1,5,commands.BucketType.user)
     async def _fox(self, ctx):
-        res = await self.bot.session.get("https://some-random-api.ml/facts/fox")
+        async with ctx.typing():
+            res = await self.bot.session.get("https://some-random-api.ml/facts/fox")
         res = await res.json()
         fact = res["fact"]
         em=discord.Embed(description=fact, color=color(), timestamp=datetime.datetime.utcnow())
@@ -187,7 +203,8 @@ class API(commands.Cog):
     @fact.command(name="bird")
     @commands.cooldown(1,5,commands.BucketType.user)
     async def _bird(self, ctx):
-        res = await self.bot.session.get("https://some-random-api.ml/facts/bird")
+        async with ctx.typing():
+            res = await self.bot.session.get("https://some-random-api.ml/facts/bird")
         res = await res.json()
         fact = res["fact"]
         em=discord.Embed(description=fact, color=color(), timestamp=datetime.datetime.utcnow())
@@ -197,7 +214,8 @@ class API(commands.Cog):
     @fact.command(name="koala")
     @commands.cooldown(1,5,commands.BucketType.user)
     async def _koala(self, ctx):
-        res = await self.bot.session.get("https://some-random-api.ml/facts/koala")
+        async with ctx.typing():
+            res = await self.bot.session.get("https://some-random-api.ml/facts/koala")
         res = await res.json()
         fact = res["fact"]
         em=discord.Embed(description=fact, color=color(), timestamp=datetime.datetime.utcnow())
