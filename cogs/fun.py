@@ -75,7 +75,7 @@ class Fun(commands.Cog):
             em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
             await ctx.send(embed=em)
         else:
-            link = self.bot.together.create_link(voice_channel, ctx.command.name)
+            link = await self.bot.together.create_link(voice_channel, ctx.command.name)
             em=discord.Embed(description=f"Click this [link]({link}) to enable {ctx.command.name} together", color=color(), timestamp=datetime.datetime.utcnow())
             em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
             await ctx.send(embed=em)
@@ -90,7 +90,7 @@ class Fun(commands.Cog):
             em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
             await ctx.send(embed=em)
         else:
-            link = self.bot.together.create_link(voice_channel, ctx.command.name)
+            link = await self.bot.together.create_link(voice_channel, ctx.command.name)
             em=discord.Embed(description=f"Click this [link]({link}) to enable {ctx.command.name} together", color=color(), timestamp=datetime.datetime.utcnow())
             em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
             await ctx.send(embed=em)
@@ -105,7 +105,7 @@ class Fun(commands.Cog):
             em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
             await ctx.send(embed=em)
         else:
-            link = self.bot.together.create_link(voice_channel, ctx.command.name)
+            link = await self.bot.together.create_link(voice_channel, ctx.command.name)
             em=discord.Embed(description=f"Click this [link]({link}) to enable {ctx.command.name} together", color=color(), timestamp=datetime.datetime.utcnow())
             em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
             await ctx.send(embed=em)
@@ -120,7 +120,7 @@ class Fun(commands.Cog):
             em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
             await ctx.send(embed=em)
         else:
-            link = self.bot.together.create_link(voice_channel, ctx.command.name)
+            link = await self.bot.together.create_link(voice_channel, ctx.command.name)
             em=discord.Embed(description=f"Click this [link]({link}) to enable {ctx.command.name} together", color=color(), timestamp=datetime.datetime.utcnow())
             em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
             await ctx.send(embed=em)
@@ -135,7 +135,7 @@ class Fun(commands.Cog):
             em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
             await ctx.send(embed=em)
         else:
-            link = self.bot.together.create_link(voice_channel, ctx.command.name)
+            link = await self.bot.together.create_link(voice_channel, ctx.command.name)
             em=discord.Embed(description=f"Click this [link]({link}) to enable {ctx.command.name} together", color=color(), timestamp=datetime.datetime.utcnow())
             em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
             await ctx.send(embed=em)
