@@ -1,10 +1,10 @@
-from re import escape
-import discord, datetime, async_cse, psutil, humanize, os, sys, inspect, mystbin, googletrans, asyncio, aiohttp, random, time, asyncdagpi, hashlib, asyncpg, io, base64, typing, gdshortener, pathlib
+import discord, datetime, async_cse, psutil, humanize, os, sys, inspect, mystbin, googletrans, asyncio, aiohttp, random, time, asyncdagpi, hashlib, asyncpg, io, base64, typing, gdshortener, pathlib, textwrap, async_tio
 from discord.ext import commands
 from discord import Webhook, AsyncWebhookAdapter
 from utils.configs import color
 from utils.get import *
 from utils.checks import *
+from jishaku.codeblocks import codeblock_converter
 from utils.functions import * 
 from jishaku.functools import executor_function
 import idevision
@@ -530,16 +530,9 @@ class Utility(commands.Cog):
                     await ctx.reply(embed=em, mention_author=False)
                 else:
                     source_lines = ''.join(source_lines).split('\n')
-                    src = "\n".join(line for line in source_lines).replace("`", "'")
-                    em=discord.Embed(title=f"{command.name} source", description=f"Note: most of the \" ' \" stand for a \" ` \"\n\n```py\n{src}```", color=color(), timestamp=datetime.datetime.utcnow())
-                    em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
-                    try:
-                        await ctx.author.send(embed=em)
-                    except discord.HTTPException:
-                        async with ctx.author.typing():
-                            em=discord.Embed(description=f"Note: most of the \" ' \" stand for a \" ` \"", color=color(), timestamp=datetime.datetime.utcnow())
-                            em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
-                        await ctx.author.send(embed=em, file=await getFile(src, "py"))
+                    src = textwrap.dedent("\n".join(line for line in source_lines))
+                    print(src)
+                    await ctx.author.send(file=await getFile(src, "py"))
                     await ctx.message.add_reaction("✅")
 
     @commands.command(name="avatar", aliases=["icon", "av"])
@@ -808,6 +801,17 @@ class Utility(commands.Cog):
             em=discord.Embed(description=res["error"], color=color(), timestamp=datetime.datetime.utcnow())
             em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
             await ctx.reply(embed=em, mention_author=False)
+
+    @commands.command(aliases=["run", "tio"])
+    @commands.cooldown(1,10,commands.BucketType.user)
+    async def execute(self, ctx, language, *, code : codeblock_converter):
+        tio= await async_tio.Tio()
+        async with ctx.typing():
+            res = await tio.execute(code.content, language=language)
+            await tio.close()
+        lang = "".join(code.language if code.language is not None else "txt")
+        f = await getFile(res.output, lang, "output")
+        await ctx.reply(file=f, mention_author=False, allowed_mentions=discord.AllowedMentions.none())
 
     @commands.command(aliases=["fortnite", "fn", "fnstats"])
     @commands.cooldown(1,5,commands.BucketType.user)

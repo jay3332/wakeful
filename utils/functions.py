@@ -3,15 +3,15 @@ from discord.ext import commands
 from jishaku.functools import executor_function
 
 @executor_function
-def makeFile(text, end):
+def makeFile(text, end, filename):
     file_ = tempfile.NamedTemporaryFile()
     file_.write(text.encode())
     file_.seek(os.SEEK_SET)
-    yield discord.File(file_.name, filename=f"message.{end}")
+    yield discord.File(file_.name, filename=f"{filename}.{end}")
     file_.close()
 
-async def getFile(text, end = "txt"):
-    result = await makeFile(text, end)
+async def getFile(text, end = "txt", filename="message"):
+    result = await makeFile(text, end, filename)
     return list(set(result))[0]
 
 async def makeEmbed(context : commands.Context, embed : discord.Embed, mention : bool = False):

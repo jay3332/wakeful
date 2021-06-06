@@ -1,4 +1,4 @@
-import discord, json, asyncio, datetime, sys, os
+import discord, json, asyncio, datetime, sys, os, pwd
 from discord.ext import commands
 from utils.configs import color
 from utils.checks import is_mod
@@ -139,10 +139,36 @@ class Admin(commands.Cog):
         elif str(reaction.emoji) == self.bot.icons['redtick']:
             await msg.delete()
 
+    @commands.group(invoke_without_command=True)
+    @commands.is_owner()
+    async def pip(self, ctx):
+        await ctx.invoke(self.bot.get_command("help"), **{"command": ctx.command.name})
+
+    @pip.command(hidden=True, aliases=["add"])
+    @commands.is_owner()
+    async def install(self, ctx, package):
+        if pwd.getpwuid(os.getuid())[0] == "pi":
+            code = codeblock_converter(f"pip3.9 install {package}")
+            await ctx.invoke(self.bot.get_command("jishaku shell"), **{"argument": code})
+        else:
+            code = codeblock_converter(f"python3.9 -m pip install {package}")
+            await ctx.invoke(self.bot.get_command("jishaku shell"), **{"argument": code})
+
+    @pip.command(hidden=True, aliases=["remove", "delete"])
+    @commands.is_owner()
+    async def uninstall(self, ctx, package):
+        if pwd.getpwuid(os.getuid())[0] == "pi":
+            code = codeblock_converter(f"pip3.9 uninstall -y {package}")
+            await ctx.invoke(self.bot.get_command("jishaku shell"), **{"argument": code})
+        else:
+            code = codeblock_converter(f"python3.9 -m pip uninstall -y {package}")
+            await ctx.invoke(self.bot.get_command("jishaku shell"), **{"argument": code})
+
+
     @developer.command(aliases=["eval"])
     @commands.is_owner()
     async def evaluate(self, ctx, *, code : codeblock_converter):
-        await ctx.invoke(self.bot.get_command("jishaku py"), **{"argument": code})
+        await ctx.invoke(self.bot.get_command("jishaku python"), **{"argument": code})
 
     @developer.command(hidden=True)
     @commands.is_owner()
