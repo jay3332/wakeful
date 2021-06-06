@@ -1,7 +1,9 @@
-import discord, json, asyncio, datetime
+import discord, json, asyncio, datetime, sys, os
 from discord.ext import commands
 from utils.configs import color
 from utils.checks import is_mod
+from utils.functions import *
+from jishaku.codeblocks import codeblock_converter
 from prettytable import PrettyTable
 
 status_types = {
@@ -21,6 +23,11 @@ class Admin(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
+
+    @commands.group(invoke_without_command=True, aliases=["dev"])
+    async def developer(self, ctx):
+        if is_mod(self.bot, ctx.author):
+            await ctx.invoke(self.bot.get_command("help"), **{"command":"developer"})
 
     @commands.group(invoke_without_command=True, hidden=True)
     @commands.cooldown(1, 5, commands.BucketType.user)
@@ -116,7 +123,7 @@ class Admin(commands.Cog):
         em=discord.Embed(description=f"```sh\n$git pull\n{shell}```", color=color())
         await ctx.reply(embed=em, mention_author=False)
 
-    @commands.command(hidden=True, aliases=["rs"])
+    @developer.command(hidden=True, aliases=["rs"])
     @commands.is_owner()
     async def restart(self, ctx):
         em=discord.Embed(description="Are you sure you want to execute this command?", color=color())
@@ -137,7 +144,12 @@ class Admin(commands.Cog):
         elif str(reaction.emoji) == self.bot.icons['redtick']:
             await msg.delete()
 
-    @commands.command(hidden=True)
+    @developer.command(aliases=["eval"])
+    @commands.is_owner()
+    async def evaluate(self, ctx, *, code : codeblock_converter):
+        await ctx.invoke(self.bot.get_command("jishaku py"), **{"argument": code})
+
+    @developer.command(hidden=True)
     @commands.is_owner()
     async def sql(self, ctx, *, query):
         res = await self.bot.db.fetch(query)

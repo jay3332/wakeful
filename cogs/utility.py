@@ -743,7 +743,7 @@ class Utility(commands.Cog):
             elif isinstance(activity, discord.activity.Game):
                 em.add_field(
                     name="Game",
-                    value=f"Name: `{activity.name}`",
+                    value=f"{self.bot.icons['arrow']}Name: `{activity.name}`",
                     inline=True
                 )
             elif isinstance(activity, discord.activity.Streaming):
@@ -753,8 +753,7 @@ class Utility(commands.Cog):
 {self.bot.icons['arrow']}Title: `{activity.name}`
 {self.bot.icons['arrow']}Platform: `{activity.platform}`
 {self.bot.icons['arrow']}URL: [{activity.url.split("/")[3]}]({activity.url})
-""",
-                    inline=True
+""", inline=True
                 )
             else:
                 try:

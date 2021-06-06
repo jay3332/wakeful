@@ -1,4 +1,5 @@
-import os, tempfile, discord
+import os, tempfile, discord, collections
+from discord.ext import commands
 from jishaku.functools import executor_function
 
 @executor_function
@@ -13,13 +14,13 @@ async def getFile(text, end = "txt"):
     result = await makeFile(text, end)
     return list(set(result))[0]
 
-async def makeEmbed(channel : discord.TextChannel, embed : discord.Embed, mention : bool = False):
+async def makeEmbed(context : commands.Context, embed : discord.Embed, mention : bool = False):
     embed = embed.to_dict()
     file_ = None
     if len(embed["description"]) > 1024:
         file_ = getFile(embed["description"])
     if file_ is not None:
-        await channel.reply(embed=discord.Embed().from_dict(embed), mention_author=mention, file=file_)
+        await context.reply(embed=discord.Embed().from_dict(embed), mention_author=mention, file=file_)
     else:
         embed["description"] == "The description was too large, so I've put it into a file"
-        await channel.reply(embed=discord.Embed().from_dict(embed), mention_author=mention)
+        await context.reply(embed=discord.Embed().from_dict(embed), mention_author=mention)
