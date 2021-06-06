@@ -441,7 +441,7 @@ class Utility(commands.Cog):
     @commands.command()
     @commands.cooldown(1,5,commands.BucketType.user)
     async def suggest(self, ctx):
-        em=discord.Embed(description=f"Please now enter your suggestion below:", color=color(), timestamp=datetime.datetime.utcnow())
+        em=discord.Embed(description=f"Please now enter your suggestion below or type `cancel` to cancel", color=color(), timestamp=datetime.datetime.utcnow())
         em.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
         msg = await ctx.reply(embed=em, mention_author=False)
         try:
