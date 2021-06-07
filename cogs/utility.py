@@ -404,7 +404,7 @@ class Utility(commands.Cog):
             member = ctx.author
             
         if "offline" != str(member.mobile_status):
-            platform = "Desktop"
+            platform = "Mobile"
         elif "offline" != str(member.desktop_status):
             platform = "Desktop"
         elif "offline" != str(member.web_status):
@@ -416,7 +416,7 @@ class Utility(commands.Cog):
         joined_at = member.joined_at.strftime("%d/%m/20%y at %H:%M:%S")
 
         if member.top_role.name == "@everyone":
-            top_role="none"
+            top_role="None"
         else:
             top_role=member.top_role.mention
 
@@ -426,7 +426,7 @@ class Utility(commands.Cog):
         em.add_field(name="Info", value=f"""
 {self.bot.icons['arrow']}Name: {member.name}
 {self.bot.icons['arrow']}Nickname: {member.nick}
-{self.bot.icons['arrow']}Status: {member.raw_status}
+{self.bot.icons['arrow']}Status: {''.join(member.raw_status.title() if member.raw_status != "dnd" else "DND")}
 {self.bot.icons['arrow']}Platform: `{platform}`
 {self.bot.icons['arrow']}Created at: {created_at} ({humanize.naturaltime(member.created_at)})""", inline=True)
         em.add_field(name="Guild", value=f"""
@@ -706,6 +706,8 @@ class Utility(commands.Cog):
                 hours = days * 24 + seconds // 3600
                 minutes = (seconds % 3600) // 60
                 seconds = seconds % 60
+                started = datetime.fromtimestamp(unix_ts) - timedelta(hours=2)
+                str_started = started.strftime("%d/%m/20%y at %H:%M:%S")
                 em.add_field(
                     name="Spotify",
                     value=f"""
@@ -713,6 +715,7 @@ class Utility(commands.Cog):
 {self.bot.icons['arrow']}Artists: `{artists}`
 {self.bot.icons['arrow']}Album: `{activity.album}`
 {self.bot.icons['arrow']}Album Cover: [url]({activity.album_cover_url})
+{self.bot.icons['arrow']}Started At: {str_started} ({humanize.naturaltime(started)})
 {self.bot.icons['arrow']}Duration: `{hours}`h `{minutes}`m `{seconds}`s
 """,
                     inline=True
