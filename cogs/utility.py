@@ -706,8 +706,7 @@ class Utility(commands.Cog):
                 hours = days * 24 + seconds // 3600
                 minutes = (seconds % 3600) // 60
                 seconds = seconds % 60
-                started = datetime.datetime.fromtimestamp(activity.start) - datetime.datetime.timedelta(hours=2)
-                str_started = started.strftime("%d/%m/20%y at %H:%M:%S")
+                started = started.strftime("%d/%m/20%y at %H:%M:%S")
                 em.add_field(
                     name="Spotify",
                     value=f"""
@@ -715,7 +714,7 @@ class Utility(commands.Cog):
 {self.bot.icons['arrow']}Artists: `{artists}`
 {self.bot.icons['arrow']}Album: `{activity.album}`
 {self.bot.icons['arrow']}Album Cover: [url]({activity.album_cover_url})
-{self.bot.icons['arrow']}Started At: {str_started} ({humanize.naturaltime(started)})
+{self.bot.icons['arrow']}Started At: {started} ({humanize.naturaltime(activity.start)})
 {self.bot.icons['arrow']}Duration: `{hours}`h `{minutes}`m `{seconds}`s
 """,
                     inline=True
