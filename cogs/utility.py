@@ -706,7 +706,7 @@ class Utility(commands.Cog):
                 hours = days * 24 + seconds // 3600
                 minutes = (seconds % 3600) // 60
                 seconds = seconds % 60
-                started = datetime.datetime.fromtimestamp(unix_ts) - datetime.datetime.timedelta(hours=2)
+                started = datetime.datetime.fromtimestamp(activit.start) - datetime.datetime.timedelta(hours=2)
                 str_started = started.strftime("%d/%m/20%y at %H:%M:%S")
                 em.add_field(
                     name="Spotify",
