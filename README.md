@@ -1,6 +1,6 @@
 # wakeful
 
-![icon i think](https://cdn.discordapp.com/avatars/845720048668114977/15f6afd90a3b4946a410c60e5fdbe619.png?size=128)
+![lines](https://img.shields.io/tokei/lines/github/jottew/wakeful?color=pink)
 
 - a discord bot founded 22.5.21
 - idk just some normal open source discord bot
