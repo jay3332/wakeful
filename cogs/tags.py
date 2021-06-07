@@ -32,7 +32,7 @@ class Tags(commands.Cog):
     async def tag(self, ctx, *, name):
         if not await exists(ctx, name):
             await ctx.message.add_reaction(self.bot.icons['redtick'])
-            em=discord.Embed(description=f"There is no tag with the name {name} on this guild", color=color())
+            em=discord.Embed(description=f"There is no tag with the name `{name}` on this guild", color=color())
             await ctx.reply(embed=em, mention_author=False)
         else:
             tag = await self.bot.db.fetchrow("SELECT * FROM tags WHERE guild = $1 AND name = $2", ctx.guild.id, name)
@@ -45,7 +45,7 @@ class Tags(commands.Cog):
     async def information(self, ctx, *, name):
         if not await exists(ctx, name):
             await ctx.message.add_reaction(self.bot.icons['redtick'])
-            em=discord.Embed(description=f"There is no tag with the name {name} on this guild", color=color())
+            em=discord.Embed(description=f"There is no tag with the name `{name}` on this guild", color=color())
             await ctx.reply(embed=em, mention_author=False)
         else:
             tag = await self.bot.db.fetchrow("SELECT * FROM tags WHERE guild = $1 AND name = $2", ctx.guild.id, name)
@@ -78,7 +78,7 @@ class Tags(commands.Cog):
             await ctx.reply(embed=em, mention_author=False)
         elif not await exists(ctx, name):
             await ctx.message.add_reaction(self.bot.icons['redtick'])
-            em=discord.Embed(description=f"There is no tag with the name {name} on this guild", color=color())
+            em=discord.Embed(description=f"There is no tag with the name `{name}` on this guild", color=color())
             await ctx.reply(embed=em, mention_author=False)
         elif not await is_owner(ctx, name):
             await ctx.message.add_reaction(self.bot.icons['redtick'])
@@ -101,7 +101,7 @@ class Tags(commands.Cog):
             await ctx.reply(embed=em, mention_author=False)
         elif not await exists(ctx, name):
             await ctx.message.add_reaction(self.bot.icons['redtick'])
-            em=discord.Embed(description=f"There is no tag with the name {name} on this guild", color=color())
+            em=discord.Embed(description=f"There is no tag with the name `{name}` on this guild", color=color())
             await ctx.reply(embed=em, mention_author=False)
         elif not await is_owner(ctx, name):
             await ctx.message.add_reaction(self.bot.icons['redtick'])
