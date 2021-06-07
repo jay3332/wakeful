@@ -1,8 +1,5 @@
 # wakeful
 
-![icon i think](https://cdn.discordapp.com/avatars/845720048668114977/15f6afd90a3b4946a410c60e5fdbe619.png?size=128)
+![lines](https://img.shields.io/tokei/lines/github/jottew/wakeful?color=pink) ![open source](https://img.shields.io/badge/open%20source-🔓-pink) [![invite](https://img.shields.io/badge/invite-🔗-pink)](https://discord.com/api/oauth2/authorize?client_id=845720048668114977&permissions=8&scope=bot)
 
-- a discord bot founded 22.5.21
-- idk just some normal open source discord bot
-- (warning) pretty messy code
-- [invite](https://discord.com/api/oauth2/authorize?client_id=845720048668114977&permissions=8&scope=bot)
+wakeful is a discord bot with many different modules and over 150 commands, if the bot reaches the maximum amount of servers, where I'd have to verify it (which I won't do), then everyone that liked the bot and wants to still use it on their server, can run a new instance of this bot. If you have more questions, of what you're allowed to do with this code, you can look into the [license](https://github.com/jottew/wakeful/blob/main/LICENSE).

@@ -412,7 +412,7 @@ class Utility(commands.Cog):
         joined_at = member.joined_at.strftime("%d/%m/20%y at %H:%M:%S")
 
         if member.top_role.name == "@everyone":
-            top_role="none"
+            top_role="None"
         else:
             top_role=member.top_role.mention
 
@@ -700,11 +700,11 @@ class Utility(commands.Cog):
 {self.bot.icons['arrow']}Title: `{activity.title}`
 {self.bot.icons['arrow']}Artists: `{artists}`
 {self.bot.icons['arrow']}Album: `{activity.album}`
-{self.bot.icons['arrow']}Album Cover: [url]({activity.album_cover_url})
 {self.bot.icons['arrow']}Duration: `{hours}`h `{minutes}`m `{seconds}`s
 """,
                     inline=True
                 )
+                em.set_thumbnail(url=activity.album_cover_url)
             elif isinstance(activity, discord.activity.CustomActivity):
                 if activity.emoji != None:
                     emoji = f"[url]({activity.emoji.url})"
