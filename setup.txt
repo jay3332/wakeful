@@ -1,6 +1,8 @@
-1. install all needed modules
-2. create a proper config.json
-3. setup a postgresql database
-4. create a prefixes table like this: "CREATE TABLE prefixes (guild BIGINT PRIMARY KEY, prefix TEXT)"
-5. create a blacklist table likes this: "CREATE TABLE blacklist (user_id bigint primary key)"
-6. create a commands table that will be used for disabled commands like this: "CREATE TABLE commands (guild BIGINT PRIMARY KEY, commands TEXT)"
+1. rename the example-config.json to config.json and set it up
+2. install all needed modules
+3. create a proper config.json
+4. setup a postgresql database
+5. create a prefixes table like this: "CREATE TABLE prefixes (guild BIGINT PRIMARY KEY, prefix TEXT)"
+6. create a blacklist table likes this: "CREATE TABLE blacklist (user_id bigint primary key)"
+7. create a commands table that will be used for disabled commands like this: "CREATE TABLE commands (guild BIGINT PRIMARY KEY, commands TEXT)"
+8. create a tags table like this: "CREATE T ABLE tags (guild BIGINT, name TEXT, content TEXT, author BIGINT, created BIGINT)"

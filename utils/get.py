@@ -1,5 +1,4 @@
 import json, datetime, discord
-from utils.configs import color
 
 def get_config(string : str):
     with open("config.json", "r") as f:
@@ -12,3 +11,6 @@ def get_cog(bot, name):
         cog = bot.get_cog(cog)
         if cog.qualified_name.lower() == name.lower():
             return cog
+    
+def color():
+    return int(get_config("COLOR"), 16)

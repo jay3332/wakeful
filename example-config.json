@@ -1,0 +1,21 @@
+{
+    "TOKEN":"",
+    "DEVTOKEN": "",
+    "DEVPREFIX": "?",
+    "GOOGLE":"",
+    "DAGPI": "",
+    "SUGGESTIONS": "",
+    "LOGS": "",
+    "GUILD": "",
+    "MODROLE": "",
+    "dbuser": "",
+    "dbpw": "",
+    "IDEVISION": "",
+    "SCREENSHOT": "",
+    "FORTNITE": "",
+    "GIPHY": "",
+    "COLOR": "",
+    "ICONS": {
+        "name": "emoji"
+    }
+}

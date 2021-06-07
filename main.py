@@ -2,7 +2,6 @@ import discord, os, datetime, json, asyncio, aiohttp, pwd, asyncpg, logging, col
 from discord.ext import commands, tasks
 from colorama import Fore
 from discord.flags import Intents
-from utils.configs import color
 from utils.checks import is_blacklisted, is_mod
 from utils.get import get_config
 
@@ -41,12 +40,7 @@ token = conf["TOKEN"]
 devtoken = conf["DEVTOKEN"]
 bot.github = "https://github.com/jottew/wakeful" # the github the bot is hosted on
 bot.invite = "https://discord.gg/RkCqvMJsDY"
-bot.icons = {
-    "greentick": "<:checkmark:850294215727775754>",
-    "redtick": "<:crossmark:850294181184143421>",
-    "arrow": "<a:arrow:850290444327059456>",
-    "loading": "<a:loading:851078515436027905>"
-}
+bot.icons = conf["ICONS"]
 bot.together = discordTogether.DiscordTogether(bot)
 bot.cmdsSinceRestart = 0
 bot.message_cache = {}
@@ -106,7 +100,7 @@ async def on_message(msg):
                     if is_mod(bot, msg.author):
                         pass
                     else:
-                        em=discord.Embed(description=f"This command has been disabled by the server administrators", color=color())
+                        em=discord.Embed(description=f"This command has been disabled by the server administrators", color=int(get_config("COLOR")))
                         await msg.channel.send(embed=em)
                         return
                 else:
@@ -120,15 +114,15 @@ async def on_message(msg):
             await bot.process_commands(msg)
         elif msg.content == f"<@!{bot.user.id}>" or msg.content == f"<@{bot.user.id}>":
             if msg.guild:
-                em=discord.Embed(description=f"The prefix for `{msg.guild.name}` is `{prefix}`", color=color())
+                em=discord.Embed(description=f"The prefix for `{msg.guild.name}` is `{prefix}`", color=int(get_config("COLOR")))
                 await msg.channel.send(embed=em)
             else:
-                em=discord.Embed(description=f"The prefix for dms is `{prefix}`", color=color())
+                em=discord.Embed(description=f"The prefix for dms is `{prefix}`", color=int(get_config("COLOR")))
                 await msg.channel.send(embed=em)
 
     elif msg.content == f"<@!{bot.user.id}>" or msg.content == f"<@{bot.user.id}>":
         if is_mod(bot, msg.author):
-            em=discord.Embed(description=f"my prefix is `{devprefix}`", color=color())
+            em=discord.Embed(description=f"my prefix is `{devprefix}`", color=int(get_config("COLOR")))
             await msg.channel.send(embed=em)
 
     elif msg.content.startswith(devprefix):
@@ -144,6 +138,7 @@ for filename in os.listdir("./cogs"):
             logger.info(f"{Fore.RED}An error occured while loading cogs.{filename[:-3]}{Fore.RESET}")
             raise exc
 
+bot.load_extension("jishaku")
 presence.start()
 bot.db=bot.loop.run_until_complete(asyncpg.create_pool(host="localhost", port="5432", user=conf["dbuser"], password=conf["dbpw"], database="wakeful"))
 if pwd.getpwuid(os.getuid())[0] == "pi": # check if username is pi

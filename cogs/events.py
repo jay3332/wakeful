@@ -2,7 +2,6 @@ import discord, difflib, asyncio, traceback
 from colorama import Fore
 from discord.ext import commands
 from discord import Webhook, AsyncWebhookAdapter
-from utils.configs import color
 from utils.checks import is_mod
 from utils.get import * 
 
@@ -66,9 +65,13 @@ class Errors(commands.Cog):
             em=discord.Embed(description=f"You don't have permission to do this", color=color())
             await ctx.reply(embed=em, mention_author=False)
         elif isinstance(error, commands.NotOwner):
-            msg = list(error.args)[0]
-            em=discord.Embed(description=msg, color=color())
-            await ctx.reply(embed=em, mention_author=False)
+            if list(error.args) != [] and len(list(error.args)) != 0:
+                msg = list(error.args)[0]
+                em=discord.Embed(description=msg, color=color())
+                await ctx.reply(embed=em, mention_author=False)
+            else:
+                em=discord.Embed(description="You aren't allowed to execute this command", color=color())
+                await ctx.reply(embed=em, mention_author=False)
         elif isinstance(error, commands.CommandInvokeError):
             error = error.original
             if isinstance(error, discord.Forbidden):
@@ -77,7 +80,7 @@ class Errors(commands.Cog):
             else:
                 if is_mod(self.bot, ctx.author):
                     errormsg = "".join(traceback.format_exception(type(error), error, error.__traceback__))
-                    em=discord.Embed(description=f"```py\n{errormsg}```", color=color())
+                    await ctx.reply(f"```py\n{errormsg}```", mention_author=False, allowed_mentions=discord.AllowedMentions.none())
                 else:
                     em=discord.Embed(description=f"```py\n{error}```", color=color())
                 await ctx.reply(embed=em, mention_author=False)
@@ -85,7 +88,7 @@ class Errors(commands.Cog):
         else:
             if is_mod(self.bot, ctx.author):
                 errormsg = "".join(traceback.format_exception(type(error), error, error.__traceback__))
-                em=discord.Embed(description=f"```py\n{errormsg}```", color=color())
+                await ctx.reply(f"```py\n{errormsg}```", mention_author=False, allowed_mentions=discord.AllowedMentions.none())
             else:
                 em=discord.Embed(description=f"```py\n{error}```", color=color())
             await ctx.reply(embed=em, mention_author=False)

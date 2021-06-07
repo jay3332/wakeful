@@ -1,8 +1,8 @@
 import discord, json, asyncio, datetime, sys, os, pwd
 from discord.ext import commands
-from utils.configs import color
 from utils.checks import is_mod
 from utils.functions import *
+from utils.get import *
 from jishaku.codeblocks import codeblock_converter
 from prettytable import PrettyTable
 
@@ -165,7 +165,7 @@ class Admin(commands.Cog):
             await ctx.invoke(self.bot.get_command("jishaku shell"), **{"argument": code})
 
 
-    @developer.command(aliases=["eval"])
+    @developer.command(aliases=["eval", "e"])
     @commands.is_owner()
     async def evaluate(self, ctx, *, code : codeblock_converter):
         await ctx.invoke(self.bot.get_command("jishaku python"), **{"argument": code})
