@@ -24,23 +24,24 @@ class Moderation(commands.Cog):
                 em=discord.Embed(description=f"This command hasn't been found", color=color())
                 await ctx.reply(embed=em, mention_author=False)
             else:
+                command_name = "".join(command.name if command.parent is None else f"{command.parent.name} {command.name}")
                 try:
-                    await self.bot.db.execute("INSERT INTO commands (guild, commands) VALUES ($1, $2)", ctx.guild.id, command.name)
+                    await self.bot.db.execute("INSERT INTO commands (guild, commands) VALUES ($1, $2)", ctx.guild.id, command_name)
                 except asyncpg.UniqueViolationError:
                     commands = await self.bot.db.fetchrow("SELECT commands FROM commands WHERE guild = $1", ctx.guild.id)
                     commands = commands["commands"]
                     commands = commands.split(",")
-                    if not command.name in commands:
-                        commands.append(command.name)
+                    if not command_name in commands:
+                        commands.append(command_name)
                         commands = ",".join(cmd for cmd in commands)
                         await self.bot.db.execute("UPDATE commands SET commands = $1 WHERE guild = $2", commands, ctx.guild.id)
-                        em=discord.Embed(description=f"I've successfully disabled the `{command.name}` command", color=color())
+                        em=discord.Embed(description=f"I've successfully disabled the `{command_name}` command", color=color())
                         await ctx.reply(embed=em, mention_author=False)
                     else:
                         em=discord.Embed(description=f"That command is already disabled", color=color())
                         await ctx.reply(embed=em, mention_author=False)
                 else:
-                    em=discord.Embed(description=f"I've successfully disabled the `{command.name}` command", color=color())
+                    em=discord.Embed(description=f"I've successfully disabled the `{command_name}` command", color=color())
                     await ctx.reply(embed=em, mention_author=False)
         else:
             em=discord.Embed(description=f"You are not allowed to disable the `{command}` command", color=color())
@@ -68,16 +69,17 @@ class Moderation(commands.Cog):
                 commands = await self.bot.db.fetchrow("SELECT commands FROM commands WHERE guild = $1", ctx.guild.id)
                 commands = commands["commands"]
                 commands = commands.split(",")
-                if command.name in commands:
-                    commands.remove(command.name)
+                command_name = "".join(command.name if command.parent is None else f"{command.parent.name} {command.name}")
+                if command_name in commands:
+                    commands.remove(command_name)
                     commands = ",".join(cmd for cmd in commands)
                     if len(commands) != 1:
                         await self.bot.db.execute("UPDATE commands SET commands = $1 WHERE guild = $2", commands, ctx.guild.id)
-                        em=discord.Embed(description=f"I've successfully enabled the `{command.name}` command", color=color())
+                        em=discord.Embed(description=f"I've successfully enabled the `{command_name}` command", color=color())
                         await ctx.reply(embed=em, mention_author=False)
                     else:
                         await self.bot.db.fetch("DELETE FROM commands WHERE guild = $1", ctx.guild.id)
-                        em=discord.Embed(description=f"I've successfully enabled the `{command.name}` command", color=color())
+                        em=discord.Embed(description=f"I've successfully enabled the `{command_name}` command", color=color())
                         await ctx.reply(embed=em, mention_author=False)
                 else:
                     em=discord.Embed(description=f"That command isn't disabled", color=color())
