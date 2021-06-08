@@ -139,6 +139,10 @@ class Tags(commands.Cog):
     @tag.command(aliases=["make", "add"])
     @commands.cooldown(1,15,commands.BucketType.user)
     async def create(self, ctx, name, *, content):
+        if name in [cmd.name for cmd in self.bot.get_command("tag").commands]:
+            await ctx.message.add_reaction(self.bot.icons['redtick'])
+            em=discord.Embed(description=f"The tag name cannot be a tag subcommand", color=color())
+            await ctx.reply(embed=em, mention_author=False)
         if await exists(ctx, name):
             await ctx.message.add_reaction(self.bot.icons['redtick'])
             em=discord.Embed(description=f"There is already a tag with the name `{name}`", color=color())
