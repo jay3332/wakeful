@@ -218,7 +218,6 @@ class Tags(commands.Cog):
                     records.append(record)
         if records != [] and len(records) != 0:
             em=discord.Embed(title=f"Search: {query}", description="\n".join(f"`{dict(rec)['name']}`" for rec in records), color=color())
-            em.set_footer(text=f"{len(res)} {''.join('record' if len(res) == 1 else 'records')} found")
             await ctx.reply(embed=em, mention_author=False)
         else:
             em=discord.Embed(description=f"There are no tags with `{query}` in the name", color=color())
