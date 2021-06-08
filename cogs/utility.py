@@ -642,7 +642,7 @@ class Utility(commands.Cog):
 {self.bot.icons['arrow']}**Users**: `{len(self.bot.users)}`
 {self.bot.icons['arrow']}**Channels**: `{channels}`:
 {self.bot.icons['arrow']}**Shards**: `{len(list(self.bot.shards))}`
-{self.bot.icons['arrow']}**Commands**: `{len([cmd for cmd in list(set(self.bot.walk_commands)) if not cmd.hidden])}`
+{self.bot.icons['arrow']}**Commands**: `{len([cmd for cmd in list(set(self.bot.walk_commands())) if not cmd.hidden])}`
 {self.bot.icons['arrow']}**Commands executed**: `{self.bot.cmdsSinceRestart}`
 {self.bot.icons['arrow']}**Cogs**: `{len(cogs)}`
 {self.bot.icons['arrow']}**Uptime**: `{days}d {hours}h {minutes}m {seconds}s`""", inline=False)
