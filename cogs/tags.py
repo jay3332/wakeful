@@ -40,6 +40,19 @@ class Tags(commands.Cog):
             content = tag["content"]
             await ctx.reply(content, mention_author=False, allowed_mentions=discord.AllowedMentions.none())
 
+    @tag.command()
+    @commands.cooldown(1,5,commands.BucketType.user)
+    async def raw(self, ctx, *, name):
+        if not await exists(ctx, name):
+            await ctx.message.add_reaction(self.bot.icons['redtick'])
+            em=discord.Embed(description=f"There is no tag with the name `{name}` on this guild", color=color())
+            await ctx.reply(embed=em, mention_author=False)
+        else:
+            tag = await self.bot.db.fetchrow("SELECT * FROM tags WHERE guild = $1 AND name = $2", ctx.guild.id, name)
+            name = tag["name"]
+            content = tag["content"]
+            await ctx.reply(discord.utils.escape_markdown(content), mention_author=False, allowed_mentions=discord.AllowedMentions.none())
+
     @tag.command(aliases=["info", "owner", "author"])
     @commands.cooldown(1,5,commands.BucketType.user)
     async def information(self, ctx, *, name):
