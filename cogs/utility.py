@@ -31,8 +31,8 @@ class Utility(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.Cog.listener()
-    async def on_message(self, message):
+    @commands.Cog.listener(name="on_message")
+    async def at_someone(self, message):
         mem=[]
         if message.guild:
             for m in message.guild.members:
@@ -42,8 +42,8 @@ class Utility(commands.Cog):
                 if message.author.guild_permissions.mention_everyone:
                     await message.channel.send(random.choice(mem).mention)
 
-    @commands.Cog.listener()
-    async def on_message(self, msg):
+    @commands.Cog.listener(name="on_message")
+    async def afk_messages(self, msg):
         if msg.author.id in list(self.bot.afks):
             self.bot.afks.pop(msg.author.id)
             em=discord.Embed(description=f"Welcome back, {msg.author.mention}, I've unmarked you as afk", color=color())
@@ -59,8 +59,8 @@ class Utility(commands.Cog):
                 await msg.channel.reply(embed=em, mention_author=False)
 
 
-    @commands.Cog.listener()
-    async def on_message(self, msg):
+    @commands.Cog.listener(name="on_message")
+    async def emojj_system(self, msg):
         if msg.author.bot:
             return
         if ";;" in msg.content:
@@ -642,7 +642,7 @@ class Utility(commands.Cog):
 {self.bot.icons['arrow']}**Users**: `{len(self.bot.users)}`
 {self.bot.icons['arrow']}**Channels**: `{channels}`:
 {self.bot.icons['arrow']}**Shards**: `{len(list(self.bot.shards))}`
-{self.bot.icons['arrow']}**Commands**: `{len([cmd for cmd in list(set(self.bot.walk_commands)) if not cmd.hidden])}`
+{self.bot.icons['arrow']}**Commands**: `{len([cmd for cmd in list(set(self.bot.walk_commands())) if not cmd.hidden])}`
 {self.bot.icons['arrow']}**Commands executed**: `{self.bot.cmdsSinceRestart}`
 {self.bot.icons['arrow']}**Cogs**: `{len(cogs)}`
 {self.bot.icons['arrow']}**Uptime**: `{days}d {hours}h {minutes}m {seconds}s`""", inline=False)
