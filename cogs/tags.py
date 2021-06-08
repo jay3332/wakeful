@@ -53,6 +53,19 @@ class Tags(commands.Cog):
             content = tag["content"]
             await ctx.reply(discord.utils.escape_markdown(content), mention_author=False, allowed_mentions=discord.AllowedMentions.none())
 
+    @tag.command(aliases=["display"])
+    @commands.cooldown(1,5,commands.BucketType.user)
+    async def show(self, ctx, *, name):
+        if not await exists(ctx, name):
+            await ctx.message.add_reaction(self.bot.icons['redtick'])
+            em=discord.Embed(description=f"There is no tag with the name `{name}` on this guild", color=color())
+            await ctx.reply(embed=em, mention_author=False)
+        else:
+            tag = await self.bot.db.fetchrow("SELECT * FROM tags WHERE guild = $1 AND name = $2", ctx.guild.id, name)
+            name = tag["name"]
+            content = tag["content"]
+            await ctx.reply(content, mention_author=False, allowed_mentions=discord.AllowedMentions.none())
+
     @tag.command(aliases=["info", "owner", "author"])
     @commands.cooldown(1,5,commands.BucketType.user)
     async def information(self, ctx, *, name):
@@ -119,7 +132,11 @@ class Tags(commands.Cog):
     @tag.command()
     @commands.cooldown(1,15,commands.BucketType.user)
     async def rename(self, ctx, name, *, new_name):
-        if name in [cmd.name for cmd in self.bot.get_command("tag").commands]:
+        commands = [cmd.name for cmd in self.bot.get_command("tag").commands]
+        for command in self.bot.get_command("tag").commands:
+            for alias in command.aliases:
+                commands.append(alias)
+        if new_name in [cmd for cmd in commands]:
             await ctx.message.add_reaction(self.bot.icons['redtick'])
             em=discord.Embed(description=f"The tag name cannot be a tag subcommand", color=color())
             await ctx.reply(embed=em, mention_author=False)
@@ -156,7 +173,11 @@ class Tags(commands.Cog):
     @tag.command(aliases=["make", "add"])
     @commands.cooldown(1,15,commands.BucketType.user)
     async def create(self, ctx, name, *, content):
-        if name in [cmd.name for cmd in self.bot.get_command("tag").commands]:
+        commands = [cmd.name for cmd in self.bot.get_command("tag").commands]
+        for command in self.bot.get_command("tag").commands:
+            for alias in command.aliases:
+                commands.append(alias)
+        if name in [cmd for cmd in commands]:
             await ctx.message.add_reaction(self.bot.icons['redtick'])
             em=discord.Embed(description=f"The tag name cannot be a tag subcommand", color=color())
             await ctx.reply(embed=em, mention_author=False)
