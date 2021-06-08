@@ -123,7 +123,7 @@ class Tags(commands.Cog):
             await ctx.message.add_reaction(self.bot.icons['redtick'])
             em=discord.Embed(description=f"The tag name cannot be a tag subcommand", color=color())
             await ctx.reply(embed=em, mention_author=False)
-        elif await exists(ctx, name):
+        elif await exists(ctx, new_name):
             await ctx.message.add_reaction(self.bot.icons['redtick'])
             em=discord.Embed(description=f"There is already a tag with the name `{name}`", color=color())
             await ctx.reply(embed=em, mention_author=False)
