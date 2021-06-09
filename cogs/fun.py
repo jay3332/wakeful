@@ -70,11 +70,11 @@ class Fun(commands.Cog):
         try:
             voice_channel = ctx.author.voice.channel.id
         except AttributeError:
-            em=discord.Embed(description=f"You have to join a voice channel to use this command", color=color(), timestamp=datetime.datetime.utcnow())
+            em=discord.Embed(description=f"You have to join a voice channel to use this command", color=color())
             await ctx.send(embed=em)
         else:
             link = await self.bot.together.create_link(voice_channel, ctx.command.name)
-            em=discord.Embed(description=f"Click this [link]({link}) to enable {ctx.command.name} together", color=color(), timestamp=datetime.datetime.utcnow())
+            em=discord.Embed(description=f"Click this [link]({link}) to enable {ctx.command.name} together", color=color())
             await ctx.send(embed=em)
 
     @_together.command()
@@ -83,11 +83,11 @@ class Fun(commands.Cog):
         try:
             voice_channel = ctx.author.voice.channel.id
         except AttributeError:
-            em=discord.Embed(description=f"You have to join a voice channel to use this command", color=color(), timestamp=datetime.datetime.utcnow())
+            em=discord.Embed(description=f"You have to join a voice channel to use this command", color=color())
             await ctx.send(embed=em)
         else:
             link = await self.bot.together.create_link(voice_channel, ctx.command.name)
-            em=discord.Embed(description=f"Click this [link]({link}) to enable {ctx.command.name} together", color=color(), timestamp=datetime.datetime.utcnow())
+            em=discord.Embed(description=f"Click this [link]({link}) to enable {ctx.command.name} together", color=color())
             await ctx.send(embed=em)
 
     @_together.command()
@@ -96,11 +96,11 @@ class Fun(commands.Cog):
         try:
             voice_channel = ctx.author.voice.channel.id
         except AttributeError:
-            em=discord.Embed(description=f"You have to join a voice channel to use this command", color=color(), timestamp=datetime.datetime.utcnow())
+            em=discord.Embed(description=f"You have to join a voice channel to use this command", color=color())
             await ctx.send(embed=em)
         else:
             link = await self.bot.together.create_link(voice_channel, ctx.command.name)
-            em=discord.Embed(description=f"Click this [link]({link}) to enable {ctx.command.name} together", color=color(), timestamp=datetime.datetime.utcnow())
+            em=discord.Embed(description=f"Click this [link]({link}) to enable {ctx.command.name} together", color=color())
             await ctx.send(embed=em)
 
     @_together.command()
@@ -109,11 +109,11 @@ class Fun(commands.Cog):
         try:
             voice_channel = ctx.author.voice.channel.id
         except AttributeError:
-            em=discord.Embed(description=f"You have to join a voice channel to use this command", color=color(), timestamp=datetime.datetime.utcnow())
+            em=discord.Embed(description=f"You have to join a voice channel to use this command", color=color())
             await ctx.send(embed=em)
         else:
             link = await self.bot.together.create_link(voice_channel, ctx.command.name)
-            em=discord.Embed(description=f"Click this [link]({link}) to enable {ctx.command.name} together", color=color(), timestamp=datetime.datetime.utcnow())
+            em=discord.Embed(description=f"Click this [link]({link}) to enable {ctx.command.name} together", color=color())
             await ctx.send(embed=em)
 
     @_together.command()
@@ -122,11 +122,11 @@ class Fun(commands.Cog):
         try:
             voice_channel = ctx.author.voice.channel.id
         except AttributeError:
-            em=discord.Embed(description=f"You have to join a voice channel to use this command", color=color(), timestamp=datetime.datetime.utcnow())
+            em=discord.Embed(description=f"You have to join a voice channel to use this command", color=color())
             await ctx.send(embed=em)
         else:
             link = await self.bot.together.create_link(voice_channel, ctx.command.name)
-            em=discord.Embed(description=f"Click this [link]({link}) to enable {ctx.command.name} together", color=color(), timestamp=datetime.datetime.utcnow())
+            em=discord.Embed(description=f"Click this [link]({link}) to enable {ctx.command.name} together", color=color())
             await ctx.send(embed=em)
 
     @commands.command()
@@ -242,19 +242,19 @@ class Fun(commands.Cog):
             brand = logo.brand
             hint = logo.hint
             question = logo.question
-            em = discord.Embed(description=f"try guessing this logo in under 20 seconds - hint: ||`{hint}`||", color=color(), timestamp=datetime.datetime.utcnow())
+            em = discord.Embed(description=f"try guessing this logo in under 20 seconds - hint: ||`{hint}`||", color=color())
             em.set_image(url=question)
             em.set_footer(text=f"Powered by dagpi.xyz", icon_url=ctx.author.avatar_url)
         emsg = await ctx.send(embed=em)
         try:
             brand = logo.brand
             msg = await self.bot.wait_for('message', check=lambda message: message.content.lower() == str(brand).lower() and message.channel == ctx.channel and message.author == ctx.author, timeout=20)
-            em=discord.Embed(description=f"correct! the logo was `{brand}`", color=color(), timestamp=datetime.datetime.utcnow())
+            em=discord.Embed(description=f"correct! the logo was `{brand}`", color=color())
             em.set_thumbnail(url=logo.answer)
             em.set_footer(text=f"Powered by dagpi.xyz", icon_url=ctx.author.avatar_url)
             await emsg.edit(embed=em)
         except asyncio.TimeoutError:
-            em=discord.Embed(description=f"you took too long to answer, it was `{logo.brand}`", color=color(), timestamp=datetime.datetime.utcnow())
+            em=discord.Embed(description=f"you took too long to answer, it was `{logo.brand}`", color=color())
             em.set_thumbnail(url=logo.answer)
             em.set_footer(text=f"Powered by dagpi.xyz", icon_url=ctx.author.avatar_url)
             await emsg.edit(embed=em)
@@ -265,7 +265,7 @@ class Fun(commands.Cog):
         res = await self.bot.session.get(f"https://http.cat/{code}")
         buf = io.BytesIO(await res.read())
         file=discord.File(buf, filename=f"{code}.png")
-        em=discord.Embed(color=color(), timestamp=datetime.datetime.utcnow())
+        em=discord.Embed(color=color())
         em.set_image(url=f"attachment://{code}.png")
         em.set_footer(text=f"Powered by http.cat", icon_url=ctx.author.avatar_url)
         await ctx.send(embed=em, file=file)
@@ -275,7 +275,7 @@ class Fun(commands.Cog):
     async def joke(self, ctx):
         async with ctx.typing():
             joke = await dagpi.joke()
-            em = discord.Embed(description=joke, color=color(), timestamp=datetime.datetime.utcnow())
+            em = discord.Embed(description=joke, color=color())
             em.set_footer(text=f"Powered by dagpi.xyz", icon_url=ctx.author.avatar_url)
         await ctx.reply(embed=em, mention_author=False)
 
@@ -284,7 +284,7 @@ class Fun(commands.Cog):
     async def eightball(self, ctx, *, question):
         async with ctx.typing():
             response = await dagpi.eight_ball()
-            em = discord.Embed(color=color(), timestamp=datetime.datetime.utcnow())
+            em = discord.Embed(color=color())
             em.add_field(name="input", value=f"```\n{question}```", inline=False)
             em.add_field(name="output", value=f"```\n{response}```", inline=False)
             em.set_footer(text=f"Powered by dagpi.xyz", icon_url=ctx.author.avatar_url)
@@ -295,7 +295,7 @@ class Fun(commands.Cog):
     async def roast(self, ctx):
         async with ctx.typing():
             roast = await dagpi.roast()
-            em = discord.Embed(description=roast, color=color(), timestamp=datetime.datetime.utcnow())
+            em = discord.Embed(description=roast, color=color())
             em.set_footer(text=f"Powered by dagpi.xyz", icon_url=ctx.author.avatar_url)
         await ctx.reply(embed=em, mention_author=False)
 

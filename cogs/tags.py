@@ -1,15 +1,24 @@
 import discord, datetime, string, time, humanize
 from discord.ext import commands
 from utils.get import *
+from utils.paginator import Paginator
 
 async def exists(ctx, name):
-    res = await ctx.bot.db.fetchrow("SELECT * FROM tags WHERE guild = $1 AND name = $2", ctx.guild.id, name)
-    try:
-        res = res["content"]
-    except TypeError:
-        return False
-    else:
+    res = await ctx.bot.db.fetch("SELECT * FROM tags WHERE guild = $1", ctx.guild.id)
+    tag = None
+    for tag_ in res:
+        if dict(tag_)["name"].lower() == name.lower():
+            tag = tag_
+    if tag is not None:
         return True
+    else:
+        return False
+
+async def get_tag(ctx, name):
+    res = await ctx.bot.db.fetch("SELECT * FROM tags WHERE guild = $1", ctx.guild.id)
+    for tag in res:
+        if dict(tag)["name"].lower() == name.lower():
+            return tag
 
 async def is_owner(ctx, name):
     res = await ctx.bot.db.fetchrow("SELECT * FROM tags WHERE guild = $1 AND name = $2", ctx.guild.id, name)
@@ -35,7 +44,7 @@ class Tags(commands.Cog):
             em=discord.Embed(description=f"There is no tag with the name `{name}` on this guild", color=color())
             await ctx.reply(embed=em, mention_author=False)
         else:
-            tag = await self.bot.db.fetchrow("SELECT * FROM tags WHERE guild = $1 AND name = $2", ctx.guild.id, name)
+            tag = await get_tag(ctx, name)
             name = tag["name"]
             content = tag["content"]
             await ctx.reply(content, mention_author=False, allowed_mentions=discord.AllowedMentions.none())
@@ -48,12 +57,12 @@ class Tags(commands.Cog):
             em=discord.Embed(description=f"There is no tag with the name `{name}` on this guild", color=color())
             await ctx.reply(embed=em, mention_author=False)
         else:
-            tag = await self.bot.db.fetchrow("SELECT * FROM tags WHERE guild = $1 AND name = $2", ctx.guild.id, name)
+            tag = await get_tag(ctx, name)
             name = tag["name"]
             content = tag["content"]
             await ctx.reply(discord.utils.escape_markdown(content), mention_author=False, allowed_mentions=discord.AllowedMentions.none())
 
-    @tag.command(aliases=["display"])
+    @tag.command(aliases=["display", "view"])
     @commands.cooldown(1,5,commands.BucketType.user)
     async def show(self, ctx, *, name):
         if not await exists(ctx, name):
@@ -61,7 +70,7 @@ class Tags(commands.Cog):
             em=discord.Embed(description=f"There is no tag with the name `{name}` on this guild", color=color())
             await ctx.reply(embed=em, mention_author=False)
         else:
-            tag = await self.bot.db.fetchrow("SELECT * FROM tags WHERE guild = $1 AND name = $2", ctx.guild.id, name)
+            tag = await get_tag(ctx, name)
             name = tag["name"]
             content = tag["content"]
             await ctx.reply(content, mention_author=False, allowed_mentions=discord.AllowedMentions.none())
@@ -74,7 +83,7 @@ class Tags(commands.Cog):
             em=discord.Embed(description=f"There is no tag with the name `{name}` on this guild", color=color())
             await ctx.reply(embed=em, mention_author=False)
         else:
-            tag = await self.bot.db.fetchrow("SELECT * FROM tags WHERE guild = $1 AND name = $2", ctx.guild.id, name)
+            tag = await get_tag(ctx, name)
             name = tag["name"]
             author = tag["author"]
             content = tag["content"]

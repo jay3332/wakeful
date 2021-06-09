@@ -135,6 +135,8 @@ class Admin(commands.Cog):
                     pass
             em=discord.Embed(description=f"Now restarting... {self.bot.icons['loading']}", color=color())
             await msg.edit(embed=em)
+            await self.bot.db.close()
+            await self.bot.session.close()
             await self.bot.close()
         elif str(reaction.emoji) == self.bot.icons['redtick']:
             await msg.delete()
@@ -163,7 +165,6 @@ class Admin(commands.Cog):
         else:
             code = codeblock_converter(f"python3.9 -m pip uninstall -y {package}")
             await ctx.invoke(self.bot.get_command("jishaku shell"), **{"argument": code})
-
 
     @developer.command(aliases=["eval", "e"])
     @commands.is_owner()

@@ -32,17 +32,6 @@ class Utility(commands.Cog):
         self.bot = bot
 
     @commands.Cog.listener(name="on_message")
-    async def at_someone(self, message):
-        mem=[]
-        if message.guild:
-            for m in message.guild.members:
-                if not m.bot:
-                    mem.append(m)
-            if "@someone" in message.content:
-                if message.author.guild_permissions.mention_everyone:
-                    await message.channel.send(random.choice(mem).mention)
-
-    @commands.Cog.listener(name="on_message")
     async def afk_messages(self, msg):
         if msg.author.id in list(self.bot.afks):
             self.bot.afks.pop(msg.author.id)
@@ -94,6 +83,13 @@ class Utility(commands.Cog):
                             emoji = e
                     if emoji is not None:
                         await msg.reply(str(emoji), mention_author=False)
+
+    @commands.command()
+    @commands.has_guild_permissions(mention_everyone=True)
+    @commands.cooldown(1,5,commands.BucketType.user)
+    @commands.guild_only()
+    async def someone(self, ctx):
+        await ctx.reply(random.choice([m for m in ctx.guild.members if not m.bot and m != ctx.author]).mention, mention_author=False)
 
     @commands.command()
     @commands.cooldown(1, 5, commands.BucketType.user)

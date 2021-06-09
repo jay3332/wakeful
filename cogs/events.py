@@ -83,7 +83,7 @@ class Errors(commands.Cog):
                     await ctx.reply(f"```py\n{errormsg}```", mention_author=False, allowed_mentions=discord.AllowedMentions.none())
                 else:
                     em=discord.Embed(description=f"```py\n{error}```", color=color())
-                await ctx.reply(embed=em, mention_author=False)
+                    await ctx.reply(embed=em, mention_author=False)
                 raise error
         else:
             if is_mod(self.bot, ctx.author):

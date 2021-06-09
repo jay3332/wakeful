@@ -13,6 +13,7 @@ class Moderation(commands.Cog):
 
     @commands.command()
     @commands.has_guild_permissions(manage_guild=True)
+    @commands.guild_only()
     @commands.cooldown(1,5,commands.BucketType.user)
     async def disable(self, ctx, *, command):
         if not command in ["help"]:
@@ -49,6 +50,7 @@ class Moderation(commands.Cog):
 
     @commands.command()
     @commands.has_guild_permissions(manage_guild=True)
+    @commands.guild_only()
     @commands.cooldown(1,5,commands.BucketType.user)
     async def enable(self, ctx, *, command):
         command = self.bot.get_command(command)
