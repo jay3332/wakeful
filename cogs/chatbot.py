@@ -8,7 +8,7 @@ from utils.get import *
 class Chatbot(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.cleverbot = ac.Cleverbot(get_config("CLEVERBOT"))
+        self.cleverbot = bot.cleverbot
 
     @commands.command()
     async def chatbot(self, ctx):
