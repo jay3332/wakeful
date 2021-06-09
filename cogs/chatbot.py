@@ -24,7 +24,6 @@ class Chatbot(commands.Cog):
                 async with ctx.typing():
                     res = await self.cleverbot.ask(msg.content, msg.author.id)
                     await msg.reply(res.text, mention_author=False, allowed_mentions=discord.AllowedMentions.none())
-        await self.cleverbot.close()
         return
 
 def setup(bot):
