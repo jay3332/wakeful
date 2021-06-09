@@ -1,4 +1,4 @@
-import discord, os, datetime, json, asyncio, aiohttp, pwd, asyncpg, logging, coloredlogs, discordTogether, discord_logging
+import discord, os, datetime, json, asyncio, aiohttp, pwd, asyncpg, logging, coloredlogs, discordTogether, discord_logging, async_cleverbot
 from discord.ext import commands, tasks
 from colorama import Fore
 from discord.flags import Intents
@@ -44,6 +44,7 @@ bot.icons = conf["ICONS"]
 bot.together = discordTogether.DiscordTogether(bot)
 bot.cmdsSinceRestart = 0
 bot.message_cache = {}
+bot.cleverbot = async_cleverbot.Cleverbot(get_config("CLEVERBOT"))
 bot.ownersid = 797044260196319282
 bot.afks = {}
 bot.banner = "https://media.discordapp.net/attachments/832746281335783426/849721738987307008/banner.png"
