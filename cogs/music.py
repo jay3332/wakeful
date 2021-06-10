@@ -3,6 +3,8 @@ from discord.ext import commands
 from utils.get import *
 
 def is_vc(ctx : commands.Context, member : discord.Member):
+    if member.guild_permissions.manage_guild:
+        return True
     if ctx.guild.me.voice is None:
         return True
     elif member.voice is None:
