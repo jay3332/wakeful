@@ -1106,7 +1106,7 @@ class Utility(commands.Cog):
                     if is_mod(self.bot, ctx.author):
                         cmds = [cmd for cmd in cog.get_commands()]
                     else:
-                        cmds = [cmd for cmd in list(set(self.bot.walk_commands)) if not cmd.hidden]
+                        cmds = [cmd for cmd in list(set(self.bot.walk_commands())) if not cmd.hidden]
                     if len(cmds) != 0 and cmds != []:
                         cogs.append(cog)
             em.add_field(
