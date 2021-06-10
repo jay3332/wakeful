@@ -407,6 +407,8 @@ class Utility(commands.Cog):
         created_at = member.created_at.strftime("%d/%m/20%y at %H:%M:%S")
         joined_at = member.joined_at.strftime("%d/%m/20%y at %H:%M:%S")
 
+        pronoun = await get_pronoun(self.bot, member)
+
         if member.top_role.name == "@everyone":
             top_role="None"
         else:
@@ -419,7 +421,8 @@ class Utility(commands.Cog):
 {self.bot.icons['arrow']}Name: {member.name}
 {self.bot.icons['arrow']}Nickname: {member.nick}
 {self.bot.icons['arrow']}Status: {''.join(member.raw_status.title() if member.raw_status != "dnd" else "DND")}
-{self.bot.icons['arrow']}Platform: `{platform}`
+{self.bot.icons['arrow']}Platform: {platform}
+{self.bot.icons['arrow']}Pronoun: {pronoun}
 {self.bot.icons['arrow']}Created at: {created_at} ({humanize.naturaltime(member.created_at)})""", inline=True)
         em.add_field(name="Guild", value=f"""
 {self.bot.icons['arrow']}Roles: {len(member.roles)}
@@ -636,7 +639,7 @@ class Utility(commands.Cog):
             em.add_field(name="Bot", value=f"""
 {self.bot.icons['arrow']}**Guilds**: `{len(self.bot.guilds)}`
 {self.bot.icons['arrow']}**Users**: `{len(self.bot.users)}`
-{self.bot.icons['arrow']}**Channels**: `{channels}`:
+{self.bot.icons['arrow']}**Channels**: `{channels}`
 {self.bot.icons['arrow']}**Shards**: `{len(list(self.bot.shards))}`
 {self.bot.icons['arrow']}**Commands**: `{len([cmd for cmd in list(set(self.bot.walk_commands())) if not cmd.hidden])}`
 {self.bot.icons['arrow']}**Commands executed**: `{self.bot.cmdsSinceRestart}`
@@ -1214,8 +1217,7 @@ class Utility(commands.Cog):
     @commands.cooldown(1,5,commands.BucketType.user)
     async def _file_(self, ctx, *, content):
         f = await getFile(content)
-        em=discord.Embed(color=color())
-        await ctx.reply(embed=em, file=f, mention_author=False)
+        await ctx.reply(file=f, mention_author=False)
 
     @commands.group(invoke_without_command=True)
     @commands.cooldown(1,10,commands.BucketType.user)
@@ -1370,6 +1372,27 @@ class Utility(commands.Cog):
         await ctx.reply(embed=em, mention_author=False)
         await asyncio.sleep(3)
         self.bot.afks[ctx.author.id] = {"reason": reason}
+
+    @commands.command(aliases=["rawmsg"])
+    @commands.cooldown(1, 10, commands.BucketType.user)
+    async def rawmessage(self, ctx, message : discord.Message = None):
+        if ctx.message.reference:
+            msg = await self.bot.http.get_message(int(ctx.message.reference.channel_id), int(ctx.message.reference.message_id))
+        elif message:
+            msg = await self.bot.http.get_message(int(message.channel.id), int(message.id))
+        else:
+            msg = await self.bot.http.get_message(int(ctx.channel.id), int(ctx.message.id))
+        raw = json.dumps(msg, indent=4)
+        em=discord.Embed(
+            description=f"```json\n{discord.utils.escape_markdown(raw)}```",
+            timestamp=datetime.datetime.utcnow(),
+            color=color()
+        )
+        if len(em.description) < 2048:
+            await ctx.reply(embed=em, mention_author=False)
+        else:
+            f = await getFile(raw, "json")
+            await ctx.reply(file=f, mention_author=False)
 
     @commands.command()
     @commands.cooldown(1,10,commands.BucketType.user)

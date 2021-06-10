@@ -218,11 +218,31 @@ class Tags(commands.Cog):
 
     @tag.command()
     @commands.cooldown(1,5,commands.BucketType.user)
+    async def claim(self, ctx, *, name):
+        if not await exists(ctx, name):
+            await ctx.message.add_reaction(self.bot.icons['redtick'])
+            em=discord.Embed(description=f"There is no tag with the name `{name}` on this guild", color=color())
+            await ctx.reply(embed=em, mention_author=False)
+        else:
+            tag = await get_tag(ctx, name)
+            author = dict(tag)["author"]
+            name_ = dict(tag)["name"]
+            member = ctx.guild.get_member(int(author))
+            if member is not None:
+                await ctx.message.add_reaction(self.bot.icons['redtick'])
+                em=discord.Embed(description=f"The tag owner is still on the server", color=color())
+                await ctx.reply(embed=em, mention_author=False)
+            else:
+                await self.bot.db.execute("UPDATE tags SET author = $1 WHERE guild = $2 AND name = $3", ctx.author.id, ctx.guild.id, name_)
+                await ctx.message.add_reaction(self.bot.icons['greentick'])
+
+    @tag.command()
+    @commands.cooldown(1,5,commands.BucketType.user)
     async def search(self, ctx, *, query):
         res = await self.bot.db.fetch("SELECT * FROM tags WHERE guild = $1", ctx.guild.id)
         records = []
         for record in res:
-            if query in dict(record)["name"]:
+            if query.lower() in dict(record)["name"].lower():
                 if len(records) < 6:
                     records.append(record)
         if records != [] and len(records) != 0:

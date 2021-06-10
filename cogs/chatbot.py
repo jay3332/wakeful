@@ -15,7 +15,7 @@ class Chatbot(commands.Cog):
         em=discord.Embed(description="Alright! I've started the chatbot, you can now talk to him, to cancel use `chat stop`, `chat close` or `chat cancel`", color=color())
         await ctx.reply(embed=em, mention_author=False)
         while True:
-            msg = await self.bot.wait_for("message", check=lambda msg: msg.author == ctx.author)
+            msg = await self.bot.wait_for("message", check=lambda msg: msg.author == ctx.author and msg.channel == ctx.channel)
             if msg.content in ["chat stop", "chat close", "chat cancel"]:
                 em=discord.Embed(description="Alright! I've successfully stopped the chatbot", color=color())
                 await msg.reply(embed=em, mention_author=False)

@@ -1,4 +1,4 @@
-import os, tempfile, discord, collections
+import os, tempfile, discord
 from discord.ext import commands
 from jishaku.functools import executor_function
 
