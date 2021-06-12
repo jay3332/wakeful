@@ -1064,6 +1064,26 @@ class Utility(commands.Cog):
             em=discord.Embed(description=f"No results found for `{query}`", color=color())
             await ctx.reply(embed=em, mention_author=False)
 
+    @rtfm.command(aliases=["cs"])
+    @commands.cooldown(1,5,commands.BucketType.user)
+    async def custom(self, ctx, suffix, query):
+        url = f"https://{suffix}.readthedocs.io/en/latest/"
+        async with ctx.typing():
+            res = await self.bot.session.get(f"https://idevision.net/api/public/rtfm?query={query}&location={url}&show-labels=false&label-labels=false")
+        if res.status == 200:
+            res = await res.json()
+            nodes = res["nodes"]
+            if nodes != {}:
+                em=discord.Embed(description="\n".join(f"[`{e}`]({nodes[e]})" for e in nodes), color=color())
+                em.set_footer(text=f"Powered by idevision.net", icon_url=ctx.author.avatar_url)
+                await ctx.reply(embed=em, mention_author=False)
+            else:
+                em=discord.Embed(description=f"No results found for `{query}`", color=color())
+                await ctx.reply(embed=em, mention_author=False)
+        else:
+            em=discord.Embed(description=f"Invalid result, maybe [the url]({url}) was invalid", color=color())
+            await ctx.reply(embed=em, mention_author=False)
+
     @commands.command()
     @commands.cooldown(1,5,commands.BucketType.user)
     async def weather(self, ctx, state):
