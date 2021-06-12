@@ -143,7 +143,7 @@ class Music(commands.Cog):
             await ctx.reply(embed=em, mention_author=False)
         else:
             em=discord.Embed(title=song.title, url=song.url, color=color())
-            em.add_field(name="Author", value=f"[{song.channel}]({song.channel_url})", inline=True)
+            em.add_field(name="Channel", value=f"[{song.channel}]({song.channel_url})", inline=True)
             em.add_field(name="Duration", value=str(datetime.timedelta(seconds=song.duration)), inline=True)
             em.set_footer(text=f"👁️ {humanize.intcomma(song.views)}")
             em.set_thumbnail(url=song.thumbnail)

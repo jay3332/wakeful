@@ -359,7 +359,7 @@ class Image(commands.Cog):
 
     @commands.command()
     @commands.cooldown(1,10,commands.BucketType.user)
-    async def youtube(self, ctx, member : discord.Member, *, text):
+    async def youtubecomment(self, ctx, member : discord.Member, *, text):
         async with ctx.typing():
             img = await dagpi.image_process(asyncdagpi.ImageFeatures.youtube(), url=str(member.avatar_url_as(format="png")), username=member.display_name, text=text)
             file=discord.File(img.image, f"{ctx.command.name}.png")

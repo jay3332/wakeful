@@ -143,7 +143,7 @@ class Moderation(commands.Cog):
         msg = await ctx.reply(embed=em, mention_author=False)
         await msg.add_reaction(self.bot.icons["greentick"])
         await msg.add_reaction(self.bot.icons["redtick"])
-        reaction, user = await self.bot.wait_for("reaction_add", check=lambda reaction, user: user.guild_permissions.manage_channels and str(reaction.emoji) in [self.bot.icons['redtick'], self.bot.icons['greentick']] and reaction.message == msg)
+        reaction, user = await self.bot.wait_for("reaction_add", check=lambda reaction, user: user.guild_permissions.manage_channels and str(reaction.emoji) in [self.bot.icons['redtick'], self.bot.icons['greentick']] and reaction.message == msg and not user.bot)
         if str(reaction.emoji) == self.bot.icons['greentick']:
             new = await channel.clone()
             await channel.delete()
