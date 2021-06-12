@@ -13,7 +13,7 @@ async def makeEmbed(context : commands.Context, embed : discord.Embed, mention :
     embed = embed.to_dict()
     file_ = None
     if len(embed["description"]) > 1024:
-        file_ = getFile(embed["description"])
+        file_ = await getFile(embed["description"])
     if file_ is not None:
         await context.reply(embed=discord.Embed().from_dict(embed), mention_author=mention, file=file_)
     else:
