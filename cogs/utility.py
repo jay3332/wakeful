@@ -115,58 +115,64 @@ class Utility(commands.Cog):
     @commands.command()
     @commands.cooldown(1,30,commands.BucketType.user)
     async def shazam(self, ctx):
-        if not ctx.message.attachments:
-            em=discord.Embed(description="Please attach a video file", color=color())
-            await ctx.reply(embed=em, mention_author=False)
-        elif not ctx.message.attachments[0].url.endswith(".mp4"):
-            em=discord.Embed(description="Please attach a video file", color=color())
-            await ctx.reply(embed=em, mention_author=False)
-        else:
-            start_time = datetime.datetime.utcnow()
+        attachment = None
+        if ctx.message.reference:
+            if ctx.message.reference.resolved.attachments:
+                attachment = ctx.message.reference.resolved.attachments[0]
+        elif ctx.message.attachments:
             attachment = ctx.message.attachments[0]
-            em=discord.Embed(description=f"{self.bot.icons['loading']} Now downloading video...", color=color())
-            msg = await ctx.reply(embed=em, mention_author=False)
-            path = tempfile.TemporaryDirectory()
-            await attachment.save(f"{path.name}/file.mp4")
-            em=discord.Embed(description=f"{self.bot.icons['loading']} Now recognizing song...", color=color())
+
+        if attachment is not None:
+            if not attachment.url.endswith(".mp4"):
+                em=discord.Embed(description="Please attach a video file", color=color())
+                return await ctx.reply(embed=em, mention_author=False)
+        else:
+            em=discord.Embed(description="Please attach a video file", color=color())
+            return await ctx.reply(embed=em, mention_author=False)
+        
+        start_time = datetime.datetime.utcnow()
+        em=discord.Embed(description=f"{self.bot.icons['loading']} Now downloading video...", color=color())
+        msg = await ctx.reply(embed=em, mention_author=False)
+        path = tempfile.TemporaryDirectory()
+        await attachment.save(f"{path.name}/file.mp4")
+        em=discord.Embed(description=f"{self.bot.icons['loading']} Now recognizing song...", color=color())
+        await msg.edit(embed=em)
+        res = await client.recognize_song(path.name+"/file.mp4")
+        try:
+            track = res["track"]
+        except KeyError:
+            em=discord.Embed(description=f"{self.bot.icons['redtick']} Could not detect song", color=color())
+            await msg.edit(embed=em, mention_author=False)
+        else:
+            title = track["title"]
+            artist = track["subtitle"]
+            await cleanup(path)
+            em=discord.Embed(description=f"{self.bot.icons['loading']} Now fetching youtube information...", color=color())
             await msg.edit(embed=em)
-            res = await client.recognize_song(path.name+"/file.mp4")
+            data = await youtube(f"{artist} {title}")
             try:
-                track = res["track"]
-            except KeyError:
-                em=discord.Embed(description=f"{self.bot.icons['redtick']} Could not detect song", color=color())
-                await msg.edit(embed=em, mention_author=False)
-            else:
-                title = track["title"]
-                artist = track["subtitle"]
-                await cleanup(path)
-                em=discord.Embed(description=f"{self.bot.icons['loading']} Now fetching youtube information...", color=color())
-                await msg.edit(embed=em)
-                data = await youtube(f"{artist} {title}")
-                try:
-                    url = "https://www.youtube.com/watch?v="+data["entries"][0]["id"]
-                except:
-                    url = "N/A"
-                delta = datetime.datetime.utcnow() - start_time
-                hours, remainder = divmod(int(delta.total_seconds()), 3600)
-                minutes, seconds = divmod(remainder, 60)
-                em=discord.Embed(color=color())
-                em.add_field(name="Title", value=title, inline=False)
-                em.add_field(name="Artist", value=artist, inline=False)
-                em.add_field(name="URL", value=url, inline=False)
-                em.set_footer(text=f"Finished in {minutes}m, {seconds}s")
-                try:
-                    em.set_thumbnail(url=data["entries"][0]["thumbnail"])
-                except:
-                    pass
-                await msg.edit(embed=em)
+                url = "https://www.youtube.com/watch?v="+data["entries"][0]["id"]
+            except:
+                url = "N/A"
+            delta = datetime.datetime.utcnow() - start_time
+            hours, remainder = divmod(int(delta.total_seconds()), 3600)
+            minutes, seconds = divmod(remainder, 60)
+            em=discord.Embed(color=color())
+            em.add_field(name="Title", value=title, inline=False)
+            em.add_field(name="Artist", value=artist, inline=False)
+            em.add_field(name="URL", value=url, inline=False)
+            em.set_footer(text=f"Finished in {minutes}m, {seconds}s")
+            try:
+                em.set_thumbnail(url=data["entries"][0]["thumbnail"])
+            except:
+                pass
+            await msg.edit(embed=em)
 
     @commands.group(invoke_without_command=True, aliases=["yt"])
     @commands.cooldown(1,5,commands.BucketType.user)
     async def youtube(self, ctx, *, query):
         async with ctx.typing():
             data = await youtube(query)
-
         try:
             data = data["entries"][0]
         except IndexError:
@@ -212,7 +218,7 @@ class Utility(commands.Cog):
         else:
             start_time = datetime.datetime.utcnow()
             async with ctx.typing():
-                data = await youtube(url)
+                data = self.ytdl.extract_info(url, download=False)
 
             if data["duration"] > 300:
                 raise TooLong()
