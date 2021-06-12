@@ -780,14 +780,13 @@ class Utility(commands.Cog):
             if isinstance(i, discord.activity.Spotify):
                 activity = i
         if activity is not None:
-            em=discord.Embed(color=color(), url=f"https://open.spotify.com/track/{activity.track_id}")
+            em=discord.Embed(title=activity.title, color=color(), url=f"https://open.spotify.com/track/{activity.track_id}")
             artists = ", ".join(artist for artist in activity.artists)
             duration = activity.duration
             days, seconds = duration.days, duration.seconds
             hours = days * 24 + seconds // 3600
             minutes = (seconds % 3600) // 60
             seconds = seconds % 60
-            em.add_field(name="Title", value=activity.title, inline=False)
             em.add_field(name="Artists", value=artists, inline=False)
             em.add_field(name="Album", value=activity.album, inline=False)
             em.add_field(name="Duration", value=f"{minutes}m {seconds}s", inline=False)
