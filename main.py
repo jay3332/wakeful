@@ -74,15 +74,6 @@ async def presence():
     else:
         pass
 
-@tasks.loop(seconds=5)
-async def musicCheck():
-    await bot.wait_until_ready()
-    for guild in bot.guilds:
-        if guild.me.voice is not None and guild.voice_client is not None:
-            members = [m for m in guild.me.voice.channel.members if not m.bot]
-            if members == [] and len(members) == 0:
-                await guild.voice_client.disconnect()
-
 @bot.event
 async def on_message(msg):
     if pwd.getpwuid(os.getuid())[0] == "pi":
@@ -164,7 +155,6 @@ for filename in os.listdir("./cogs"):
 
 bot.load_extension("jishaku")
 presence.start()
-musicCheck.start()
 bot.db=bot.loop.run_until_complete(asyncpg.create_pool(host="localhost", port="5432", user=conf["dbuser"], password=conf["dbpw"], database="wakeful"))
 if pwd.getpwuid(os.getuid())[0] == "pi": # check if username is pi
     bot.run(token) # run stable

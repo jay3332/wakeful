@@ -25,6 +25,15 @@ class Music(commands.Cog):
             if guild.voice_client is not None:
                 await guild.voice_client.disconnect()
 
+    @commands.Cog.listener()
+    async def on_voice_state_update(self, member, before, after):
+        if member.guild.voice_client is not None and member.guild.me.voice is not None:
+            if before.channel is not None and after.channel is None:
+                if before.channel == member.guild.me.voice.channel:
+                    members = [m for m in member.guild.me.voice.channel.members if not m.bot]
+                    if members == [] and len(members) == 0:
+                        await member.guild.voice_client.disconnect()
+
     @commands.command()
     async def join(self, ctx):
         try:
