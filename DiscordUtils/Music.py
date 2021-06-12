@@ -1,6 +1,7 @@
 import asyncio
 import aiohttp
 import re
+from utils.get import youtube
 try:
     import youtube_dl
     import discord
@@ -21,32 +22,16 @@ class NotConnectedToVoice(Exception):
 class NotPlaying(Exception):
     """Cannot <do something> because nothing is being played"""
     
-async def ytbettersearch(query):
-    url = f"https://www.youtube.com/results?search_query={query}"
-    async with aiohttp.ClientSession() as session:
-        async with session.get(url) as resp:
-            html = await resp.text()
-    index = html.find('watch?v')
-    url = ""
-    while True:
-        char = html[index]
-        if char == '"':
-            break
-        url += char
-        index += 1
-    url = f"https://www.youtube.com/{url}"
-    return url
-    
 def is_url(url):
     if re.match(r"http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*(),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+", url):
         return True
     else:
         return False
 
-async def get_video_data(url, search, bettersearch, loop):
+async def get_video_data(url, search, loop):
     if not has_voice:
         raise RuntimeError("DiscordUtils[voice] install needed in order to use voice")
-    if not search and not bettersearch:
+    if not search:
         data = await loop.run_in_executor(None, lambda: ydl.extract_info(url, download=False))
         source = data["url"]
         url = "https://www.youtube.com/watch?v="+data["id"]
@@ -61,41 +46,23 @@ async def get_video_data(url, search, bettersearch, loop):
         channel_url = data["uploader_url"]
         return Song(source, url, title, description, views, duration, thumbnail, channel, channel_url, False)
     else:
-        if bettersearch:
-            url = await ytbettersearch(url)
-            data = ydl.extract_info(url, download=False)
-            source = data["url"]
-            url = "https://www.youtube.com/watch?v="+data["id"]
-            title = data["title"]
-            description = data["description"]
-            likes = data["like_count"]
-            dislikes = data["dislike_count"]
-            views = data["view_count"]
-            duration = data["duration"]
-            thumbnail = data["thumbnail"]
-            channel = data["uploader"]
-            channel_url = data["uploader_url"]
-            return Song(source, url, title, description, views, duration, thumbnail, channel, channel_url, False)
-        elif search:
-            ytdl = youtube_dl.YoutubeDL({"format": "bestaudio/best", "restrictfilenames": True, "noplaylist": True, "nocheckcertificate": True, "ignoreerrors": True, "logtostderr": False, "quiet": True, "no_warnings": True, "default_search": "auto", "source_address": "0.0.0.0"})
-            data = ytdl.extract_info(url, download=False)
-            try:
-                data = data["entries"][0]
-            except KeyError or TypeError:
-                pass
-            del ytdl
-            source = data["url"]
-            url = "https://www.youtube.com/watch?v="+data["id"]
-            title = data["title"]
-            description = data["description"]
-            likes = data["like_count"]
-            dislikes = data["dislike_count"]
-            views = data["view_count"]
-            duration = data["duration"]
-            thumbnail = data["thumbnail"]
-            channel = data["uploader"]
-            channel_url = data["uploader_url"]
-            return Song(source, url, title, description, views, duration, thumbnail, channel, channel_url, False)
+        data = await youtube(url)
+        try:
+            data = data["entries"][0]
+        except KeyError or TypeError:
+            pass
+        source = data["url"]
+        url = "https://www.youtube.com/watch?v="+data["id"]
+        title = data["title"]
+        description = data["description"]
+        likes = data["like_count"]
+        dislikes = data["dislike_count"]
+        views = data["view_count"]
+        duration = data["duration"]
+        thumbnail = data["thumbnail"]
+        channel = data["uploader"]
+        channel_url = data["uploader_url"]
+        return Song(source, url, title, description, views, duration, thumbnail, channel, channel_url, False)
         
 def check_queue(ctx, opts, music, after, on_play, loop):
     if not has_voice:

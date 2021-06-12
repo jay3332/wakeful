@@ -142,7 +142,7 @@ class Utility(commands.Cog):
                 await cleanup(path)
                 em=discord.Embed(description=f"{self.bot.icons['loading']} Now fetching youtube information...", color=color())
                 await msg.edit(embed=em)
-                data = self.ytdl.extract_info(f"{artist} {title}", download=False)
+                data = await youtube(f"{artist} {title}")
                 try:
                     url = "https://www.youtube.com/watch?v="+data["entries"][0]["id"]
                 except:
@@ -165,7 +165,7 @@ class Utility(commands.Cog):
     @commands.cooldown(1,5,commands.BucketType.user)
     async def youtube(self, ctx, *, query):
         async with ctx.typing():
-            data = self.ytdl.extract_info(query, download=False)
+            data = await youtube(query)
 
         try:
             data = data["entries"][0]
@@ -212,7 +212,7 @@ class Utility(commands.Cog):
         else:
             start_time = datetime.datetime.utcnow()
             async with ctx.typing():
-                data = self.ytdl.extract_info(url, download=False)
+                data = await youtube(url)
 
             if data["duration"] > 300:
                 raise TooLong()
