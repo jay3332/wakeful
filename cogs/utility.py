@@ -769,6 +769,33 @@ class Utility(commands.Cog):
         else:
             text = msg
         await ctx.reply("".join(f"||{letter}||" for letter in text), mention_author=False, allowed_mentions=discord.AllowedMentions.none())
+
+    @commands.command()
+    @commands.cooldown(1,5,commands.BucketType.user)
+    async def spotify(self, ctx, member : discord.Member = None):
+        if member is None:
+            member = ctx.author
+        activity = None
+        for i in ctx.author.activities:
+            if isinstance(i, discord.activity.Spotify):
+                activity = i
+        if activity is not None:
+            em=discord.Embed(color=color(), url=f"https://open.spotify.com/track/{activity.track_id}")
+            artists = ", ".join(artist for artist in activity.artists)
+            duration = activity.duration
+            days, seconds = duration.days, duration.seconds
+            hours = days * 24 + seconds // 3600
+            minutes = (seconds % 3600) // 60
+            seconds = seconds % 60
+            em.add_field(name="Title", value=activity.title, inline=False)
+            em.add_field(name="Artists", value=artists, inline=False)
+            em.add_field(name="Album", value=activity.album, inline=False)
+            em.add_field(name="Duration", value=f"{minutes}m {seconds}s", inline=False)
+            em.set_thumbnail(url=activity.album_cover_url)
+            await ctx.reply(embed=em, mention_author=False)
+        else:
+            em=discord.Embed(description=f"{member.mention} isn't listening to spotify", color=color())
+            await ctx.reply(embed=em, mention_author=False)
     
     @commands.command(aliases=["rp", "activity", "richpresence", "status"])
     @commands.cooldown(1,5,commands.BucketType.user)
@@ -785,12 +812,13 @@ class Utility(commands.Cog):
                 minutes = (seconds % 3600) // 60
                 seconds = seconds % 60
                 em.add_field(
-                    name="Spotify",
+                    name=f"Spotify",
                     value=f"""
 {self.bot.icons['arrow']}Title: `{activity.title}`
+{self.bot.icons['arrow']}URL: [Click here](https://open.spotify.com/track/{activity.track_id})
 {self.bot.icons['arrow']}Artists: `{artists}`
 {self.bot.icons['arrow']}Album: `{activity.album}`
-{self.bot.icons['arrow']}Duration: `{hours}`h `{minutes}`m `{seconds}`s
+{self.bot.icons['arrow']}Duration: `{minutes}`m `{seconds}`s
 """,
                     inline=True
                 )
@@ -887,8 +915,11 @@ class Utility(commands.Cog):
             res = await tio.execute(code.content, language=language)
             await tio.close()
         lang = "".join(code.language if code.language is not None else "txt")
-        f = await getFile(res.output, lang, "output")
-        await ctx.reply(file=f, mention_author=False, allowed_mentions=discord.AllowedMentions.none())
+        if len(res.output) > 2000:
+            f = await getFile(res.output, lang, "output")
+            await ctx.reply(file=f, mention_author=False, allowed_mentions=discord.AllowedMentions.none())
+        else:
+            await ctx.reply(f"```{language}\n{res.output}```", mention_author=False, allowed_mentions=discord.AllowedMentions.none())
 
     @commands.command(aliases=["fortnite", "fn", "fnstats"])
     @commands.cooldown(1,5,commands.BucketType.user)
