@@ -37,7 +37,7 @@ async def get_pronoun(bot : typing.Union[discord.Client, discord.ext.commands.Bo
         "other": "Other",
         "ask": f"Ask",
         "avoid": "No pronoun, use name",
-        "None": "None"
+        "None": "N/A"
     }
     res = await (await bot.session.get(f"https://pronoundb.org/api/v1/lookup?id={member.id}&platform=discord")).json()
     try:
