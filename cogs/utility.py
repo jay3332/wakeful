@@ -25,13 +25,14 @@ def do_translate(output, text):
     return translation
 
 @executor_function
-def download(url):
+def download(bot, url):
     video = pytube.YouTube(str(url))
     if video.length > 300:
         raise TooLong
     else:
         res = video.streams.get_highest_resolution()
         path = tempfile.TemporaryDirectory()
+        bot.directorys[path.name] = path
         download = res.download(path.name)
         file_ = discord.File(str(download))
         path.cleanup()
@@ -136,7 +137,7 @@ class Utility(commands.Cog):
             start_time = datetime.datetime.utcnow()
 
             async with ctx.typing():
-                res = await download(url)
+                res = self.bot.http.loop.create_task(await download(self.bot, url))
 
             delta = datetime.datetime.utcnow() - start_time
             hours, remainder = divmod(int(delta.total_seconds()), 3600)

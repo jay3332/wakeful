@@ -46,6 +46,7 @@ bot.icons = conf["ICONS"]
 bot.together = discordTogether.DiscordTogether(bot)
 bot.cmdsSinceRestart = 0
 bot.message_cache = {}
+bot.directorys = {}
 bot.ownersid = 797044260196319282
 bot.afks = {}
 bot.banner = "https://media.discordapp.net/attachments/832746281335783426/849721738987307008/banner.png"
