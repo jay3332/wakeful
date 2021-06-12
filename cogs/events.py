@@ -1,7 +1,8 @@
 import discord, difflib, asyncio, traceback
 from colorama import Fore
+from jishaku.models import copy_context_with
 from discord.ext import commands
-from discord import Webhook, AsyncWebhookAdapter
+from utils.webhook import Webhook, AsyncWebhookAdapter
 from utils.checks import is_mod
 from utils.get import * 
 
@@ -43,15 +44,20 @@ class Errors(commands.Cog):
                 command = None
             if command:
                 if not command.hidden:
-                    em=discord.Embed(description=f"`{cmd}` is not a valid command, maybe you meant `{match[0]}`", color=color())
-                    m = await ctx.reply(embed=em, mention_author=False)
-                    await asyncio.sleep(3)
-                    await m.delete()
+                    em=discord.Embed(description=f"`{cmd}` is not a valid command, did you mean `{match[0]}`?", color=color())
+                    msg = await ctx.reply(embed=em, mention_author=False, delete_after=5)
+                    reactions = [self.bot.icons['greentick'], self.bot.icons['redtick']]
+                    for reaction in reactions:
+                        await msg.add_reaction(reaction)
+                    reaction, user = await self.bot.wait_for("reaction_add", check=lambda reaction, user: user == ctx.author and str(reaction.emoji) in reactions and reaction.message == msg)
+                    if str(reaction.emoji) == self.bot.icons['greentick']:
+                        alt_ctx = await copy_context_with(ctx, author=ctx.author, content=f"{ctx.prefix}{match[0]}")
+                        await self.bot.invoke(alt_ctx)
+                    elif str(reaction.emoji) == self.bot.icons['redtick']:
+                        await msg.delete()
             else:
                 em=discord.Embed(description=f"`{cmd}` is not a valid command", color=color())
-                m = await ctx.reply(embed=em, mention_author=False)
-                await asyncio.sleep(3)
-                await m.delete()
+                m = await ctx.reply(embed=em, mention_author=False, delete_after=3)
         elif isinstance(error, commands.MemberNotFound):
             em=discord.Embed(description=f"Couldn't find member `{error.argument}`", color=color())
             await ctx.reply(embed=em, mention_author=False)

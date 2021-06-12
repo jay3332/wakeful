@@ -1,12 +1,21 @@
-import discord, os, datetime, json, asyncio, aiohttp, pwd, asyncpg, logging, coloredlogs, discordTogether, discord_logging
+import discord, os, datetime, json, asyncio, aiohttp, pwd, asyncpg, logging, coloredlogs, discordTogether
+from discord.ext.commands.bot import when_mentioned_or
 from discord.ext import commands, tasks
 from colorama import Fore
 from discord.flags import Intents
 from utils.checks import is_blacklisted, is_mod
 from utils.get import *
 
+with open('config.json') as f:
+    conf = json.load(f)
+
+devprefix = conf["DEVPREFIX"] # the prefix for the development version
+
+
 async def get_prefix(bot, message):
     await bot.wait_until_ready()
+    if pwd.getpwuid(os.getuid())[0] != "pi":
+        return devprefix
     if message.guild is None:
         return "!"
     else:
@@ -18,10 +27,6 @@ async def get_prefix(bot, message):
             prefix = await bot.db.fetchrow("SELECT prefix FROM prefixes WHERE guild = $1", message.guild.id)
             return prefix["prefix"]
 
-with open('config.json') as f:
-    conf = json.load(f)
-
-devprefix = conf["DEVPREFIX"] # the prefix for the development version
 
 class wakeful(commands.AutoShardedBot):
     def __init__(self, *args, **kwargs):
@@ -29,10 +34,7 @@ class wakeful(commands.AutoShardedBot):
     async def on_ready(self):
         logger.info(f"Logged in as: {bot.user.name}#{bot.user.discriminator} ({bot.user.id})")
 
-if pwd.getpwuid(os.getuid())[0] == "pi":
-    bot = wakeful(command_prefix=get_prefix, case_insensitive=True, ShardCount=10, intents=discord.Intents.all())
-else:
-    bot = wakeful(command_prefix=devprefix, case_insensitive=True, ShardCount=10, intents=discord.Intents.all())
+bot = wakeful(command_prefix=get_prefix, case_insensitive=True, ShardCount=10, intents=discord.Intents.all())
 bot.remove_command("help")
 
 bot.uptime = datetime.datetime.utcnow()

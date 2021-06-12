@@ -1,13 +1,12 @@
 import discord, datetime, async_cse, psutil, humanize, os, sys, inspect, mystbin, googletrans, asyncio, aiohttp, random, time, asyncdagpi, hashlib, asyncpg, io, base64, typing, gdshortener, pathlib, textwrap, async_tio, mathjspy
 from discord.ext.commands.core import command
 from discord.ext import commands
-from discord import Webhook, AsyncWebhookAdapter
+from utils.webhook import Webhook, AsyncWebhookAdapter
 from utils.get import *
 from utils.checks import *
 from jishaku.codeblocks import codeblock_converter
 from utils.functions import * 
 from jishaku.functools import executor_function
-import idevision
 
 @executor_function
 def do_translate(output, text):
@@ -21,7 +20,6 @@ def do_translate(output, text):
 google = async_cse.Search(get_config("GOOGLE"))
 mystbinn = mystbin.Client()
 dagpi = asyncdagpi.Client(get_config("DAGPI"))
-idevisionn = idevision.async_client(get_config("IDEVISION"))
 isgd = gdshortener.ISGDShortener()
 
 class Utility(commands.Cog):
@@ -1426,12 +1424,12 @@ class Utility(commands.Cog):
             filetype = None
         
         async with ctx.typing():
-            res = await idevisionn.ocr(image, filetype=filetype)
+            res = (await (await self.bot.session.get("https://idevision.net/api/public/ocr", headers={"Authorization":get_config("IDEVISION")}, params={"filetype":filetype}, data=image)).json())["data"]
 
         if res != "":
             em=discord.Embed(color=color())
             em.set_footer(text=f"Powered by idevision.net", icon_url=ctx.author.avatar_url)
-            await ctx.reply(embed=em, mention_author=False, file=getFile(res))
+            await ctx.reply(embed=em, mention_author=False, file=await getFile(res))
         else:
             em=discord.Embed(description=f"I couldn't read what your image says", color=color())
             await ctx.reply(embed=em, mention_author=False)

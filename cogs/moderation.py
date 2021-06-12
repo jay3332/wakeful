@@ -126,9 +126,7 @@ class Moderation(commands.Cog):
             e = await ctx.channel.purge(limit=amount)
             em=discord.Embed(description=f"I've successfully purged `{len(e)}` messages", color=color())
             
-            msg = await ctx.reply(embed=em, mention_author=False)
-            await asyncio.sleep(2)
-            await msg.delete()
+            msg = await ctx.reply(embed=em, mention_author=False, delete_after=2)
         else:
             await ctx.message.add_reaction(self.bot.icons["redtick"])
             em=discord.Embed(description=f"The maximum amount you can purge is `100`", color=color())
