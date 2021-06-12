@@ -9,7 +9,9 @@ from utils.errors import *
 from jishaku.codeblocks import codeblock_converter
 from utils.functions import * 
 from jishaku.functools import executor_function
+from shazamio.api import Shazam
 
+client = Shazam()
 google = async_cse.Search(get_config("GOOGLE"))
 mystbinn = mystbin.Client()
 dagpi = asyncdagpi.Client(get_config("DAGPI"))
@@ -37,6 +39,10 @@ def download(bot, url):
         file_ = discord.File(str(download))
         path.cleanup()
         return file_
+        
+@executor_function
+def cleanup(path):
+    path.cleanup()
 
 class Utility(commands.Cog):
 
@@ -105,6 +111,55 @@ class Utility(commands.Cog):
     @commands.guild_only()
     async def someone(self, ctx):
         await ctx.reply(random.choice([m for m in ctx.guild.members if not m.bot and m != ctx.author]).mention, mention_author=False)
+
+    @commands.command()
+    @commands.cooldown(1,30,commands.BucketType.user)
+    async def shazam(self, ctx):
+        if not ctx.message.attachments:
+            em=discord.Embed(description="Please attach a video file", color=color())
+            await ctx.reply(embed=em, mention_author=False)
+        elif not ctx.message.attachments[0].url.endswith(".mp4"):
+            em=discord.Embed(description="Please attach a video file", color=color())
+            await ctx.reply(embed=em, mention_author=False)
+        else:
+            start_time = datetime.datetime.utcnow()
+            attachment = ctx.message.attachments[0]
+            em=discord.Embed(description=f"{self.bot.icons['loading']} Now downloading video...", color=color())
+            msg = await ctx.reply(embed=em, mention_author=False)
+            path = tempfile.TemporaryDirectory()
+            await attachment.save(f"{path.name}/file.mp4")
+            em=discord.Embed(description=f"{self.bot.icons['loading']} Now recognizing song...", color=color())
+            await msg.edit(embed=em)
+            res = await client.recognize_song(path.name+"/file.mp4")
+            try:
+                track = res["track"]
+            except KeyError:
+                em=discord.Embed(description=f"{self.bot.icons['redtick']} Could not detect song", color=color())
+                await msg.edit(embed=em, mention_author=False)
+            else:
+                title = track["title"]
+                artist = track["subtitle"]
+                await cleanup(path)
+                em=discord.Embed(description=f"{self.bot.icons['loading']} Now fetching youtube information...", color=color())
+                await msg.edit(embed=em)
+                data = self.ytdl.extract_info(f"{artist} {title}", download=False)
+                try:
+                    url = "https://www.youtube.com/watch?v="+data["entries"][0]["id"]
+                except:
+                    url = "N/A"
+                delta = datetime.datetime.utcnow() - start_time
+                hours, remainder = divmod(int(delta.total_seconds()), 3600)
+                minutes, seconds = divmod(remainder, 60)
+                em=discord.Embed(color=color())
+                em.add_field(name="Title", value=title, inline=False)
+                em.add_field(name="Artist", value=artist, inline=False)
+                em.add_field(name="URL", value=url, inline=False)
+                em.set_footer(text=f"Finished in {minutes}m, {seconds}s")
+                try:
+                    em.set_thumbnail(url=data["entries"][0]["thumbnail"])
+                except:
+                    pass
+                await msg.edit(embed=em)
 
     @commands.group(invoke_without_command=True, aliases=["yt"])
     @commands.cooldown(1,5,commands.BucketType.user)
