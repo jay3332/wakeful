@@ -1343,7 +1343,10 @@ class Utility(commands.Cog):
         )
         for cog in self.bot.cogs:
             cog = get_cog(self.bot, cog)
-            cmds = [cmd for cmd in list(cog.get_commands()) if not cmd.hidden]
+            if is_mod(self.bot, ctx.author):
+                cmds = [cmd for cmd in list(cog.get_commands())]
+            else:
+                cmds = [cmd for cmd in list(cog.get_commands()) if not cmd.hidden]
             if len(cmds) != 0 and cmds != []:
                 em.add_field(
                     name=f"{cog.qualified_name} ({len(cog.get_commands())})",
