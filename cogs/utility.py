@@ -1192,7 +1192,7 @@ class Utility(commands.Cog):
         res = mathjspy.MathJS().eval(args)
         await ctx.reply(f"{args}={res}", mention_author=False, allowed_mentions=discord.AllowedMentions.none())
 
-    @commands.command()
+    @commands.group(invoke_without_command=True)
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def help(self, ctx, *, command : str = None):
         if command is None:
@@ -1332,6 +1332,43 @@ class Utility(commands.Cog):
                 else:
                     em=discord.Embed(description=f"There isn't a cog / command with the name `{command}`", color=color())
                     await ctx.reply(embed=em, mention_author=False)
+
+    @help.command()
+    @commands.cooldown(1,5,commands.BucketType.user)
+    async def all(self, ctx):
+        raw_cogs=[]
+        for cog in self.bot.cogs:
+            raw_cogs.append(cog)
+        cog_objects=[]
+        for cog in raw_cogs:
+            cog_objects.append(self.bot.get_cog(str(cog)))
+        names = f"\n".join(cog.qualified_name for cog in cog_objects)
+        commandse = []
+        for cog in cog_objects:
+            for command in cog.walk_commands():
+                commandse.append(command.name)
+        commands=", ".join(command for command in commandse)
+        em=discord.Embed(
+            title="All Commands",
+            timestamp=datetime.datetime.utcnow(),
+            color=color()
+        )
+        for cog in cog_objects:
+            if cog.get_commands():
+                if not cog.qualified_name == "Jishaku":
+                    if not cog.qualified_name == "Developer":
+                        listts=[]
+                        for command in cog.walk_commands():
+                            if not command.hidden:
+                                if not command.parent:
+                                    listts.append(f"`{command.name}`")
+                        em.add_field(
+                            name=f"{cog.qualified_name} ({len(cog.get_commands())})",
+                            value="> " + ", ".join(command for command in listts),
+                            inline=False
+                        )
+        await ctx.author.send(embed=em)
+        await ctx.message.add_reaction("📬")
 
     @commands.command(name="file", aliases=["makefile", "createfile"])
     @commands.cooldown(1,5,commands.BucketType.user)

@@ -58,7 +58,6 @@ class Music(commands.Cog):
             em=discord.Embed(description=f"You are not in my voice channel", color=color())
             await ctx.reply(embed=em, mention_author=False)
         else:
-            player = self.music.get_player(guild_id=ctx.guild.id)
             try:
                 player = self.music.create_player(ctx, ffmpeg_error_betterfix=True)
             except DiscordUtils.NotConnectedToVoice:
