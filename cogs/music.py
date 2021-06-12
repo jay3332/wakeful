@@ -1,4 +1,4 @@
-import discord, DiscordUtils, humanize
+import discord, DiscordUtils, humanize, re
 from discord.ext import commands
 from utils.get import *
 
@@ -47,6 +47,12 @@ class Music(commands.Cog):
 
     @commands.command(aliases=["p"])
     async def play(self, ctx, *, url):
+        if re.search(r"http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*(),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+", url):
+            if not re.search(r"^(https?\:\/\/)?((www\.)?youtube\.com|youtu\.?be)\/.+$", url):
+                em=discord.Embed(description="That is not a valid youtube video url", color=color())
+                return await ctx.reply(embed=em, mention_author=False)
+            else:
+                pass
         if not is_vc(ctx, ctx.author):
             await ctx.message.add_reaction(self.bot.icons["redtick"])
             em=discord.Embed(description=f"You are not in my voice channel", color=color())
