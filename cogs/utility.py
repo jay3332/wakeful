@@ -130,7 +130,7 @@ class Utility(commands.Cog):
     @youtube.command(aliases=["video"])
     @commands.cooldown(1,30,commands.BucketType.user)
     async def mp4(self, ctx, url):
-        if not re.search(r"(?:v=|\/)([0-9A-Za-z_-]{11}).*", url):
+        if not re.search(r"^(https?\:\/\/)?((www\.)?youtube\.com|youtu\.?be)\/.+$", url):
             em=discord.Embed(description="That is not a valid youtube video url", color=color())
             await ctx.reply(embed=em, mention_author=False)
         else:
@@ -151,7 +151,7 @@ class Utility(commands.Cog):
     @youtube.command(aliases=["audio"])
     @commands.cooldown(1,15,commands.BucketType.user)
     async def mp3(self, ctx, url):
-        if not re.search(r"(?:v=|\/)([0-9A-Za-z_-]{11}).*", url):
+        if not re.search(r"^(https?\:\/\/)?((www\.)?youtube\.com|youtu\.?be)\/.+$", url):
             em=discord.Embed(description="That is not a valid youtube video url", color=color())
             await ctx.reply(embed=em, mention_author=False)
         else:
