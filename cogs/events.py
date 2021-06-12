@@ -38,29 +38,30 @@ class Errors(commands.Cog):
             em=discord.Embed(description=f"`{param}` is a required argument that is missing", color=color())
             await ctx.reply(embed=em, mention_author=False)
         elif isinstance(error, commands.CommandNotFound):
-            cmd = ctx.invoked_with
-            cmds = [cmd.name for cmd in self.bot.commands]
-            match = difflib.get_close_matches(cmd, cmds)
-            try:
-                command = self.bot.get_command(match[0])
-            except IndexError:
-                command = None
-            if command:
-                if not command.hidden:
-                    em=discord.Embed(description=f"`{cmd}` is not a valid command, did you mean `{match[0]}`?", color=color())
-                    msg = await ctx.reply(embed=em, mention_author=False, delete_after=5)
-                    reactions = [self.bot.icons['greentick'], self.bot.icons['redtick']]
-                    for reaction in reactions:
-                        await msg.add_reaction(reaction)
-                    reaction, user = await self.bot.wait_for("reaction_add", check=lambda reaction, user: user == ctx.author and str(reaction.emoji) in reactions and reaction.message == msg)
-                    if str(reaction.emoji) == self.bot.icons['greentick']:
-                        alt_ctx = await copy_context_with(ctx, author=ctx.author, content=f"{ctx.prefix}{match[0]}")
-                        await self.bot.invoke(alt_ctx)
-                    elif str(reaction.emoji) == self.bot.icons['redtick']:
-                        await msg.delete()
-            else:
-                em=discord.Embed(description=f"`{cmd}` is not a valid command", color=color())
-                m = await ctx.reply(embed=em, mention_author=False, delete_after=3)
+            if ctx.prefix != "":
+                cmd = ctx.invoked_with
+                cmds = [cmd.name for cmd in self.bot.commands]
+                match = difflib.get_close_matches(cmd, cmds)
+                try:
+                    command = self.bot.get_command(match[0])
+                except IndexError:
+                    command = None
+                if command:
+                    if not command.hidden:
+                        em=discord.Embed(description=f"`{cmd}` is not a valid command, did you mean `{match[0]}`?", color=color())
+                        msg = await ctx.reply(embed=em, mention_author=False, delete_after=5)
+                        reactions = [self.bot.icons['greentick'], self.bot.icons['redtick']]
+                        for reaction in reactions:
+                            await msg.add_reaction(reaction)
+                        reaction, user = await self.bot.wait_for("reaction_add", check=lambda reaction, user: user == ctx.author and str(reaction.emoji) in reactions and reaction.message == msg)
+                        if str(reaction.emoji) == self.bot.icons['greentick']:
+                            alt_ctx = await copy_context_with(ctx, author=ctx.author, content=f"{ctx.prefix}{match[0]}")
+                            await self.bot.invoke(alt_ctx)
+                        elif str(reaction.emoji) == self.bot.icons['redtick']:
+                            await msg.delete()
+                else:
+                    em=discord.Embed(description=f"`{cmd}` is not a valid command", color=color())
+                    m = await ctx.reply(embed=em, mention_author=False, delete_after=3)
         elif isinstance(error, commands.MemberNotFound):
             em=discord.Embed(description=f"Couldn't find member `{error.argument}`", color=color())
             await ctx.reply(embed=em, mention_author=False)

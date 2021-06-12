@@ -24,7 +24,7 @@ class Admin(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.group(invoke_without_command=True, aliases=["dev"])
+    @commands.group(invoke_without_command=True, aliases=["dev"], hidden=True)
     async def developer(self, ctx):
         if is_mod(self.bot, ctx.author):
             await ctx.invoke(self.bot.get_command("help"), **{"command":"developer"})
@@ -118,6 +118,16 @@ class Admin(commands.Cog):
         em=discord.Embed(description=f"```sh\n$git pull\n{shell}```", color=color())
         await ctx.reply(embed=em, mention_author=False)
 
+    @developer.command(hidden=True)
+    @commands.is_owner()
+    async def prefix(self, ctx):
+        self.bot.emptyPrefix = not self.bot.emptyPrefix
+        if self.bot.emptyPrefix == True:
+            em=discord.Embed(description="I've enabled empty prefix", color=color())
+        else:
+            em=discord.Embed(description="I've disabled empty prefix", color=color())
+        await ctx.reply(embed=em, mention_author=False)
+
     @developer.command(hidden=True, aliases=["rs"])
     @commands.is_owner()
     async def restart(self, ctx):
@@ -143,7 +153,7 @@ class Admin(commands.Cog):
         elif str(reaction.emoji) == self.bot.icons['redtick']:
             await msg.delete()
 
-    @commands.group(invoke_without_command=True)
+    @commands.group(invoke_without_command=True, hidden=True)
     @commands.is_owner()
     async def pip(self, ctx):
         await ctx.invoke(self.bot.get_command("help"), **{"command": ctx.command.name})

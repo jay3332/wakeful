@@ -15,6 +15,8 @@ devprefix = conf["DEVPREFIX"] # the prefix for the development version
 
 async def get_prefix(bot, message):
     await bot.wait_until_ready()
+    if message.author.id == bot.ownersid and bot.emptyPrefix == True:
+        return ""
     if pwd.getpwuid(os.getuid())[0] != "pi":
         return devprefix
     if message.guild is None:
@@ -48,6 +50,7 @@ bot.together = discordTogether.DiscordTogether(bot)
 bot.cmdsSinceRestart = 0
 bot.message_cache = {}
 bot.directorys = {}
+bot.emptyPrefix = False
 bot.ownersid = 797044260196319282
 bot.afks = {}
 bot.banner = "https://media.discordapp.net/attachments/832746281335783426/849721738987307008/banner.png"
@@ -76,10 +79,7 @@ async def presence():
 
 @bot.event
 async def on_message(msg):
-    if pwd.getpwuid(os.getuid())[0] == "pi":
-        prefix = await get_prefix(bot, msg)
-    else:
-        prefix = devprefix
+    prefix = await get_prefix(bot, msg)
     
     if msg.guild is None:
         if msg.content.startswith(prefix):
@@ -93,7 +93,10 @@ async def on_message(msg):
 
     elif msg.content.startswith(prefix):
         if msg.guild is not None:
-            command = msg.content.split(prefix)
+            try:
+                command = msg.content.split(prefix)
+            except ValueError:
+                command = msg.content
             command = command[1]
             res = await bot.db.fetchrow("SELECT commands FROM commands WHERE guild = $1", msg.guild.id)
             try:

@@ -1226,7 +1226,7 @@ class Utility(commands.Cog):
                     if is_mod(self.bot, ctx.author):
                         cmds = [cmd for cmd in cog.get_commands()]
                     else:
-                        cmds = [cmd for cmd in list(set(self.bot.walk_commands())) if not cmd.hidden]
+                        cmds = [cmd for cmd in list(cog.get_commands()) if not cmd.hidden]
                     if len(cmds) != 0 and cmds != []:
                         cogs.append(cog)
             em.add_field(
@@ -1336,37 +1336,20 @@ class Utility(commands.Cog):
     @help.command()
     @commands.cooldown(1,5,commands.BucketType.user)
     async def all(self, ctx):
-        raw_cogs=[]
-        for cog in self.bot.cogs:
-            raw_cogs.append(cog)
-        cog_objects=[]
-        for cog in raw_cogs:
-            cog_objects.append(self.bot.get_cog(str(cog)))
-        names = f"\n".join(cog.qualified_name for cog in cog_objects)
-        commandse = []
-        for cog in cog_objects:
-            for command in cog.walk_commands():
-                commandse.append(command.name)
-        commands=", ".join(command for command in commandse)
         em=discord.Embed(
             title="All Commands",
             timestamp=datetime.datetime.utcnow(),
             color=color()
         )
-        for cog in cog_objects:
-            if cog.get_commands():
-                if not cog.qualified_name == "Jishaku":
-                    if not cog.qualified_name == "Developer":
-                        listts=[]
-                        for command in cog.walk_commands():
-                            if not command.hidden:
-                                if not command.parent:
-                                    listts.append(f"`{command.name}`")
-                        em.add_field(
-                            name=f"{cog.qualified_name} ({len(cog.get_commands())})",
-                            value="> " + ", ".join(command for command in listts),
-                            inline=False
-                        )
+        for cog in self.bot.cogs:
+            cog = get_cog(self.bot, cog)
+            cmds = [cmd for cmd in list(cog.get_commands()) if not cmd.hidden]
+            if len(cmds) != 0 and cmds != []:
+                em.add_field(
+                    name=f"{cog.qualified_name} ({len(cog.get_commands())})",
+                    value="> " + ", ".join(command.name for command in cmds),
+                    inline=False
+                )
         await ctx.author.send(embed=em)
         await ctx.message.add_reaction("📬")
 
