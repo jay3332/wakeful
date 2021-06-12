@@ -137,7 +137,7 @@ class Utility(commands.Cog):
             start_time = datetime.datetime.utcnow()
 
             async with ctx.typing():
-                res = self.bot.http.loop.create_task(await download(self.bot, url))
+                res = await download(self.bot, url)
 
             delta = datetime.datetime.utcnow() - start_time
             hours, remainder = divmod(int(delta.total_seconds()), 3600)
