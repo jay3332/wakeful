@@ -1,7 +1,7 @@
-class wakefulError(Exception):
+class Error(Exception):
     pass
 
-class TooLong(wakefulError):
+class TooLong(Error):
 
     def __init__(self):
         pass
