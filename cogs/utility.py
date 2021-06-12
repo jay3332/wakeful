@@ -914,12 +914,11 @@ class Utility(commands.Cog):
         async with ctx.typing():
             res = await tio.execute(code.content, language=language)
             await tio.close()
-        lang = "".join(code.language if code.language is not None else "txt")
         if len(res.output) > 2000:
-            f = await getFile(res.output, lang, "output")
+            f = await getFile(res.output, filename="output")
             await ctx.reply(file=f, mention_author=False, allowed_mentions=discord.AllowedMentions.none())
         else:
-            await ctx.reply(f"```{language}\n{res.output}```", mention_author=False, allowed_mentions=discord.AllowedMentions.none())
+            await ctx.reply(f"```\n{res.output}```", mention_author=False, allowed_mentions=discord.AllowedMentions.none())
 
     @commands.command(aliases=["fortnite", "fn", "fnstats"])
     @commands.cooldown(1,5,commands.BucketType.user)
