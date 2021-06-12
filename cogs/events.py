@@ -5,6 +5,7 @@ from discord.ext import commands
 from utils.webhook import Webhook, AsyncWebhookAdapter
 from utils.checks import is_mod
 from utils.get import * 
+from utils.errors import *
 
 class Errors(commands.Cog):
 
@@ -22,7 +23,9 @@ class Errors(commands.Cog):
 
     @commands.Cog.listener()
     async def on_command_error(self, ctx, error):
-        if isinstance(error, commands.CommandOnCooldown):
+        if isinstance(error, TooLong):
+            await ctx.reply(str(error), mention_author=False, allowed_mentions=discord.AllowedMentions.none())
+        elif isinstance(error, commands.CommandOnCooldown):
             if not is_mod(self.bot, ctx.author):
                 em=discord.Embed(description=f"This command is on cooldown, try again in `{round(error.retry_after, 1)}` seconds.", color=color())
                 await ctx.reply(embed=em, mention_author=False)
@@ -80,7 +83,9 @@ class Errors(commands.Cog):
                 await ctx.reply(embed=em, mention_author=False)
         elif isinstance(error, commands.CommandInvokeError):
             error = error.original
-            if isinstance(error, discord.Forbidden):
+            if isinstance(error, TooLong):
+                await ctx.reply(str(error), mention_author=False, allowed_mentions=discord.AllowedMentions.none())
+            elif isinstance(error, discord.Forbidden):
                 em=discord.Embed(description=f"I don't have permission to do this", color=color())
                 await ctx.reply(embed=em, mention_author=False)
             else:

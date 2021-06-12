@@ -1,10 +1,11 @@
 from ast import Index
-import discord, datetime, async_cse, psutil, humanize, os, sys, inspect, mystbin, googletrans, asyncio, aiohttp, random, time, asyncdagpi, hashlib, asyncpg, io, typing, gdshortener, pathlib, textwrap, async_tio, mathjspy, pytube, youtube_dl
+import discord, datetime, async_cse, psutil, humanize, os, sys, inspect, mystbin, googletrans, asyncio, aiohttp, random, time, asyncdagpi, hashlib, asyncpg, io, typing, gdshortener, pathlib, textwrap, async_tio, mathjspy, pytube, youtube_dl, re
 from discord.ext.commands.core import command
 from discord.ext import commands
 from utils.webhook import Webhook, AsyncWebhookAdapter
 from utils.get import *
 from utils.checks import *
+from utils.errors import *
 from jishaku.codeblocks import codeblock_converter
 from utils.functions import * 
 from jishaku.functools import executor_function
@@ -26,12 +27,15 @@ def do_translate(output, text):
 @executor_function
 def download(url):
     video = pytube.YouTube(str(url))
-    res = video.streams.get_highest_resolution()
-    path = tempfile.TemporaryDirectory()
-    download = res.download(path.name)
-    file_ = discord.File(str(download))
-    path.cleanup()
-    return file_
+    if video.length > 300:
+        raise TooLong
+    else:
+        res = video.streams.get_highest_resolution()
+        path = tempfile.TemporaryDirectory()
+        download = res.download(path.name)
+        file_ = discord.File(str(download))
+        path.cleanup()
+        return file_
 
 class Utility(commands.Cog):
 
@@ -122,31 +126,60 @@ class Utility(commands.Cog):
         em.set_thumbnail(url=data["thumbnail"])
         await ctx.reply(embed=em, mention_author=False)
 
-    @youtube.command(aliases=["dl"])
+    @youtube.command(aliases=["video"])
     @commands.cooldown(1,30,commands.BucketType.user)
-    async def download(self, ctx, *, query):
-        start_time = datetime.datetime.utcnow()
-        async with ctx.typing():
-            data = self.ytdl.extract_info(query, download=False)
-
-        try:
-            data = data["entries"][0]
-        except IndexError:
-            em=discord.Embed(description="I could not find a video with that query", color=color())
-            return await ctx.reply(embed=em, mention_author=False)
-        except KeyError:
-            data = data
-        url = "https://www.youtube.com/watch?v="+data["id"]
-        async with ctx.typing():
-            res = await download(url)
-        delta = datetime.datetime.utcnow() - start_time
-        hours, remainder = divmod(int(delta.total_seconds()), 3600)
-        minutes, seconds = divmod(remainder, 60)
-        try:
-            await ctx.reply(content=f"Download took: {minutes}m, {seconds}s", file=res, mention_author=False)
-        except discord.HTTPException:
-            em=discord.Embed(description="The video was too large to be sent", color=color())
+    async def mp4(self, ctx, url):
+        if not re.search(r"(?:v=|\/)([0-9A-Za-z_-]{11}).*", url):
+            em=discord.Embed(description="That is not a valid youtube video url", color=color())
             await ctx.reply(embed=em, mention_author=False)
+        else:
+            start_time = datetime.datetime.utcnow()
+
+            async with ctx.typing():
+                res = await download(url)
+
+            delta = datetime.datetime.utcnow() - start_time
+            hours, remainder = divmod(int(delta.total_seconds()), 3600)
+            minutes, seconds = divmod(remainder, 60)
+            try:
+                await ctx.reply(content=f"Download took: {minutes}m, {seconds}s", file=res, mention_author=False)
+            except discord.HTTPException:
+                em=discord.Embed(description="The video was too large to be sent", color=color())
+                await ctx.reply(embed=em, mention_author=False)
+
+    @youtube.command(aliases=["audio"])
+    @commands.cooldown(1,15,commands.BucketType.user)
+    async def mp3(self, ctx, url):
+        if not re.search(r"(?:v=|\/)([0-9A-Za-z_-]{11}).*", url):
+            em=discord.Embed(description="That is not a valid youtube video url", color=color())
+            await ctx.reply(embed=em, mention_author=False)
+        else:
+            start_time = datetime.datetime.utcnow()
+            async with ctx.typing():
+                data = self.ytdl.extract_info(url, download=False)
+
+            if data["duration"] > 300:
+                raise TooLong()
+            else:
+                try:
+                    data = data["entries"][0]
+                except IndexError:
+                    em=discord.Embed(description="I could not find a video with that query", color=color())
+                    return await ctx.reply(embed=em, mention_author=False)
+                except KeyError:
+                    data = data
+
+                async with ctx.typing():
+                    res = await (await self.bot.session.get(data["url"])).read()
+                
+                delta = datetime.datetime.utcnow() - start_time
+                hours, remainder = divmod(int(delta.total_seconds()), 3600)
+                minutes, seconds = divmod(remainder, 60)
+                try:
+                    await ctx.reply(content=f"Download took: {minutes}m, {seconds}s", file=discord.File(io.BytesIO(res), filename=f"{data['title']}.mp3"), mention_author=False)
+                except discord.HTTPException:
+                    em=discord.Embed(description="The video was too large to be sent", color=color())
+                    await ctx.reply(embed=em, mention_author=False)
 
     @commands.command()
     @commands.cooldown(1, 5, commands.BucketType.user)
