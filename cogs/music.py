@@ -1,6 +1,7 @@
-import discord, DiscordUtils, humanize, re
+import discord, DiscordUtils, humanize, re, asyncio
 from discord.ext import commands
 from utils.get import *
+from jishaku.models import copy_context_with
 
 def is_vc(ctx : commands.Context, member : discord.Member):
     if member.guild_permissions.manage_guild:
@@ -67,17 +68,17 @@ class Music(commands.Cog):
             em=discord.Embed(description=f"You are not in my voice channel", color=color())
             await ctx.reply(embed=em, mention_author=False)
         else:
-            try:
-                player = self.music.create_player(ctx, ffmpeg_error_betterfix=True)
-            except DiscordUtils.NotConnectedToVoice:
+            async with ctx.typing():
                 try:
-                    await ctx.author.voice.channel.connect()
-                except AttributeError:
-                    em=discord.Embed(description="You have to join a voice channel to use this command", color=color())
-                    await ctx.reply(embed=em, mention_author=False)
-                    return
-                else:
                     player = self.music.create_player(ctx, ffmpeg_error_betterfix=True)
+                except DiscordUtils.NotConnectedToVoice:
+                    try:
+                        await ctx.author.voice.channel.connect()
+                    except AttributeError:
+                        em=discord.Embed(description="You have to join a voice channel to use this command", color=color())
+                        return await ctx.reply(embed=em, mention_author=False)
+                    else:
+                        player = self.music.create_player(ctx, ffmpeg_error_betterfix=True)
 
             if not ctx.voice_client.is_playing():
                 await player.queue(url, search=True)
@@ -85,6 +86,14 @@ class Music(commands.Cog):
             else:
                 await player.queue(url, search=True)
             await ctx.message.add_reaction(self.bot.icons["greentick"])
+            await ctx.message.add_reaction("ℹ️")
+            try:
+                reaction, user = await self.bot.wait_for("reaction_add", check=lambda reaction, user: str(reaction.emoji) == "ℹ️"  and reaction.message == ctx.message and not user.bot and user == ctx.author, timeout=15)
+            except asyncio.TimeoutError:
+                pass
+            else:
+                alt_ctx = await copy_context_with(ctx, author=user, content=f"{ctx.prefix}nowplaying")
+                await self.bot.invoke(alt_ctx)
 
     @commands.command()
     async def pause(self, ctx):
@@ -159,6 +168,7 @@ class Music(commands.Cog):
             em=discord.Embed(title=song.title, url=song.url, color=color())
             em.add_field(name="Channel", value=f"[{song.channel}]({song.channel_url})", inline=True)
             em.add_field(name="Duration", value=str(datetime.timedelta(seconds=song.duration)), inline=True)
+            em.add_field(name="Looping", value="".join(self.bot.icons['greentick'] if song.is_looping == True else self.bot.icons['redtick']))
             em.set_footer(text=f"👁️ {humanize.intcomma(song.views)}")
             em.set_thumbnail(url=song.thumbnail)
             await ctx.reply(embed=em, mention_author=False)
