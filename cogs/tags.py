@@ -1,7 +1,6 @@
 import discord, datetime, string, time, humanize
 from discord.ext import commands
 from utils.get import *
-from utils.paginator import Paginator
 
 async def exists(ctx, name):
     res = await ctx.bot.db.fetch("SELECT * FROM tags WHERE guild = $1", ctx.guild.id)

@@ -1,6 +1,6 @@
 import discord, datetime, async_cse, psutil, humanize, os, sys, inspect, mystbin, googletrans, asyncio, aiohttp, random, time
 import asyncdagpi, hashlib, asyncpg, io, typing, gdshortener, pathlib, textwrap, async_tio
-import mathjspy, pytube, youtube_dl, re, nudenet
+import mathjspy, pytube, youtube_dl, re 
 
 from discord.ext.commands.core import command
 from discord.ext import commands
