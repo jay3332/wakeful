@@ -1,5 +1,6 @@
 import discord, io, asyncdagpi, asyncio, datetime, aiohttp, string, random, json, wonderwords, time, typing
 from discord.ext import commands
+from fuzzywuzzy import fuzz
 from gtts import gTTS
 from jishaku.functools import executor_function
 from utils.get import *
@@ -223,7 +224,7 @@ class Fun(commands.Cog):
             em.set_image(url="attachment://typeracer.png")
         _msg = await ctx.reply(embed=em, file=_file, mention_author=False)
         try:
-            msg = await self.bot.wait_for("message", check=lambda message: message.content == str(sentence) and message.channel == ctx.channel, timeout=60)
+            msg = await self.bot.wait_for("message", check=lambda message: fuzz.ratio(sentence, message.content) > 96 and message.channel == ctx.channel, timeout=60)
             delta = datetime.datetime.utcnow() - start_time
             hours, remainder = divmod(int(delta.total_seconds()), 3600)
             minutes, seconds = divmod(remainder, 60)

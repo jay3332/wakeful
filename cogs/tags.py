@@ -101,7 +101,7 @@ class Tags(commands.Cog):
             em.add_field(name="Name", value=name, inline=True)
             em.add_field(name="Author", value=author, inline=True)
             em.add_field(name="Content", value=content, inline=True)
-            em.add_field(name="Created At", value=f"{created.strftime('%d/%m/20%y at %H:%M:%S')} ({humanize.naturaltime(created)})", inline=True)
+            em.add_field(name="Created At", value=f"{created.strftime('%d/%m/%Y at %H:%M:%S')} ({humanize.naturaltime(created)})", inline=True)
             await ctx.reply(embed=em, mention_author=False)
 
     @tag.command(aliases=["update"])

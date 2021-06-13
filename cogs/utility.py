@@ -1,11 +1,15 @@
-from ast import Index
-import discord, datetime, async_cse, psutil, humanize, os, sys, inspect, mystbin, googletrans, asyncio, aiohttp, random, time, asyncdagpi, hashlib, asyncpg, io, typing, gdshortener, pathlib, textwrap, async_tio, mathjspy, pytube, youtube_dl, re
+import discord, datetime, async_cse, psutil, humanize, os, sys, inspect, mystbin, googletrans, asyncio, aiohttp, random, time
+import asyncdagpi, hashlib, asyncpg, io, typing, gdshortener, pathlib, textwrap, async_tio
+import mathjspy, pytube, youtube_dl, re, nudenet
+
 from discord.ext.commands.core import command
 from discord.ext import commands
 from utils.webhook import Webhook, AsyncWebhookAdapter
 from utils.get import *
 from utils.checks import *
 from utils.errors import *
+from __main__ import get_prefix
+
 from jishaku.codeblocks import codeblock_converter
 from utils.functions import * 
 from jishaku.functools import executor_function
@@ -16,6 +20,15 @@ google = async_cse.Search(get_config("GOOGLE"))
 mystbinn = mystbin.Client()
 dagpi = asyncdagpi.Client(get_config("DAGPI"))
 isgd = gdshortener.ISGDShortener()
+
+@executor_function
+def cleanup(path):
+    path.cleanup()
+
+@executor_function
+def make():
+    directory = tempfile.TemporaryDirectory()
+    return directory
 
 @executor_function
 def do_translate(output, text):
@@ -39,10 +52,6 @@ def download(bot, url):
         file_ = discord.File(str(download))
         path.cleanup()
         return file_
-        
-@executor_function
-def cleanup(path):
-    path.cleanup()
 
 class Utility(commands.Cog):
 
@@ -197,6 +206,7 @@ class Utility(commands.Cog):
         else:
             start_time = datetime.datetime.utcnow()
 
+
             async with ctx.typing():
                 res = await download(self.bot, url)
 
@@ -250,7 +260,7 @@ class Utility(commands.Cog):
             em=discord.Embed(title=emoji.name, color=color())
             em.add_field(
                 name="Created At",
-                value=f"{emoji.created_at.strftime('%d/%m/20%y at %H:%M:%S')} ({humanize.naturaltime(emoji.created_at)})",
+                value=f"{emoji.created_at.strftime('%d/%m/%Y at %H:%M:%S')} ({humanize.naturaltime(emoji.created_at)})",
                 inline=True
             )
             em.add_field(
@@ -269,13 +279,13 @@ class Utility(commands.Cog):
 {self.bot.icons['arrow']}Name: {emoji.guild.name}
 > {emoji.guild.description}
 
-{self.bot.icons['arrow']}Created At: {emoji.guild.created_at.strftime('%d/%m/20%y at %H:%M:%S')} ({humanize.naturaltime(emoji.guild.created_at)})
+{self.bot.icons['arrow']}Created At: {emoji.guild.created_at.strftime('%d/%m/%Y at %H:%M:%S')} ({humanize.naturaltime(emoji.guild.created_at)})
 {self.bot.icons['arrow']}Verification Level: {str(emoji.guild.verification_level).title()}
 """, inline=True
             )
             em.add_field(
                 name="Created At",
-                value=f"{emoji.created_at.strftime('%d/%m/20%y at %H:%M:%S')} ({humanize.naturaltime(emoji.created_at)})",
+                value=f"{emoji.created_at.strftime('%d/%m/%Y at %H:%M:%S')} ({humanize.naturaltime(emoji.created_at)})",
                 inline=True
             )
             em.add_field(
@@ -515,7 +525,7 @@ class Utility(commands.Cog):
             booster_role = ctx.guild.premium_subscriber_role.mention 
         except AttributeError:
             booster_role = "None"
-        created_at = ctx.guild.created_at.strftime("%d/%m/20%y at %H:%M:%S")
+        created_at = ctx.guild.created_at.strftime("%d/%m/%Y at %H:%M:%S")
         em=discord.Embed(title=ctx.guild.name, description=f"{description}", color=color())
         em.set_image(url=ctx.guild.banner_url)
         em.set_thumbnail(url=ctx.guild.icon_url)
@@ -555,8 +565,8 @@ class Utility(commands.Cog):
         else:
             platform = "None"
 
-        created_at = member.created_at.strftime("%d/%m/20%y at %H:%M:%S")
-        joined_at = member.joined_at.strftime("%d/%m/20%y at %H:%M:%S")
+        created_at = member.created_at.strftime("%d/%m/%Y at %H:%M:%S")
+        joined_at = member.joined_at.strftime("%d/%m/%Y at %H:%M:%S")
 
         pronoun = await get_pronoun(self.bot, member)
 
@@ -605,7 +615,7 @@ class Utility(commands.Cog):
                 if attachment is not None:
                     em.set_image(url=attachment)
                 await webhook.send(embed=em)
-                await suggestion.add_reaction("✅")
+                await suggestion.add_reaction(self.bot.icons['greentick'])
                 em=discord.Embed(description="Your suggestion has been sent to the admins\nNote: abuse may get you blacklisted", color=color())
                 await msg.edit(embed=em)
             else:
@@ -674,7 +684,41 @@ class Utility(commands.Cog):
                     src = textwrap.dedent("\n".join(line for line in source_lines))
                     print(src)
                     await ctx.author.send(file=await getFile(src, "py"))
-                    await ctx.message.add_reaction("✅")
+                    await ctx.message.add_reaction(self.bot.icons['greentick'])
+
+    @commands.group(invoke_without_command=True)
+    async def news(self, ctx, branch = "main"):
+        news = await self.bot.db.fetchrow("SELECT * FROM news WHERE branch = $1", branch) 
+        content = news["content"]
+        author = self.bot.get_user(int(news['author']))
+        updated = datetime.datetime.fromtimestamp(int(news["updated"]))
+        em=discord.Embed(title=f"News on branch {branch}", description=content, color=color())
+        if author is not None:
+            em.set_footer(text=f"Author: {author} • Updated: {updated.strftime('%d/%m/%Y at %H:%M:%S')}", icon_url=author.avatar_url)
+        else:
+            em.set_footer(text=f"Author: N/A • Updated: {updated.strftime('%d/%m/%Y at %H:%M:%S')}")
+        em.set_thumbnail(url="https://images.emojiterra.com/google/android-11/128px/1f4f0.png")
+        await ctx.reply(embed=em)
+
+    @news.command(hidden=True, aliases=["update"])
+    async def set(self, ctx, branch, *, content):
+        await self.bot.db.execute("UPDATE news SET content = $1, author = $2, updated = $3 WHERE branch = $4", content, ctx.author.id, time.time(), branch)
+        await ctx.message.add_reaction(self.bot.icons['greentick'])
+
+    @news.command(hidden=True, aliases=["remove"])
+    async def delete(self, ctx, branch):
+        await self.bot.db.execute("DELETE FROM news WHERE branch = $1", branch)
+        await ctx.message.add_reaction(self.bot.icons['greentick'])
+
+    @news.command(hidden=True, aliases=["make"])
+    async def create(self, ctx, branch, *, content):
+        await self.bot.db.execute("INSERT INTO news (branch, author, updated, content) VALUES ($1, $2, $3, $4)", branch, ctx.author.id, time.time(), content)
+        await ctx.message.add_reaction(self.bot.icons['greentick'])
+
+    @news.command(hidden=True)
+    async def rename(self, ctx, branch, name):
+        await self.bot.db.execute("UPDATE news SET branch = $1, author = $2, updated = $3 WHERE branch = $4", name, ctx.author.id, time.time(), branch)
+        await ctx.message.add_reaction(self.bot.icons['greentick'])
 
     @commands.command(name="avatar", aliases=["icon", "av"])
     @commands.cooldown(1, 5, commands.BucketType.user)
@@ -1275,14 +1319,17 @@ class Utility(commands.Cog):
     @commands.group(invoke_without_command=True)
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def help(self, ctx, *, command : str = None):
+        prefix = (await get_prefix(self.bot, ctx.message))[2]
         if command is None:
             em=discord.Embed(
                 title="Help Page",
                 description=f'''
+The prefix for `{ctx.guild.name}` is `{prefix}`
 ```diff
-- Type "{ctx.prefix}help [command]" or "{ctx.prefix}help [cog]" for more information about a command or cog
-+ [argument] for an optional argument
-+ <argument> for a required argument
+- Type "{prefix}help [command]" or "{prefix}help [cog]"
+- for more information about a command or cog
++ [] = optional argument
++ <> = required argument
 ```
 [Developer](https://discord.com/users/{self.bot.ownersid}) | [Support]({self.bot.invite}) | [Invite](https://discord.com/api/oauth2/authorize?client_id={self.bot.user.id}&permissions=8&scope=bot)
 ''',
@@ -1314,22 +1361,14 @@ class Utility(commands.Cog):
                 value="\n".join(f"`{cog.qualified_name}`" for cog in cogs),
                 inline=True
             )
-            process = psutil.Process()
-            delta_uptime = datetime.datetime.utcnow() - self.bot.uptime
-            hours, remainder = divmod(int(delta_uptime.total_seconds()), 3600)
-            minutes, seconds = divmod(remainder, 60)
-            days, hours = divmod(hours, 24)
+            news = await self.bot.db.fetchrow("SELECT * FROM news WHERE branch = 'main'")
+            content = news["content"]
+            updated = datetime.datetime.fromtimestamp(int(news["updated"]))
             em.add_field(
-                name="Information",
-                value=f"""
-**Uptime**: `{days}d {hours}h {minutes}m {seconds}s`
-**Commands**: `{len([cmd for cmd in list(set(self.bot.walk_commands())) if not cmd.hidden])}`
-**Shards**: `{len(list(self.bot.shards))}`
-**Memory**: `{humanize.naturalsize(process.memory_full_info().rss)}`
-""",
+                name=f"News - {updated.strftime('%d %b %Y')}",
+                value=content,
                 inline=True
             )
-            em.set_image(url=self.bot.banner)
             await ctx.reply(embed=em, mention_author=False)
         else:
             if self.bot.get_command(str(command)) is not None:
@@ -1367,7 +1406,7 @@ class Utility(commands.Cog):
                         color=color()
                     )
                     
-                    em.add_field(name="Usage", value=f"{ctx.prefix}{given_command.name} {command_usage}", inline=False)
+                    em.add_field(name="Usage", value=f"{prefix}{given_command.name} {command_usage}", inline=False)
                     if given_command.aliases:
                         em.add_field(name=f"Aliases [{len(given_command.aliases)}]", value="> " + ", ".join(f"`{alias}`" for alias in given_command.aliases), inline=False)
                     else:
@@ -1404,7 +1443,6 @@ class Utility(commands.Cog):
                         commands_ = [cmd for cmd in given_cog.walk_commands() if not cmd.hidden and not cmd.name in disabled and cmd.parent is None]
                     if commands_ is not None and commands_ != []:
                         em=discord.Embed(title=f"{given_cog.qualified_name} commands [{len(commands_)}]", description=f"{given_cog.description}\n\n> "+", ".join(f"`{cmd.name}`" for cmd in commands_), color=color())
-                        em.set_image(url=self.bot.banner)
                         await ctx.reply(embed=em, mention_author=False)
                     else:
                         em=discord.Embed(description=f"There isn't a cog / command with the name `{command}`", color=color())
@@ -1546,11 +1584,11 @@ class Utility(commands.Cog):
             em=discord.Embed(title=guild.name,description=f"""
 > {guild.description}
 
-{self.bot.icons['arrow']}Created at: {guild.created_at.strftime('%d/%m/20%y at %H:%M:%S')} ({humanize.naturaltime(guild.created_at)})
+{self.bot.icons['arrow']}Created at: {guild.created_at.strftime('%d/%m/%Y at %H:%M:%S')} ({humanize.naturaltime(guild.created_at)})
 {self.bot.icons['arrow']}Verification Level: {str(guild.verification_level).title()}""", color=color(), url=invite)
         else:
             em=discord.Embed(title=guild.name,description=f"""
-{self.bot.icons['arrow']}Created at: {guild.created_at.strftime('%d/%m/20%y at %H:%M:%S')} ({humanize.naturaltime(guild.created_at)})
+{self.bot.icons['arrow']}Created at: {guild.created_at.strftime('%d/%m/%Y at %H:%M:%S')} ({humanize.naturaltime(guild.created_at)})
 {self.bot.icons['arrow']}Verification Level: {str(guild.verification_level).title()}""", color=color(), url=invite)
         em.set_thumbnail(url=guild.icon_url)
         em.set_footer(text=f"ID: {guild.id}", icon_url=ctx.author.avatar_url)

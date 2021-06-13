@@ -69,34 +69,34 @@ class Admin(commands.Cog):
     async def streaming(self, ctx, url, *, game):
         if is_mod(self.bot, ctx.author):
             await self.bot.change_presence(activity=discord.Streaming(name=str(game), url=f'https://www.twitch.tv/{url.lower()}'))
-            await ctx.message.add_reaction("✅")
+            await ctx.message.add_reaction(self.bot.icons['greentick'])
             self.bot.status = ""
 
     @status.command(hidden=True)
     async def playing(self, ctx, *, game):
         if is_mod(self.bot, ctx.author):
             await self.bot.change_presence(activity=discord.Game(name=game))
-            await ctx.message.add_reaction("✅")
+            await ctx.message.add_reaction(self.bot.icons['greentick'])
             self.bot.status = ""
 
     @status.command(hidden=True)
     async def watching(self, ctx, *, game):
         if is_mod(self.bot, ctx.author):
             await self.bot.change_presence(activity=discord.Activity(name=f"{game}", type=3))
-            await ctx.message.add_reaction("✅")
+            await ctx.message.add_reaction(self.bot.icons['greentick'])
 
     @status.command(hidden=True)
     async def listening(self, ctx, *, game):
         if is_mod(self.bot, ctx.author):
             await self.bot.change_presence(activity=discord.Activity(name=f"{game}", type=2))
-            await ctx.message.add_reaction("✅")
+            await ctx.message.add_reaction(self.bot.icons['greentick'])
             self.bot.status = ""
 
     @status.command(hidden=True)
     async def competing(self, ctx, *, game):
         if is_mod(self.bot, ctx.author):
             await self.bot.change_presence(activity=discord.Activity(name=f"{game}", type=5))
-            await ctx.message.add_reaction("✅")
+            await ctx.message.add_reaction(self.bot.icons['greentick'])
             self.bot.status = ""
 
     @status.command(aliases=["default", "original"], hidden=True)
@@ -104,7 +104,7 @@ class Admin(commands.Cog):
         if is_mod(self.bot, ctx.author):
             await self.bot.change_presence(activity=discord.Game(f"@wakeful for prefix | {len(self.bot.guilds)} guilds & {len(self.bot.users)} users"))
             self.bot.status = None
-            await ctx.message.add_reaction("✅")
+            await ctx.message.add_reaction(self.bot.icons['greentick'])
 
     @developer.command(hidden=True)
     @commands.is_owner()
@@ -188,7 +188,7 @@ class Admin(commands.Cog):
     async def sql(self, ctx, *, query):
         res = await self.bot.db.fetch(query)
         if len(res) == 0:
-            await ctx.message.add_reaction('✅')
+            await ctx.message.add_reaction(self.bot.icons['greentick'])
         else:
             headers = list(res[0].keys())
             table = PrettyTable()
