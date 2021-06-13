@@ -127,20 +127,12 @@ async def on_message(msg):
                 pass
         await bot.process_commands(msg)
 
-    elif pwd.getpwuid(os.getuid())[0] == "pi":
-        if msg.content.startswith(prefix):
-            await bot.process_commands(msg)
-        elif msg.content == f"<@!{bot.user.id}>" or msg.content == f"<@{bot.user.id}>":
-            if msg.guild:
-                em=discord.Embed(description=f"The prefix for `{msg.guild.name}` is `{prefix}`", color=color())
-                await msg.channel.send(embed=em)
-            else:
-                em=discord.Embed(description=f"The prefix for dms is `{prefix}`", color=color())
-                await msg.channel.send(embed=em)
-
-    elif msg.content == f"<@!{bot.user.id}>" or msg.content == f"<@{bot.user.id}>":
-        if is_mod(bot, msg.author):
-            em=discord.Embed(description=f"my prefix is `{devprefix}`", color=color())
+    if msg.content == f"<@!{bot.user.id}>" or msg.content == f"<@{bot.user.id}>":
+        if msg.guild:
+            em=discord.Embed(description=f"The prefix for `{msg.guild.name}` is `{prefix}`", color=color())
+            await msg.channel.send(embed=em)
+        else:
+            em=discord.Embed(description=f"The prefix for dms is `{prefix}`", color=color())
             await msg.channel.send(embed=em)
 
     elif msg.content.startswith(devprefix):
