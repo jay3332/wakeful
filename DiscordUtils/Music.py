@@ -154,7 +154,7 @@ class MusicPlayer(object):
     def on_remove_from_queue(self, func):
         self.on_remove_from_queue_func = func
     async def queue(self, url, search=False, bettersearch=False):
-        song = await get_video_data(url, search, bettersearch, self.loop)
+        song = await get_video_data(url, search, self.loop)
         self.music.queue[self.ctx.guild.id].append(song)
         if self.on_queue_func:
             await self.on_queue_func(self.ctx, song)
