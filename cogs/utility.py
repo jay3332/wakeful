@@ -1321,11 +1321,11 @@ class Utility(commands.Cog):
     async def help(self, ctx, *, command : str = None):
         prefix = (await get_prefix(self.bot, ctx.message))[2]
         if command is None:
+            prefix_msg = ''.join(f"The prefix for `{ctx.guild.name}` is `{prefix}` \n" if not self.bot.emptyPrefix else "")
             em=discord.Embed(
                 title="Help Page",
                 description=f'''
-The prefix for `{ctx.guild.name}` is `{prefix}`
-```diff
+{prefix_msg}```diff
 - Type "{prefix}help [command]" or "{prefix}help [cog]"
 - for more information about a command or cog
 + [] = optional argument

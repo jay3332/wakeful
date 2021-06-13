@@ -16,9 +16,11 @@ devprefix = conf["DEVPREFIX"] # the prefix for the development version
 async def get_prefix(bot, message):
     await bot.wait_until_ready()
     if message.author.id == bot.ownersid and bot.emptyPrefix == True:
-        return commands.when_mentioned_or(*"")(bot, message)
+        return commands.when_mentioned_or("")(bot, message)
+
     if pwd.getpwuid(os.getuid())[0] != "pi":
         return commands.when_mentioned_or(*"?")(bot, message)
+
     if message.guild is None:
         return commands.when_mentioned_or("!")(bot, message)
     else:
@@ -51,9 +53,11 @@ class wakeful(commands.AutoShardedBot):
         self.mod_role = int(conf["MODROLE"])
 
     async def on_message(self, msg):
+        if self.emptyPrefix:
+            await self.process_commands(msg)
+            return
+        
         prefix = await get_prefix(self, msg)
-
-        print(prefix)
         
         if msg.guild is None:
             if msg.content.startswith(prefix):
@@ -65,52 +69,51 @@ class wakeful(commands.AutoShardedBot):
         if await is_blacklisted(self, msg.author):
             return
 
-        else:
-            for i in prefix:
-                if msg.content.startswith(i):
-                        
-                    if msg.guild is not None:
+        for i in prefix:
+            if msg.content.startswith(i):
+                    
+                if msg.guild is not None:
+                    try:
+                        command = msg.content.split(i)
+                    except ValueError:
+                        command = msg.content
+                    command = command[1]
+                    res = await self.db.fetchrow("SELECT commands FROM commands WHERE guild = $1", msg.guild.id)
+                    try:
+                        commands = res["commands"]
+                    except:
+                        success = False
+                    else:
+                        success = True
+                    if success:
+                        command_obj = self.get_command(command)
                         try:
-                            command = msg.content.split(i)
-                        except ValueError:
-                            command = msg.content
-                        command = command[1]
-                        res = await self.db.fetchrow("SELECT commands FROM commands WHERE guild = $1", msg.guild.id)
-                        try:
-                            commands = res["commands"]
+                            self.get_command(command).parent
                         except:
-                            success = False
+                            command_name = None
                         else:
-                            success = True
-                        if success:
-                            command_obj = self.get_command(command)
-                            try:
-                                self.get_command(command).parent
-                            except:
-                                command_name = None
-                            else:
-                                command_name = "".join(command_obj.name if command_obj.parent is None else f"{command_obj.parent.name} {command_obj.name}")
-                            commands = commands.split(",")
-                            if command_name in commands and command != "":
-                                if is_mod(self, msg.author):
-                                    pass
-                                else:
-                                    em=discord.Embed(description=f"This command has been disabled by the server administrators", color=color())
-                                    return await msg.channel.send(embed=em)
-                            else:
+                            command_name = "".join(command_obj.name if command_obj.parent is None else f"{command_obj.parent.name} {command_obj.name}")
+                        commands = commands.split(",")
+                        if command_name in commands and command != "":
+                            if is_mod(self, msg.author):
                                 pass
+                            else:
+                                em=discord.Embed(description=f"This command has been disabled by the server administrators", color=color())
+                                return await msg.channel.send(embed=em)
                         else:
                             pass
-                    await self.process_commands(msg)
-                    return
-
-                if msg.content == f"<@!{self.user.id}>" or msg.content == f"<@{self.user.id}>":
-                    if msg.guild:
-                        em=discord.Embed(description=f"The prefix for `{msg.guild.name}` is `{prefix[2]}`", color=color())
-                        return await msg.channel.send(embed=em)
                     else:
-                        em=discord.Embed(description=f"The prefix for dms is `{prefix[2]}`", color=color())
-                        return await msg.channel.send(embed=em)
+                        pass
+                await self.process_commands(msg)
+                return
+            
+            if msg.content == f"<@!{self.user.id}>" or msg.content == f"<@{self.user.id}>":
+                if msg.guild:
+                    em=discord.Embed(description=f"The prefix for `{msg.guild.name}` is `{prefix[2]}`", color=color())
+                    return await msg.channel.send(embed=em)
+                else:
+                    em=discord.Embed(description=f"The prefix for dms is `{prefix[2]}`", color=color())
+                    return await msg.channel.send(embed=em)
 
 
     async def on_ready(self):

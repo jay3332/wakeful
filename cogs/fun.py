@@ -1,4 +1,4 @@
-import discord, io, asyncdagpi, asyncio, datetime, aiohttp, string, random, json, wonderwords, time, typing
+import discord, io, asyncdagpi, asyncio, datetime, string, random, json, wonderwords, typing
 from discord.ext import commands
 from fuzzywuzzy import fuzz
 from gtts import gTTS

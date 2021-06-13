@@ -1,7 +1,6 @@
 from datetime import datetime
 import discord, string, random, asyncio, asyncpg
 from discord.ext import commands
-from gtts import gTTS
 from utils.get import *
 
 class Moderation(commands.Cog):

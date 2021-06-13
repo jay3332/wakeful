@@ -1,5 +1,4 @@
 import discord, difflib, asyncio, traceback
-from colorama import Fore
 from jishaku.models import copy_context_with
 from discord.ext import commands
 from utils.webhook import Webhook, AsyncWebhookAdapter

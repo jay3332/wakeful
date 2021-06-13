@@ -1,5 +1,4 @@
 import discord
-from discord.mentions import AllowedMentions
 import async_cleverbot as ac
 from discord.ext import commands
 from utils.get import *
