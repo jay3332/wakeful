@@ -1561,28 +1561,24 @@ class Utility(commands.Cog):
     @commands.command()
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def ping(self, ctx):
-        em=discord.Embed(color=color())
-        dagpi_ping = round(await dagpi.image_ping(), 3) * 1000
-        em.add_field(name="latency", value=f"""
-{self.bot.icons['arrow']}**Typing**: `pinging`
-{self.bot.icons['arrow']}**Bot**: `{round(self.bot.latency*1000)}`ms
-{self.bot.icons['arrow']}**Database**: `pinging`
-{self.bot.icons['arrow']}**Dagpi**: `{dagpi_ping}`ms""", inline=False)
+        em=discord.Embed(title="🏓 Pong", description=f"{self.bot.icons['loading']} Now measuring latency...", color=color())
+
         start=time.perf_counter()
         msg = await ctx.reply(embed=em, mention_author=False)
         end=time.perf_counter()
         final=end-start
-        api_latency = round(final*1000)
-        em=discord.Embed(color=color())
+        typing = round(final*1000)
+
         poststart = time.perf_counter()
         await self.bot.db.fetch("SELECT 1")
         postduration = (time.perf_counter()-poststart) * 1000
         db_ping = round(postduration, 1)
-        em.add_field(name="latency", value=f"""
-{self.bot.icons['arrow']}**Typing**: `{api_latency}`ms
-{self.bot.icons['arrow']}**Bot**: `{round(self.bot.latency*1000)}`ms
-{self.bot.icons['arrow']}**Database**: `{db_ping}`ms
-{self.bot.icons['arrow']}**Dagpi**: `{dagpi_ping}`ms""", inline=False)
+
+        em=discord.Embed(title="🏓 Pong", color=color())
+        em.set_thumbnail(url=self.bot.user.avatar_url)
+        em.add_field(name="Websocket", value=f"{round(self.bot.latency*1000)}ms", inline=True)
+        em.add_field(name="Typing", value=f"{typing}ms", inline=True)
+        em.add_field(name="Database", value=f"{db_ping}ms", inline=True)
         await msg.edit(embed=em)
 
     @commands.command()

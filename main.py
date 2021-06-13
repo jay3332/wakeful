@@ -135,10 +135,6 @@ async def on_message(msg):
             em=discord.Embed(description=f"The prefix for dms is `{prefix}`", color=color())
             await msg.channel.send(embed=em)
 
-    elif msg.content.startswith(devprefix):
-        if is_mod(bot, msg.author):
-            await bot.process_commands(msg)
-
 for filename in os.listdir("./cogs"):
     if filename.endswith(".py"):
         try:
