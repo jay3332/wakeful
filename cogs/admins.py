@@ -37,7 +37,7 @@ class Admin(commands.Cog):
             return await ctx.reply(embed=em, mention_author=False)
         ref = ctx.message.reference.resolved
         if ref.author != self.bot.user:
-            em=discord.Embed(description="This command is only to delte my messages", color=color())
+            em=discord.Embed(description="This command is only to delete my messages", color=color())
             return await ctx.reply(embed=em, mention_author=False)
         await ref.delete()
         try:
