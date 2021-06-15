@@ -607,7 +607,7 @@ class Utility(commands.Cog):
 
         pronoun = await get_pronoun(self.bot, member)
 
-        em=discord.Embed(title=f"{member.mention}'s pronouns are `{pronoun}`", color=color())
+        em=discord.Embed(description=f"{member.mention}'s pronouns are `{pronoun}`", color=color())
         await ctx.reply(embed=em, mention_author=False)
 
     @commands.command()
@@ -1353,10 +1353,11 @@ class Utility(commands.Cog):
             res = mathjspy.MathJS().eval(args)
         except Exception as exc:
             em.add_field(name="Input", value=args, inline=True)
-            em.add_field(name="Error", value=str(exc), inline=True)
+            em.add_field(name="Error", value=f"`{str(exc)}`", inline=True)
         else:
             em.add_field(name="Input", value=args, inline=True)
             em.add_field(name="Output", value=res, inline=True)
+        em.set_thumbnail(url="https://upload.wikimedia.org/wikipedia/commons/thumb/3/35/Calculator_Flat_Icon_Vector.svg/512px-Calculator_Flat_Icon_Vector.svg.png")
         await ctx.reply(embed=em, mention_author=False, allowed_mentions=discord.AllowedMentions.none())
 
     @commands.group(invoke_without_command=True)
