@@ -1,4 +1,4 @@
-import discord
+import discord, asyncio
 import async_cleverbot as ac
 from discord.ext import commands
 from utils.get import *
@@ -14,15 +14,21 @@ class Chatbot(commands.Cog):
         await ctx.reply(embed=em, mention_author=False)
         cleverbot = ac.Cleverbot(get_config("CLEVERBOT"))
         while True:
-            msg = await self.bot.wait_for("message", check=lambda msg: msg.author == ctx.author and msg.channel == ctx.channel)
-            if msg.content in ["chat stop", "chat close", "chat cancel"]:
-                em=discord.Embed(description="Alright! I've successfully stopped the chatbot", color=color())
+            try:
+                msg = await self.bot.wait_for("message", check=lambda msg: msg.author == ctx.author and msg.channel == ctx.channel, timeout=30)
+            except asyncio.TimeoutError:
+                em=discord.Embed(description="I've stopped the chatbot, as you've not been responding for 30 seconds", color=color())
                 await msg.reply(embed=em, mention_author=False)
                 break
             else:
-                async with ctx.typing():
-                    res = await cleverbot.ask(msg.content, msg.author.id)
-                    await msg.reply(res.text, mention_author=False, allowed_mentions=discord.AllowedMentions.none())
+                if msg.content.lower() in ["chat stop", "chat close", "chat cancel"]:
+                    em=discord.Embed(description="Alright! I've successfully stopped the chatbot", color=color())
+                    await msg.reply(embed=em, mention_author=False)
+                    break
+                else:
+                    async with ctx.typing():
+                        res = await cleverbot.ask(msg.content, msg.author.id)
+                        await msg.reply(res.text, mention_author=False, allowed_mentions=discord.AllowedMentions.none())
         return
 
 def setup(bot):

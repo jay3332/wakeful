@@ -2,10 +2,10 @@ import discord, datetime, async_cse, psutil, humanize, os, sys, inspect, mystbin
 import asyncdagpi, hashlib, asyncpg, io, typing, gdshortener, pathlib, textwrap, async_tio
 import mathjspy, pytube, youtube_dl, re 
 
-from discord.ext.commands.core import command
-from discord.ext import commands
+from discord.ext import commands, menus
 from utils.webhook import Webhook, AsyncWebhookAdapter
 from utils.get import *
+from utils.paginator import Paginator
 from utils.checks import *
 from utils.errors import *
 from __main__ import get_prefix
@@ -42,7 +42,7 @@ def do_translate(output, text):
 @executor_function
 def download(bot, url):
     video = pytube.YouTube(str(url))
-    if video.length > 300:
+    if video.length > 600:
         raise TooLong
     else:
         res = video.streams.get_highest_resolution()
@@ -161,7 +161,7 @@ class Utility(commands.Cog):
             data = await youtube(f"{artist} {title}")
             try:
                 url = "https://www.youtube.com/watch?v="+data["entries"][0]["id"]
-            except:
+            except Exception:
                 url = "N/A"
             delta = datetime.datetime.utcnow() - start_time
             hours, remainder = divmod(int(delta.total_seconds()), 3600)
@@ -173,7 +173,7 @@ class Utility(commands.Cog):
             em.set_footer(text=f"Finished in {minutes}m, {seconds}s")
             try:
                 em.set_thumbnail(url=data["entries"][0]["thumbnail"])
-            except:
+            except Exception:
                 pass
             await msg.edit(embed=em)
 
@@ -230,7 +230,7 @@ class Utility(commands.Cog):
             async with ctx.typing():
                 data = self.ytdl.extract_info(url, download=False)
 
-            if data["duration"] > 300:
+            if data["duration"] > 600:
                 raise TooLong()
             else:
                 try:
@@ -371,11 +371,11 @@ class Utility(commands.Cog):
             license_ = json["info"]["license"] or "None"
             try:
                 documentation = json["info"]["project_urls"]["Documentation"] or "None"
-            except:
+            except Exception:
                 documentation = "None"
             try:
                 website = json["info"]["project_urls"]["Homepage"] or "None"
-            except:
+            except Exception:
                 website = "None"
             keywords = json["info"]["keywords"] or "None"
             em=discord.Embed(
@@ -401,7 +401,7 @@ class Utility(commands.Cog):
 
     @commands.command(aliases=["g"])
     @commands.cooldown(1, 5, commands.BucketType.user)
-    async def google(self, ctx, *, term):
+    async def google(self, ctx, *, query):
         async with ctx.typing():
             if ctx.channel.is_nsfw():
                 safe_search_setting=False
@@ -410,28 +410,33 @@ class Utility(commands.Cog):
                 safe_search_setting=True
                 safe_search="Enabled"
             value=0
-            results = await google.search(str(term), safesearch=safe_search_setting)
-            image = None
-            for res in results:
-                if res.image_url.endswith("png") or res.image_url.endswith("jpg") or res.image_url.endswith("jpeg") or res.image_url.endswith("webp"):
-                    image = res.image_url
-            em=discord.Embed(
-                title=f"Results for: `{term}`",
-                color=color()
-            )
-            em.set_footer(text=f"Requested by {ctx.author} • Safe-Search: {safe_search}", icon_url=ctx.author.avatar_url)
-            if image is not None:
-                em.set_thumbnail(url=image)
-            for result in results:
-                if not value > 4:
-                    epic = results[int(value)]
-                    em.add_field(
-                        name=f" \uFEFF",
-                        value=f"**[{str(epic.title)}]({str(epic.url)})**\n{str(epic.description)}\n",
-                        inline=False
-                    )
-                    value+=1
-        await ctx.reply(embed=em, mention_author=False)
+            try:
+                results = await google.search(str(query), safesearch=safe_search_setting)
+            except async_cse.NoResults:
+                em=discord.Embed(description=f"I couldn't find any results for `{query}`", color=color())
+                await ctx.reply(embed=em, mention_author=False)
+            else:
+                image = None
+                for res in results:
+                    if res.image_url.endswith("png") or res.image_url.endswith("jpg") or res.image_url.endswith("jpeg") or res.image_url.endswith("webp"):
+                        image = res.image_url
+                em=discord.Embed(
+                    title=f"Results for: `{query}`",
+                    color=color()
+                )
+                em.set_footer(text=f"Requested by {ctx.author} • Safe-Search: {safe_search}", icon_url=ctx.author.avatar_url)
+                if image is not None:
+                    em.set_thumbnail(url=image)
+                for result in results:
+                    if not value > 4:
+                        epic = results[int(value)]
+                        em.add_field(
+                            name=f" \uFEFF",
+                            value=f"**[{str(epic.title)}]({str(epic.url)})**\n{str(epic.description)}\n",
+                            inline=False
+                        )
+                        value+=1
+                await ctx.reply(embed=em, mention_author=False)
 
     @commands.command(aliases=["gimage"])
     @commands.cooldown(1, 5, commands.BucketType.user)
@@ -594,6 +599,17 @@ class Utility(commands.Cog):
         em.set_thumbnail(url=member.avatar_url)
         await ctx.reply(embed=em, mention_author=False)
 
+    @commands.command(aliases=["pronouns"])
+    @commands.cooldown(1,5,commands.BucketType.user)
+    async def pronoun(self, ctx, member : discord.Member = None):
+        if member is None:
+            member = ctx.author
+
+        pronoun = await get_pronoun(self.bot, member)
+
+        em=discord.Embed(title=f"{member.mention}'s pronouns are `{pronoun}`", color=color())
+        await ctx.reply(embed=em, mention_author=False)
+
     @commands.command()
     @commands.cooldown(1,5,commands.BucketType.user)
     async def suggest(self, ctx):
@@ -644,20 +660,26 @@ class Utility(commands.Cog):
         res = await self.bot.session.get("http://api.urbandictionary.com/v0/define", params={"term": term})
         res = await res.json()
         if res["list"] != [] and len(res["list"]) != 0:
-            res = res["list"][0]
-            definition = res["definition"].replace("[", "").replace("]", "")
-            permalink = res["permalink"]
-            upvotes = res["thumbs_up"]
-            author = res["author"]
-            example = res["example"].replace("[", "").replace("]", "")
-            word = res["word"]
-            em=discord.Embed(title=word, description=f"""
+            embeds = []
+            for i in res["list"]:
+                if len(embeds) > 9:
+                    break
+                res = i
+                definition = res["definition"].replace("[", "").replace("]", "")
+                permalink = res["permalink"]
+                upvotes = res["thumbs_up"]
+                author = res["author"]
+                example = res["example"].replace("[", "").replace("]", "")
+                word = res["word"]
+                em=discord.Embed(title=word, description=f"""
 {self.bot.icons['arrow']}**Definition**:
 {definition}
 {self.bot.icons['arrow']}**Example**:
 {example}""", url=permalink, color=color())
-            em.set_footer(text=f"👍 {upvotes} • 👤 {author}", icon_url=ctx.author.avatar_url)
-            await ctx.reply(embed=em, mention_author=False)
+                em.set_footer(text=f"👍 {upvotes} • 👤 {author}", icon_url=ctx.author.avatar_url)
+                embeds.append(em)
+            pag = menus.MenuPages(Paginator(embeds, per_page=1))
+            await pag.start(ctx)
         else:
             em=discord.Embed(description=f"I could not find any results for `{term}`", color=color())
             await ctx.reply(embed=em, mention_author=False)
@@ -698,7 +720,7 @@ class Utility(commands.Cog):
         else:
             em.set_footer(text=f"Author: N/A • Updated: {updated.strftime('%d/%m/%Y at %H:%M:%S')}")
         em.set_thumbnail(url="https://images.emojiterra.com/google/android-11/128px/1f4f0.png")
-        await ctx.reply(embed=em)
+        await ctx.reply(embed=em, mention_author=False)
 
     @news.command(hidden=True, aliases=["update"])
     async def set(self, ctx, branch, *, content):
@@ -759,6 +781,17 @@ class Utility(commands.Cog):
         em=discord.Embed(description=f"Here's my [invite](https://discord.com/api/oauth2/authorize?client_id={self.bot.user.id}&permissions=8&scope=bot)", color=color())
         await ctx.reply(embed=em, mention_author=False)
 
+    @commands.command(aliases=["up"])
+    @commands.cooldown(1,5,commands.BucketType.user)
+    async def uptime(self, ctx):
+        delta_uptime = datetime.datetime.utcnow() - self.bot.uptime
+        hours, remainder = divmod(int(delta_uptime.total_seconds()), 3600)
+        minutes, seconds = divmod(remainder, 60)
+        days, hours = divmod(hours, 24)
+        em=discord.Embed(title="Uptime", description=f"{days}d, {hours}h, {minutes}m, {seconds}s", color=color())
+        em.set_thumbnail(url="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c0/Eo_circle_green_arrow-up.svg/1200px-Eo_circle_green_arrow-up.svg.png")
+        await ctx.reply(embed=em, mention_author=False)
+
     @commands.command(aliases=["botinfo", "about", "bi"])
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def info(self, ctx):
@@ -778,10 +811,11 @@ class Utility(commands.Cog):
             minutes, seconds = divmod(remainder, 60)
             days, hours = divmod(hours, 24)
             # File Stats
-            files = classes = funcs = coroutines = comments = lines = 0
+            files = classes = funcs = coroutines = comments = lines = letters = 0
             for f in p.rglob("*.py"):
                 files += 1
                 with f.open() as of:
+                    letters = sum(len(f.read()))
                     for line in of.readlines():
                         line = line.strip()
                         if line.startswith("class"):
@@ -804,7 +838,7 @@ class Utility(commands.Cog):
                 disabled = await self.bot.db.fetchrow("SELECT commands FROM commands WHERE guild = $1", ctx.guild.id)
                 try:
                     disabled = disabled["commands"]
-                except:
+                except Exception:
                     disabled = []
                 else:
                     disabled = disabled.split(",")
@@ -841,6 +875,7 @@ class Utility(commands.Cog):
 {self.bot.icons['arrow']}**Cogs**: `{len(cogs)}`
 {self.bot.icons['arrow']}**Uptime**: `{days}d {hours}h {minutes}m {seconds}s`""", inline=False)
             em.add_field(name="File Statistics", value=f"""
+{self.bot.icons['arrow']}**Letters**: `{letters}`
 {self.bot.icons['arrow']}**Files**: `{files}`
 {self.bot.icons['arrow']}**Lines**: `{lines}`
 {self.bot.icons['arrow']}**Functions**: `{funcs}`
@@ -960,7 +995,7 @@ class Utility(commands.Cog):
             else:
                 try:
                     type = str(activity.type).lower().split("activitytype.")[1].title()
-                except:
+                except Exception:
                     type = "None"
                 em.add_field(
                     name="Unknown",
@@ -1096,7 +1131,7 @@ class Utility(commands.Cog):
             
             await ctx.reply(embed=em, mention_author=False)
         else:
-            em=discord.Embed(description=f"`{msg.content}`", color=color())
+            em=discord.Embed(description=f"`{msg.clean_content}`", color=color())
             
             em.set_author(name=f"{msg.author} ({msg.author.id})", icon_url=msg.author.avatar_url)
             await ctx.reply(embed=em, mention_author=False)
@@ -1198,7 +1233,7 @@ class Utility(commands.Cog):
             location = await location.json()
             try:
                 woeid = location[0]["woeid"]
-            except:
+            except Exception:
                 em=discord.Embed(description=f"I couldn't retrieve the weather for `{state}`", color=color())
                 
                 await ctx.reply(embed=em, mention_author=False)
@@ -1313,15 +1348,26 @@ class Utility(commands.Cog):
     @commands.command(aliases=["calculator", "calculater", "calc"])
     @commands.cooldown(1,5,commands.BucketType.user)
     async def calculate(self, ctx, *, args : str):
-        res = mathjspy.MathJS().eval(args)
-        await ctx.reply(f"{args}={res}", mention_author=False, allowed_mentions=discord.AllowedMentions.none())
+        em=discord.Embed(color=color())
+        try:
+            res = mathjspy.MathJS().eval(args)
+        except Exception as exc:
+            em.add_field(name="Input", value=args, inline=True)
+            em.add_field(name="Error", value=str(exc), inline=True)
+        else:
+            em.add_field(name="Input", value=args, inline=True)
+            em.add_field(name="Output", value=res, inline=True)
+        await ctx.reply(embed=em, mention_author=False, allowed_mentions=discord.AllowedMentions.none())
 
     @commands.group(invoke_without_command=True)
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def help(self, ctx, *, command : str = None):
         prefix = (await get_prefix(self.bot, ctx.message))[2]
         if command is None:
-            prefix_msg = ''.join(f"The prefix for `{ctx.guild.name}` is `{prefix}` \n" if not self.bot.emptyPrefix else "")
+            if ctx.author.id == self.bot.ownersid:
+                prefix_msg = ''.join(f"The prefix for `{ctx.guild.name}` is `{prefix}` \n" if not self.bot.emptyPrefix else "")
+            else:
+                prefix_msg = f"The prefix for `{ctx.guild.name}` is `{prefix}` \n"
             em=discord.Embed(
                 title="Help Page",
                 description=f'''
@@ -1340,7 +1386,7 @@ class Utility(commands.Cog):
                 disabled = await self.bot.db.fetchrow("SELECT commands FROM commands WHERE guild = $1", ctx.guild.id)
                 try:
                     disabled = disabled["commands"]
-                except:
+                except Exception:
                     disabled = []
                 else:
                     disabled = disabled.split(",")
@@ -1376,7 +1422,7 @@ class Utility(commands.Cog):
                 disabled = await self.bot.db.fetchrow("SELECT commands FROM commands WHERE guild = $1", ctx.guild.id)
                 try:
                     disabled = disabled["commands"]
-                except:
+                except Exception:
                     disabled = []
                 else:
                     disabled = disabled.split(",")
@@ -1384,10 +1430,10 @@ class Utility(commands.Cog):
                     #-------------------------------------
                     try:
                         command_subcommands = "> " + ", ".join(f"`{command.name}`" for command in given_command.commands if not command.hidden or not command.name in disabled)
-                    except:
+                    except Exception:
                         command_subcommands = "None"
                     #-------------------------------------
-                    if given_command.usage:
+                    if given_command.usage is not None:
                         command_usage = given_command.usage
                     else:
                         parameters = {}
@@ -1416,10 +1462,10 @@ class Utility(commands.Cog):
                             commands_ = [cmd for cmd in given_command.commands]
                         else:
                             commands_ = [cmd for cmd in given_command.commands if not cmd.hidden and not cmd.name in disabled]
-                    except:
-                        commands_ = "None"
+                    except Exception:
+                        commands_ = "N/A"
                     try:
-                        em.add_field(name=f"Subcommands [{len(commands_)}]", value=command_subcommands, inline=False)
+                        em.add_field(name=f"Subcommands [{''.join(len(commands_) if str(commands_) != 'N/A' else '0')}]", value=command_subcommands, inline=False)
                     except AttributeError:
                         em.add_field(name=f"Subcommands [0]", value="None", inline=False)
                     em.add_field(name="Category", value=given_command.cog_name, inline=False)
@@ -1431,7 +1477,7 @@ class Utility(commands.Cog):
                 disabled = await self.bot.db.fetchrow("SELECT commands FROM commands WHERE guild = $1", ctx.guild.id)
                 try:
                     disabled = disabled["commands"]
-                except:
+                except Exception:
                     disabled = []
                 else:
                     disabled = disabled.split(",")
@@ -1577,24 +1623,28 @@ class Utility(commands.Cog):
     @commands.command()
     @commands.cooldown(1,5,commands.BucketType.user)
     async def inviteinfo(self, ctx, invite):
-        code = discord.utils.resolve_invite(invite)
-        invite = await self.bot.fetch_invite(invite)
-        guild = invite.guild
-        if guild.description is not None:
-            em=discord.Embed(title=guild.name,description=f"""
-> {guild.description}
-
-{self.bot.icons['arrow']}Created at: {guild.created_at.strftime('%d/%m/%Y at %H:%M:%S')} ({humanize.naturaltime(guild.created_at)})
-{self.bot.icons['arrow']}Verification Level: {str(guild.verification_level).title()}""", color=color(), url=invite)
+        try:
+            invite = await self.bot.fetch_invite(invite)
+        except discord.NotFound:
+            em=discord.Embed(description=f"I couldn't find this invite", color=color())
+            await ctx.reply(embed=em, mention_author=False)
         else:
-            em=discord.Embed(title=guild.name,description=f"""
-{self.bot.icons['arrow']}Created at: {guild.created_at.strftime('%d/%m/%Y at %H:%M:%S')} ({humanize.naturaltime(guild.created_at)})
-{self.bot.icons['arrow']}Verification Level: {str(guild.verification_level).title()}""", color=color(), url=invite)
-        em.set_thumbnail(url=guild.icon_url)
-        em.set_footer(text=f"ID: {guild.id}", icon_url=ctx.author.avatar_url)
-        if guild.banner_url is not None:
-            em.set_image(url=guild.banner_url)
-        await ctx.reply(embed=em, mention_author=False)
+            guild = invite.guild
+            if guild.description is not None:
+                em=discord.Embed(title=guild.name,description=f"""
+    > {guild.description}
+
+    {self.bot.icons['arrow']}Created at: {guild.created_at.strftime('%d/%m/%Y at %H:%M:%S')} ({humanize.naturaltime(guild.created_at)})
+    {self.bot.icons['arrow']}Verification Level: {str(guild.verification_level).title()}""", color=color(), url=invite)
+            else:
+                em=discord.Embed(title=guild.name,description=f"""
+    {self.bot.icons['arrow']}Created at: {guild.created_at.strftime('%d/%m/%Y at %H:%M:%S')} ({humanize.naturaltime(guild.created_at)})
+    {self.bot.icons['arrow']}Verification Level: {str(guild.verification_level).title()}""", color=color(), url=invite)
+            em.set_thumbnail(url=guild.icon_url)
+            em.set_footer(text=f"ID: {guild.id}", icon_url=ctx.author.avatar_url)
+            if guild.banner_url is not None:
+                em.set_image(url=guild.banner_url)
+            await ctx.reply(embed=em, mention_author=False)
 
     @commands.command()
     @commands.cooldown(1, 5, commands.BucketType.user)

@@ -357,7 +357,7 @@ class Image(commands.Cog):
             em.set_footer(text=f"Powered by dagpi.xyz", icon_url=ctx.author.avatar_url)
         await ctx.send(file=file, embed=em)
 
-    @commands.command()
+    @commands.command(aliases=["ytcomment"])
     @commands.cooldown(1,10,commands.BucketType.user)
     async def youtubecomment(self, ctx, member : discord.Member, *, text):
         async with ctx.typing():

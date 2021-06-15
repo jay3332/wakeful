@@ -17,6 +17,10 @@
     "CLEVERBOT": "",
     "COLOR": "",
     "ICONS": {
-        "name": "emoji"
+        "greentick": "✅",
+        "redtick": "❌",
+        "arrow": "▶",
+        "loading": "🔁",
+        "info": "ℹ️"
     }
 }

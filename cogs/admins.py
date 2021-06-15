@@ -29,6 +29,23 @@ class Admin(commands.Cog):
         if is_mod(self.bot, ctx.author):
             await ctx.invoke(self.bot.get_command("help"), **{"command":"developer"})
 
+    @developer.command(aliases=["del"])
+    @commands.is_owner()
+    async def delete(self, ctx):
+        if not ctx.message.reference:
+            em=discord.Embed(description="Please reply to the message you want to delete", color=color)
+            return await ctx.reply(embed=em, mention_author=False)
+        ref = ctx.message.reference.resolved
+        if ref.author != self.bot.user:
+            em=discord.Embed(description="This command is only to delte my messages", color=color)
+            return await ctx.reply(embed=em, mention_author=False)
+        await ref.delete()
+        try:
+            await ctx.message.delete()
+        except Exception:
+            pass
+
+
     @commands.group(invoke_without_command=True, hidden=True)
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def blacklist(self, ctx):
@@ -141,7 +158,7 @@ class Admin(commands.Cog):
             for reaction_ in reactions:
                 try:
                     await msg.clear_reactions()
-                except:
+                except Exception:
                     pass
             em=discord.Embed(description=f"Now restarting... {self.bot.icons['loading']}", color=color())
             await msg.edit(embed=em)

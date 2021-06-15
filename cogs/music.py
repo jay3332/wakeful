@@ -82,7 +82,7 @@ class Music(commands.Cog):
                     else:
                         try:
                             await ctx.guild.me.edit(deafen=True)
-                        except:
+                        except Exception:
                             pass
                         player = self.music.create_player(ctx, ffmpeg_error_betterfix=True)
 
@@ -92,9 +92,9 @@ class Music(commands.Cog):
             else:
                 await player.queue(url, search=True)
             await ctx.message.add_reaction(self.bot.icons["greentick"])
-            await ctx.message.add_reaction("ℹ️")
+            await ctx.message.add_reaction(self.bot.icons['info'])
             try:
-                reaction, user = await self.bot.wait_for("reaction_add", check=lambda reaction, user: str(reaction.emoji) == "ℹ️"  and reaction.message == ctx.message and not user.bot and user == ctx.author, timeout=15)
+                reaction, user = await self.bot.wait_for("reaction_add", check=lambda reaction, user: str(reaction.emoji) == self.bot.icons['info']  and reaction.message == ctx.message and not user.bot and user == ctx.author, timeout=15)
             except asyncio.TimeoutError:
                 pass
             else:

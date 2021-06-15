@@ -93,7 +93,7 @@ class Tags(commands.Cog):
 
             try:
                 author = (ctx.guild.get_member(int(author))).mention
-            except:
+            except Exception:
                 author = "None"
 
             em=discord.Embed(title="", color=color())
@@ -165,18 +165,8 @@ class Tags(commands.Cog):
             em=discord.Embed(description=f"You don't own this tag", color=color())
             await ctx.reply(embed=em, mention_author=False)
         else:
-            valid_name = True
-            for letter in new_name:
-                if letter in list(string.punctuation):
-                    valid_name = False
-
-            if valid_name != True: # ---------------------------------- check if the name has any invalid characters
-                await ctx.message.add_reaction(self.bot.icons['redtick'])
-                em=discord.Embed(description=f"You can't have an unsupported character in the new name", color=color())
-                await ctx.reply(embed=em, mention_author=False)
-            else:
-                await self.bot.db.execute("UPDATE tags SET name = $1 WHERE guild = $2 AND name = $3", new_name, ctx.guild.id, name)
-                await ctx.message.add_reaction(self.bot.icons['greentick'])
+            await self.bot.db.execute("UPDATE tags SET name = $1 WHERE guild = $2 AND name = $3", new_name, ctx.guild.id, name)
+            await ctx.message.add_reaction(self.bot.icons['greentick'])
 
     @tag.command(aliases=["make", "add"])
     @commands.cooldown(1,15,commands.BucketType.user)
@@ -202,18 +192,8 @@ class Tags(commands.Cog):
             em=discord.Embed(description=f"The content can't be over 200 characters long", color=color())
             await ctx.reply(embed=em, mention_author=False)
         else:
-            valid_name = True
-            for letter in name:
-                if letter in list(string.punctuation):
-                    valid_name = False
-
-            if valid_name != True: # ---------------------------------- check if the name has any invalid characters
-                await ctx.message.add_reaction(self.bot.icons['redtick'])
-                em=discord.Embed(description=f"You can't have an unsupported character in the new name", color=color())
-                await ctx.reply(embed=em, mention_author=False)
-            else:
-                await self.bot.db.execute("INSERT INTO tags (guild, name, content, author, created) VALUES ($1, $2, $3, $4, $5)", ctx.guild.id, name, content, ctx.author.id, int(time.time()))
-                await ctx.message.add_reaction(self.bot.icons['greentick'])
+            await self.bot.db.execute("INSERT INTO tags (guild, name, content, author, created) VALUES ($1, $2, $3, $4, $5)", ctx.guild.id, name, content, ctx.author.id, int(time.time()))
+            await ctx.message.add_reaction(self.bot.icons['greentick'])
 
     @tag.command()
     @commands.cooldown(1,5,commands.BucketType.user)

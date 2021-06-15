@@ -13,17 +13,27 @@ class Errors(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message_delete(self, msg):
-        if not msg.author.bot:
-            self.bot.message_cache[msg.guild.id] = {}
-            self.bot.message_cache[msg.guild.id][msg.channel.id] = msg
-            await asyncio.sleep(10)
-            if self.bot.message_cache[msg.guild.id][msg.channel.id] == msg:
-                self.bot.message_cache[msg.guild.id].pop(msg.channel.id)
+        if not msg.author.bot and msg.guild is not None:
+            res = await self.bot.db.fetchrow("SELECT commands FROM commands WHERE guild = $1", msg.guild.id)
+            try:
+                res["commands"]
+            except TypeError:
+                commands = []
+            else:
+                commands = res["commands"]
+                commands = commands.split(",")
+                if not "snipe" in commands:
+                    self.bot.message_cache[msg.guild.id] = {}
+                    self.bot.message_cache[msg.guild.id][msg.channel.id] = msg
+                    await asyncio.sleep(10)
+                    if self.bot.message_cache[msg.guild.id][msg.channel.id] == msg:
+                        self.bot.message_cache[msg.guild.id].pop(msg.channel.id)
 
     @commands.Cog.listener()
     async def on_command_error(self, ctx, error):
         if isinstance(error, TooLong):
             await ctx.reply(str(error), mention_author=False, allowed_mentions=discord.AllowedMentions.none())
+            
         elif isinstance(error, commands.CommandOnCooldown):
             if not is_mod(self.bot, ctx.author):
                 em=discord.Embed(description=f"This command is on cooldown, try again in `{round(error.retry_after, 1)}` seconds.", color=color())
@@ -31,11 +41,13 @@ class Errors(commands.Cog):
             else:
                 ctx.command.reset_cooldown(ctx)
                 await self.bot.process_commands(ctx.message)
+
         elif isinstance(error, commands.MissingRequiredArgument):
             param = str(error.param).split(":")
             param = param[0].replace(" ", "")
             em=discord.Embed(description=f"`{param}` is a required argument that is missing", color=color())
             await ctx.reply(embed=em, mention_author=False)
+
         elif isinstance(error, commands.CommandNotFound):
             if ctx.prefix != "":
                 cmd = ctx.invoked_with
@@ -52,6 +64,7 @@ class Errors(commands.Cog):
                         reactions = [self.bot.icons['greentick'], self.bot.icons['redtick']]
                         for reaction in reactions:
                             await msg.add_reaction(reaction)
+
                         reaction, user = await self.bot.wait_for("reaction_add", check=lambda reaction, user: user == ctx.author and str(reaction.emoji) in reactions and reaction.message == msg)
                         if str(reaction.emoji) == self.bot.icons['greentick']:
                             alt_ctx = await copy_context_with(ctx, author=ctx.author, content=f"{ctx.prefix}{match[0]}")
@@ -61,18 +74,23 @@ class Errors(commands.Cog):
                 else:
                     em=discord.Embed(description=f"`{cmd}` is not a valid command", color=color())
                     m = await ctx.reply(embed=em, mention_author=False, delete_after=3)
+
         elif isinstance(error, commands.MemberNotFound):
             em=discord.Embed(description=f"Couldn't find member `{error.argument}`", color=color())
             await ctx.reply(embed=em, mention_author=False)
+
         elif isinstance(error, commands.BotMissingPermissions):
             em=discord.Embed(description=f"I don't have permission to do this", color=color())
             await ctx.reply(embed=em, mention_author=False)
+
         elif isinstance(error, commands.MissingPermissions):
             em=discord.Embed(description=f"You don't have permission to do this", color=color())
             await ctx.reply(embed=em, mention_author=False)
+
         elif isinstance(error, commands.MissingAnyRole):
             em=discord.Embed(description=f"You don't have permission to do this", color=color())
             await ctx.reply(embed=em, mention_author=False)
+
         elif isinstance(error, commands.NotOwner):
             if list(error.args) != [] and len(list(error.args)) != 0:
                 msg = list(error.args)[0]
@@ -81,10 +99,12 @@ class Errors(commands.Cog):
             else:
                 em=discord.Embed(description="You aren't allowed to execute this command", color=color())
                 await ctx.reply(embed=em, mention_author=False)
+
         elif isinstance(error, commands.CommandInvokeError):
             error = error.original
             if isinstance(error, TooLong):
                 await ctx.reply(str(error), mention_author=False, allowed_mentions=discord.AllowedMentions.none())
+
             elif isinstance(error, discord.Forbidden):
                 em=discord.Embed(description=f"I don't have permission to do this", color=color())
                 await ctx.reply(embed=em, mention_author=False)
@@ -95,13 +115,16 @@ class Errors(commands.Cog):
                 else:
                     em=discord.Embed(description=f"```py\n{error}```", color=color())
                     await ctx.reply(embed=em, mention_author=False)
+                    
                 raise error
+
         else:
             if is_mod(self.bot, ctx.author):
                 errormsg = "".join(traceback.format_exception(type(error), error, error.__traceback__))
                 await ctx.reply(f"```py\n{errormsg}```", mention_author=False, allowed_mentions=discord.AllowedMentions.none())
             else:
                 em=discord.Embed(description=f"```py\n{error}```", color=color())
+
             await ctx.reply(embed=em, mention_author=False)
             raise error
 
