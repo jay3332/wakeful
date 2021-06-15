@@ -815,7 +815,7 @@ class Utility(commands.Cog):
             for f in p.rglob("*.py"):
                 files += 1
                 with f.open() as of:
-                    letters = sum(len(of.read()))
+                    letters = sum(len(f.open().read()) for f in p.rglob("*.py"))
                     for line in of.readlines():
                         line = line.strip()
                         if line.startswith("class"):
