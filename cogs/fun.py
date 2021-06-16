@@ -14,7 +14,7 @@ def do_tts(language, message):
     tts = gTTS(text=message, lang=language)
     tts.write_to_fp(epix)
     epix.seek(0)
-    file = discord.File(epix, f"{message}.mp4")
+    file = discord.File(epix, f"{message}.wav")
     return file
 
 @executor_function
