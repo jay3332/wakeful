@@ -137,7 +137,7 @@ class Utility(commands.Cog):
         if not ctx.message.reference:
             em=discord.Embed(description=f"Please reply to the message you want to read", color=color())
             return await ctx.reply(embed=em, mention_author=False)
-        if not ctx.message.reference.attachments:
+        if not ctx.message.reference.resolved.attachments:
             em=discord.Embed(description=f"The message you replied to doesn't have any attachments", color=color())
             return await ctx.reply(embed=em, mention_author=False)
         res = (await ctx.message.reference.resolved.attachments[0].read()).decode()
