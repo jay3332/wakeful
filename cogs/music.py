@@ -85,6 +85,7 @@ class Music(commands.Cog):
                             await ctx.guild.me.edit(deafen=True)
                         except Exception:
                             pass
+                        player = self.music.create_player(ctx, ffmpeg_error_betterfix=True)
 
             if not ctx.voice_client.is_playing():
                 await player.queue(url, search=True)
