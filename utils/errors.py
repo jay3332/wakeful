@@ -7,4 +7,4 @@ class TooLong(Error):
         pass
 
     def __str__(self):
-        return "The video cannot be longer than 5 minutes"
+        return "The video cannot be longer than 15 minutes"
