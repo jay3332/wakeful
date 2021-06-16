@@ -1,3 +1,4 @@
+import tempfile
 import discord, DiscordUtils, humanize, re, asyncio, datetime
 from discord.ext import commands
 from utils.get import *
@@ -84,7 +85,6 @@ class Music(commands.Cog):
                             await ctx.guild.me.edit(deafen=True)
                         except Exception:
                             pass
-                        player = self.music.create_player(ctx, ffmpeg_error_betterfix=True)
 
             if not ctx.voice_client.is_playing():
                 await player.queue(url, search=True)
@@ -92,7 +92,6 @@ class Music(commands.Cog):
             else:
                 await player.queue(url, search=True)
             await ctx.message.add_reaction(self.bot.icons["greentick"])
-            await ctx.message.add_reaction(self.bot.icons['info'])
             try:
                 reaction, user = await self.bot.wait_for("reaction_add", check=lambda reaction, user: str(reaction.emoji) == self.bot.icons['info']  and reaction.message == ctx.message and not user.bot and user == ctx.author, timeout=15)
             except asyncio.TimeoutError:
@@ -142,8 +141,13 @@ class Music(commands.Cog):
             await ctx.reply(embed=em, mention_author=False)
         else:
             player = self.music.get_player(guild_id=ctx.guild.id)
-            song = await player.toggle_song_loop()
-            await ctx.message.add_reaction(self.bot.icons["greentick"])
+            try:
+                song = await player.toggle_song_loop()
+            except DiscordUtils.NotPlaying:
+                em=discord.Embed(description="There currently isn't a song playing", color=color())
+                await ctx.reply(embed=em, mention_author=False)
+            else:
+                await ctx.message.add_reaction(self.bot.icons["greentick"])
 
     @commands.command()
     async def queue(self, ctx):
@@ -198,8 +202,13 @@ class Music(commands.Cog):
             await ctx.reply(embed=em, mention_author=False)
         else:
             player = self.music.get_player(guild_id=ctx.guild.id)
-            await player.change_volume(float(vol) / 100)
-            await ctx.message.add_reaction(self.bot.icons["greentick"])
+            try:
+                await player.change_volume(float(vol) / 100)
+            except AttributeError:
+                em=discord.Embed(description="There currently isn't a song playing", color=color())
+                await ctx.reply(embed=em, mention_author=False)
+            else:
+                await ctx.message.add_reaction(self.bot.icons["greentick"])
 
     @commands.command()
     async def remove(self, ctx, index : int):

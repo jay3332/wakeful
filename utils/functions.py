@@ -1,4 +1,4 @@
-import os, tempfile, discord, io
+import os, tempfile, discord, io, typing, re
 from discord.ext import commands
 from jishaku.functools import executor_function
 
@@ -19,3 +19,25 @@ async def makeEmbed(context : commands.Context, embed : discord.Embed, mention :
     else:
         embed["description"] == "The description was too large, so I've put it into a file"
         await context.reply(embed=discord.Embed().from_dict(embed), mention_author=mention)
+
+def isImage(url):
+    if url.endswith("png") or url.endswith("jpg") or url.endswith("jpeg") or url.endswith("webp"):
+        return True
+    return False
+
+def getImage(ctx : commands.Context, url : typing.Union[discord.Member, str] = None):
+    if url is not None:
+        if isinstance(url, discord.Member):
+            return str(url.avatar_url_as(format="png", size=1024))
+        elif re.search(r"http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*(),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+", url) and isImage(url):
+            return url
+    
+    if ctx.message.attachments:
+        if isImage(ctx.message.attachments[0].url) or isImage(ctx.message.attachments[0].proxy_url):
+            return ctx.message.attachments[0].proxy_url or ctx.message.attachments[0].url
+        elif isinstance(url, discord.Member):
+            return str(url.avatar_url_as(format="png", size=1024))
+        else:
+            return str(ctx.author.avatar_url_as(format="png", size=1024))
+    else:
+        return str(ctx.author.avatar_url_as(format="png", size=1024))

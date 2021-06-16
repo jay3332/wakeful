@@ -1,4 +1,5 @@
-import discord, datetime, async_cse, psutil, humanize, os, sys, inspect, mystbin, googletrans, asyncio, aiohttp, random, time
+import discord, datetime, async_cse, psutil, humanize, os, sys, inspect, mystbin, googletrans, asyncio, aiohttp, random, time, lyricsgenius
+from discord.channel import TextChannel
 import asyncdagpi, hashlib, asyncpg, io, typing, gdshortener, pathlib, textwrap, async_tio
 import mathjspy, pytube, youtube_dl, re 
 
@@ -10,9 +11,10 @@ from utils.checks import *
 from utils.errors import *
 from __main__ import get_prefix
 
-from jishaku.codeblocks import codeblock_converter
 from utils.functions import * 
+from utils.paginator import *
 from jishaku.functools import executor_function
+from jishaku.codeblocks import codeblock_converter
 from shazamio.api import Shazam
 
 client = Shazam()
@@ -20,6 +22,7 @@ google = async_cse.Search(get_config("GOOGLE"))
 mystbinn = mystbin.Client()
 dagpi = asyncdagpi.Client(get_config("DAGPI"))
 isgd = gdshortener.ISGDShortener()
+genius = lyricsgenius.Genius(get_config("GENIUS"))
 
 @executor_function
 def cleanup(path):
@@ -38,6 +41,10 @@ def do_translate(output, text):
     translator = googletrans.Translator()
     translation = translator.translate(str(text), dest=str(output))
     return translation
+
+@executor_function
+def get_song(song, artist = None):
+    return genius.search_song(title=song, artist=artist)
 
 @executor_function
 def download(bot, url):
@@ -115,6 +122,17 @@ class Utility(commands.Cog):
                         await msg.reply(str(emoji), mention_author=False)
 
     @commands.command()
+    @commands.cooldown(1,5,commands.BucketType.user)
+    async def lyrics(self, ctx, artist, *, song):
+        async with ctx.typing():
+            song = await get_song(song=song, artist=artist)
+        if song is None:
+            em=discord.Embed(description=f"I couldn't find a song with the name `{song}`", color=color())
+            return await ctx.reply(embed=em, mention_author=False)
+        await ctx.reply(file=await getFile(song.lyrics, filename=song.title), mention_author=False)
+        
+
+    @commands.command()
     @commands.has_guild_permissions(mention_everyone=True)
     @commands.cooldown(1,5,commands.BucketType.user)
     @commands.guild_only()
@@ -182,20 +200,30 @@ class Utility(commands.Cog):
     async def youtube(self, ctx, *, query):
         async with ctx.typing():
             data = await youtube(query)
+
+        print(data)
+
+        print(list(data))
+        
         try:
-            data = data["entries"][0]
-        except IndexError:
-            em=discord.Embed(description="I could not find a video with that query", color=color())
-            return await ctx.reply(embed=em, mention_author=False)
+            data = data["entries"]
         except KeyError:
             data = data
-        url = "https://www.youtube.com/watch?v="+data["id"]
-        em=discord.Embed(title=data["title"], url=url, color=color())
-        em.add_field(name="Channel", value=f"[{data['channel']}]({data['channel_url']})", inline=True)
-        em.add_field(name="Duration", value=str(datetime.timedelta(seconds=data['duration'])), inline=True)
-        em.add_field(name="Views", value=humanize.intcomma(data['view_count']))
-        em.set_thumbnail(url=data["thumbnail"])
-        await ctx.reply(embed=em, mention_author=False)
+        if data == [] and len(data) == 0:
+            em=discord.Embed(description="I could not find a video with that query", color=color())
+            return await ctx.reply(embed=em, mention_author=False)
+
+        embeds = []
+        for data in data:
+            url = "https://www.youtube.com/watch?v="+data["id"]
+            em=discord.Embed(title=data["title"], url=url, color=color())
+            em.add_field(name="Channel", value=f"[{data['channel']}]({data['channel_url']})", inline=True)
+            em.add_field(name="Duration", value=str(datetime.timedelta(seconds=data['duration'])), inline=True)
+            em.add_field(name="Views", value=humanize.intcomma(data['view_count']))
+            em.set_thumbnail(url=data["thumbnail"])
+            embeds.append(em)
+        pag = menus.MenuPages(Paginator(embeds, per_page=1))
+        await pag.start(ctx)
 
     @youtube.command(aliases=["video"])
     @commands.cooldown(1,30,commands.BucketType.user)
@@ -1128,13 +1156,18 @@ class Utility(commands.Cog):
             msg = self.bot.message_cache[ctx.guild.id][ctx.channel.id]
         except KeyError:
             em=discord.Embed(description=f"There's no message to snipe", color=color())
-            
             await ctx.reply(embed=em, mention_author=False)
         else:
-            em=discord.Embed(description=f"`{msg.clean_content}`", color=color())
-            
-            em.set_author(name=f"{msg.author} ({msg.author.id})", icon_url=msg.author.avatar_url)
-            await ctx.reply(embed=em, mention_author=False)
+            res = WrapText(msg.content)
+            for w in res:
+                print(len(w))
+            embeds = []
+            for word in res:
+                em = discord.Embed(description=word, color=color())
+                em.set_author(name=msg.author, icon_url=msg.author.avatar_url)
+                embeds.append(em)
+            pag = menus.MenuPages(Paginator(embeds, per_page=1))
+            await pag.start(ctx)
 
     @commands.command(aliases=["ss"])
     @commands.is_nsfw()

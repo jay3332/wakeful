@@ -14,7 +14,7 @@ def do_tts(language, message):
     tts = gTTS(text=message, lang=language)
     tts.write_to_fp(epix)
     epix.seek(0)
-    file = discord.File(epix, f"{message}.wav")
+    file = discord.File(epix, f"{message}.mp4")
     return file
 
 @executor_function
@@ -318,25 +318,14 @@ class Fun(commands.Cog):
 
     @commands.command(usage="[file]")
     @commands.cooldown(1, 5, commands.BucketType.user)
-    async def caption(self, ctx, member : discord.Member = None):
-        if not member:
-            if ctx.message.attachments:
-                attachment = ctx.message.attachments[0]
-                url = attachment.proxy_url
-            else:
-                url = str(ctx.author.avatar_url_as(static_format="png", size=1024))
-        else:
-            url = str(member.avatar_url_as(static_format="png", size=1024))
+    async def caption(self, ctx, member : typing.Union[discord.Member, str] = None):
+        url = getImage(ctx, member)
+        print(type(url))
         async with ctx.typing():
-            data = {
-                "Content": url,
-                "Type": "CaptionRequest"
-            }
-            headers = {"Content-Type": "application/json; charset=utf-8"}
-            res = await self.bot.session.post("https://captionbot.azurewebsites.net/api/messages", json=data, headers=headers)
-            text = await res.text()
-            em=discord.Embed(description=text, color=color())
-            em.set_image(url=url)
+            res = await self.bot.session.post("https://captionbot.azurewebsites.net/api/messages", json={"Content": url, "Type": "CaptionRequest"}, headers={"Content-Type": "application/json; charset=utf-8"})
+        text = await res.text()
+        em=discord.Embed(description=text, color=color())
+        em.set_image(url=url)
         await ctx.reply(embed=em, mention_author=False)
 
     @commands.command(name="ascii")

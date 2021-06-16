@@ -18,9 +18,6 @@ async def get_prefix(bot, message):
     if message.author.id == bot.ownersid and bot.emptyPrefix == True:
         return commands.when_mentioned_or("")(bot, message)
 
-    if pwd.getpwuid(os.getuid())[0] != "pi":
-        return commands.when_mentioned_or(*"?")(bot, message)
-
     if message.guild is None:
         return commands.when_mentioned_or("!")(bot, message)
     else:
@@ -28,7 +25,10 @@ async def get_prefix(bot, message):
             prefix = await bot.db.fetchrow("SELECT prefix FROM prefixes WHERE guild = $1", message.guild.id)
             return commands.when_mentioned_or(prefix["prefix"])(bot, message)
         except:
-            await bot.db.execute("INSERT INTO prefixes(guild, prefix) VALUES($1, $2)", message.guild.id, 'w,')
+            if pwd.getpwuid(os.getuid())[0] != "pi":
+                await bot.db.execute("INSERT INTO prefixes(guild, prefix) VALUES($1, $2)", message.guild.id, ',w')
+            else:
+                await bot.db.execute("INSERT INTO prefixes(guild, prefix) VALUES($1, $2)", message.guild.id, 'w,')
             prefix = await bot.db.fetchrow("SELECT prefix FROM prefixes WHERE guild = $1", message.guild.id)
             return commands.when_mentioned_or(prefix["prefix"])(bot, message)
 
@@ -56,6 +56,10 @@ class wakeful(commands.AutoShardedBot):
         if self.emptyPrefix:
             await self.process_commands(msg)
             return
+
+        if pwd.getpwuid(os.getuid())[0] != "pi":
+            if not is_mod(self, msg.author):
+                return
         
         prefix = await get_prefix(self, msg)
         
@@ -155,7 +159,4 @@ for filename in os.listdir("./cogs"):
 bot.load_extension("jishaku")
 presence.start()
 bot.db=bot.loop.run_until_complete(asyncpg.create_pool(host="localhost", port="5432", user=conf["dbuser"], password=conf["dbpw"], database="wakeful"))
-if pwd.getpwuid(os.getuid())[0] == "pi": # check if username is pi
-    bot.run(token) # run stable
-else:
-    bot.run(devtoken) # run development version
+bot.run(token) # run stable
