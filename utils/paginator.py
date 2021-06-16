@@ -20,6 +20,6 @@ class Paginator(menus.ListPageSource):
         return embed
 
 def WrapText(text : str):
-    wrapper = textwrap.TextWrapper(width=2048)
+    wrapper = textwrap.TextWrapper(width=2024)
     words = wrapper.wrap(text=text)
     return words
