@@ -1054,16 +1054,8 @@ class Utility(commands.Cog):
 
     @_qr.command(name="read", aliases=["show"])
     @commands.cooldown(1,5,commands.BucketType.user)
-    async def _read(self, ctx):
-        if ctx.message.attachments:
-            if ctx.message.attachments[0].url.endswith("png") or ctx.message.attachments[0].url.endswith("jpg") or ctx.message.attachments[0].url.endswith("jpeg") or ctx.message.attachments[0].url.endswith("webp"):
-                attachment = ctx.message.attachments[0].url
-            else:
-                em=discord.Embed(description=f"Please attach a png, jpg, jpeg or webp file", color=color())
-                return await ctx.reply(embed=em, mention_author=False)
-        else:
-            em=discord.Embed(description=f"Please attach a png, jpg, jpeg or webp file", color=color())
-            return await ctx.reply(embed=em, mention_author=False)
+    async def _read(self, ctx, url : str = None):
+        attachment = getImage(ctx, url)
         res = await self.bot.session.get(f"http://api.qrserver.com/v1/read-qr-code/?fileurl={attachment}")
         res = await res.json()
         res = res[0]["symbol"][0]
