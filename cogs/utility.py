@@ -129,7 +129,7 @@ class Utility(commands.Cog):
         if song is None:
             em=discord.Embed(description=f"I couldn't find a song with the name `{song}`", color=color())
             return await ctx.reply(embed=em, mention_author=False)
-        await ctx.reply(file=await getFile(f"{song.lyrics}_lyrics", filename=song.title), mention_author=False)
+        await ctx.reply(file=await getFile(song.lyrics, filename=f"{song.title}_lyrics", mention_author=False)
         
     @commands.command(aliases=["content"])
     @commands.cooldown(1,5,commands.BucketType.user)
