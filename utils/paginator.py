@@ -21,5 +21,5 @@ class Paginator(menus.ListPageSource):
 
 def WrapText(text : str):
     wrapper = textwrap.TextWrapper(width=2048)
-    words = wrapper.wrap(text="a"*4096)
+    words = wrapper.wrap(text=text)
     return words
