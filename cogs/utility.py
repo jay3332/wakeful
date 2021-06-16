@@ -42,7 +42,7 @@ def do_translate(output, text):
 @executor_function
 def download(bot, url):
     video = pytube.YouTube(str(url))
-    if video.length > 600:
+    if video.length > 900:
         raise TooLong
     else:
         res = video.streams.get_highest_resolution()
@@ -230,7 +230,7 @@ class Utility(commands.Cog):
             async with ctx.typing():
                 data = self.ytdl.extract_info(url, download=False)
 
-            if data["duration"] > 600:
+            if data["duration"] > 900:
                 raise TooLong()
             else:
                 try:
