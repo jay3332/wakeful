@@ -146,7 +146,7 @@ class Utility(commands.Cog):
         for txt in text:
             em=discord.Embed(description=txt, color=color())
             embeds.append(em)
-        pag = menus.MenuPages(embeds, per_page=1)
+        pag = menus.MenuPages(Paginator(embeds, per_page=1))
         await pag.start(ctx)
 
     @commands.command()
