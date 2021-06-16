@@ -144,7 +144,7 @@ class Utility(commands.Cog):
         text = WrapText(res)
         embeds = []
         for txt in text:
-            em=discord.Embed(description=txt, color=color())
+            em=discord.Embed(description=f"```{txt}```", color=color())
             embeds.append(em)
         pag = menus.MenuPages(Paginator(embeds, per_page=1))
         await pag.start(ctx)
