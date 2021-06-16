@@ -129,7 +129,7 @@ class Utility(commands.Cog):
         if song is None:
             em=discord.Embed(description=f"I couldn't find a song with the name `{song}`", color=color())
             return await ctx.reply(embed=em, mention_author=False)
-        await ctx.reply(file=await getFile(song.lyrics, filename=song.title), mention_author=False)
+        await ctx.reply(file=await getFile(f"{song.lyrics}_lyrics", filename=song.title), mention_author=False)
         
     @commands.command(aliases=["content"])
     @commands.cooldown(1,5,commands.BucketType.user)
@@ -143,8 +143,9 @@ class Utility(commands.Cog):
         res = (await ctx.message.reference.resolved.attachments[0].read()).decode()
         text = WrapText(res)
         embeds = []
+        filename = ctx.message.reference.resolved.attachments[0].filename.replace("_"," ").title()
         for txt in text:
-            em=discord.Embed(description=f"```{txt}```", color=color())
+            em=discord.Embed(title=filename, description=f"```{txt}```", color=color())
             embeds.append(em)
         pag = menus.MenuPages(Paginator(embeds, per_page=1))
         await pag.start(ctx)
