@@ -131,6 +131,23 @@ class Utility(commands.Cog):
             return await ctx.reply(embed=em, mention_author=False)
         await ctx.reply(file=await getFile(song.lyrics, filename=song.title), mention_author=False)
         
+    @commands.command(aliases=["content"])
+    @commands.cooldown(1,5,commands.BucketType.User)
+    async def read(self, ctx):
+        if not ctx.message.reference:
+            em=discord.Embed(description=f"Please reply to the message you want to read", color=color())
+            return await ctx.reply(embed=em, mention_author=False)
+        if not ctx.message.reference.attachments:
+            em=discord.Embed(description=f"The message you replied to doesn't have any attachments", color=color())
+            return await ctx.reply(embed=em, mention_author=False)
+        res = (await ctx.message.reference.resolved.attachments[0].read()).decode()
+        text = WrapText(res)
+        embeds = []
+        for txt in text:
+            em=discord.Embed(description=txt, color=color())
+            embeds.append(em)
+        pag = menus.MenuPages(embeds, per_page=1)
+        await pag.start(ctx)
 
     @commands.command()
     @commands.has_guild_permissions(mention_everyone=True)
