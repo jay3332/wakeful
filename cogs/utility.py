@@ -1047,7 +1047,7 @@ class Utility(commands.Cog):
     @commands.cooldown(1,5,commands.BucketType.user)
     async def _create(self, ctx, *, text):
         text = text.replace(" " ,"%20")
-        async with ctx.typinf():
+        async with ctx.typing():
             res = await (await self.bot.session.get(f"https://api.qrserver.com/v1/create-qr-code/?data={text}&size=200x200")).read()
         em=discord.Embed(color=color())
         f = discord.File(io.BytesIO(res), filename="qr.png")
