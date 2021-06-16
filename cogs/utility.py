@@ -132,7 +132,7 @@ class Utility(commands.Cog):
         await ctx.reply(file=await getFile(song.lyrics, filename=song.title), mention_author=False)
         
     @commands.command(aliases=["content"])
-    @commands.cooldown(1,5,commands.BucketType.User)
+    @commands.cooldown(1,5,commands.BucketType.user)
     async def read(self, ctx):
         if not ctx.message.reference:
             em=discord.Embed(description=f"Please reply to the message you want to read", color=color())
