@@ -1494,7 +1494,7 @@ class Utility(commands.Cog):
                     except Exception:
                         commands_ = "N/A"
                     try:
-                        em.add_field(name=f"Subcommands [{''.join(len(commands_) if str(commands_) != 'N/A' else '0')}]", value=command_subcommands, inline=False)
+                        em.add_field(name=f"Subcommands [{''.join(str(len(commands_)) if str(commands_) != 'N/A' else '0')}]", value=command_subcommands, inline=False)
                     except AttributeError:
                         em.add_field(name=f"Subcommands [0]", value="None", inline=False)
                     em.add_field(name="Category", value=given_command.cog_name, inline=False)
