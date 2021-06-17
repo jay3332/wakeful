@@ -254,5 +254,21 @@ class Tags(commands.Cog):
             em=discord.Embed(description=f"There are no tags with `{query}` in the name", color=color())
             await ctx.reply(embed=em, mention_author=False)
 
+    @commands.command()
+    @commands.cooldown(1,5,commands.BucketType.user)
+    async def tags(self, ctx):
+        records = await self.bot.db.fetch("SELECT * FROM tags WHERE guild = $1", ctx.guild.id)
+        if records != [] and len(records) != 0:
+            res = WrapList(records, 6)
+            embeds = []
+            for txt in res:
+                em=discord.Embed(description="\n".join(f"{list(records).index(text)+1}. {text['name']}" for text in txt), color=color())
+                embeds.append(em)
+            pag = menus.MenuPages(Paginator(embeds, per_page=1))
+            await pag.start(ctx)
+        else:
+            em=discord.Embed(description=f"There are no tags on this guild", color=color())
+            await ctx.reply(embed=em, mention_author=False)
+
 def setup(bot):
     bot.add_cog(Tags(bot))
