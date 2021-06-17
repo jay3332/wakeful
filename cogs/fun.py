@@ -1,3 +1,4 @@
+from utils.checks import gameRunning
 import discord, io, asyncdagpi, asyncio, datetime, string, random, json, wonderwords, typing
 from discord.ext import commands
 from fuzzywuzzy import fuzz
@@ -5,8 +6,10 @@ from gtts import gTTS
 from jishaku.functools import executor_function
 from utils.get import *
 from utils.functions import *
+from akinator.async_aki import Akinator
 
 dagpi = asyncdagpi.Client(get_config("DAGPI"))
+akin = Akinator()
 
 @executor_function
 def do_tts(language, message):
@@ -40,6 +43,68 @@ class Fun(commands.Cog):
         async with ctx.typing():
             file = await do_tts("en", message)
         await ctx.reply(file=file, mention_author=False)
+    
+    @commands.command(aliases=["aki"])
+    @commands.cooldown(1, 15, commands.BucketType.guild)
+    async def akinator(self, ctx):
+        if gameRunning(ctx, ctx.command.name):
+            channel = self.bot.games[ctx.command.name][str(ctx.guild.id)]["channel"]
+            message = self.bot.games[ctx.command.name][str(ctx.guild.id)]["message"]
+            em=discord.Embed(description=f"There is already a game of {ctx.command.name} running in {channel.mention}, click [here]({message.jump_url}) to look at it", color=color())
+            return await ctx.reply(embed=em, mention_author=False)
+
+        controls = {
+            "yes": self.bot.icons['greentick'],
+            "no": self.bot.icons['redtick'],
+            "idk": self.bot.icons['shrug'],
+        }
+
+        emojis = [controls[e] for e in list(controls)]
+
+        em=discord.Embed(description=f"{self.bot.icons['loading']} Now starting the game...", color=color())
+        msg = await ctx.reply(embed=em, mention_author=False)
+        
+        game = await akin.start_game()
+
+        self.bot.games["akinator"][str(ctx.guild.id)] = {
+            "channel": ctx.channel,
+            "message": msg
+        }
+
+        while akin.progression <= 80:
+            if round(akin.progression) == 0:
+                em=discord.Embed(description=f"""
+{game}
+{controls['yes']} = Yes
+{controls['no']} = No
+{controls['idk']} = I don't know""", color=color())
+                await msg.edit(embed=em)
+            for emoji in list(controls):
+                await msg.add_reaction(str(controls[emoji]))
+
+            try:
+                reaction, user = await self.bot.wait_for("reaction_add", timeout=30, check=lambda reaction, user: user == ctx.author and str(reaction.emoji) in emojis and reaction.message == msg)
+            except asyncio.TimeoutError:
+                em=discord.Embed(description="The game has been stopped as you've not been responding for 30 seconds", color=color())
+                await msg.reply(embed=em, mention_author=False)
+                break
+            else:
+                if str(reaction.emoji) == controls["yes"]:
+                    first_answer = "yes"
+                elif str(reaction.emoji) == controls["no"]:
+                    first_answer = "no"
+                elif str(reaction.emoji) == controls["idk"]:
+                    first_answer = "idk"
+
+                question = await akin.answer(first_answer)
+
+                em=discord.Embed(description=f"""
+{question}
+{controls['yes']} = Yes
+{controls['no']} = No
+{controls['idk']} = I don't know""", color=color())
+                await msg.edit(embed=em)
+        await akin.win()
 
     @commands.command()
     @commands.cooldown(1,5,commands.BucketType.user)

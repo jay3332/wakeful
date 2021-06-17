@@ -41,6 +41,9 @@ class wakeful(commands.AutoShardedBot):
         self.cmdsSinceRestart = 0
         self.message_cache = {}
         self.directorys = {}
+        self.games = {
+            "akinator": {}
+        }
         self.emptyPrefix = False
         self.ownersid = 797044260196319282
         self.afks = {}

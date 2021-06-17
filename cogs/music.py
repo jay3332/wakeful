@@ -33,9 +33,7 @@ class Music(commands.Cog):
     @commands.Cog.listener()
     async def on_voice_state_update(self, member, before, after):
         if member.guild.voice_client is not None and member.guild.me.voice is not None:
-            if member == self.bot.user and before.deaf == True and after.deaf == False:
-                await member.guild.me.edit(deafen=True)
-            elif before.channel is not None and after.channel is None:
+            if before.channel is not None and after.channel is None:
                 if before.channel == member.guild.me.voice.channel:
                     members = [m for m in member.guild.me.voice.channel.members if not m.bot]
                     if members == [] and len(members) == 0:
@@ -49,7 +47,7 @@ class Music(commands.Cog):
             em=discord.Embed(description="You have to join a voice channel to use this command", color=color())
             await ctx.reply(embed=em, mention_author=False)
         else:
-            await ctx.guild.me.edit(deafen=True)
+            await ctx.guild.change_voice_state(channel=ctx.author.voice.channel,self_deaf=True)
 
     @commands.command()
     async def leave(self, ctx):
@@ -84,10 +82,7 @@ class Music(commands.Cog):
                         em=discord.Embed(description="You have to join a voice channel to use this command", color=color())
                         return await ctx.reply(embed=em, mention_author=False)
                     else:
-                        try:
-                            await ctx.guild.me.edit(deafen=True)
-                        except Exception:
-                            pass
+                        await ctx.guild.change_voice_state(channel=ctx.author.voice.channel,self_deaf=True)
                         player = self.music.create_player(ctx, ffmpeg_error_betterfix=True)
 
             if not ctx.voice_client.is_playing():
