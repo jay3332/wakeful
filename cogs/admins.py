@@ -177,7 +177,7 @@ class Admin(commands.Cog):
 
     @pip.command(hidden=True, aliases=["add"])
     @commands.is_owner()
-    async def install(self, ctx, package):
+    async def install(self, ctx, *, package):
         if pwd.getpwuid(os.getuid())[0] == "pi":
             code = codeblock_converter(f"pip3.9 install {package}")
             await ctx.invoke(self.bot.get_command("jishaku shell"), **{"argument": code})
@@ -187,7 +187,7 @@ class Admin(commands.Cog):
 
     @pip.command(hidden=True, aliases=["remove", "delete"])
     @commands.is_owner()
-    async def uninstall(self, ctx, package):
+    async def uninstall(self, ctx, *, package):
         if pwd.getpwuid(os.getuid())[0] == "pi":
             code = codeblock_converter(f"pip3.9 uninstall -y {package}")
             await ctx.invoke(self.bot.get_command("jishaku shell"), **{"argument": code})
