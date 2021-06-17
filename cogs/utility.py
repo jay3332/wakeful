@@ -1,3 +1,4 @@
+from asyncdagpi import image
 import discord, datetime, async_cse, psutil, humanize, os, sys, inspect, mystbin, googletrans, asyncio, aiohttp, random, time, lyricsgenius
 from discord.ext.commands.core import cooldown
 import asyncdagpi, hashlib, asyncpg, io, typing, gdshortener, pathlib, textwrap, async_tio, zipfile
@@ -481,34 +482,28 @@ class Utility(commands.Cog):
             else:
                 safe_search_setting=True
                 safe_search="Enabled"
-            value=0
             try:
                 results = await google.search(str(query), safesearch=safe_search_setting)
             except async_cse.NoResults:
                 em=discord.Embed(description=f"I couldn't find any results for `{query}`", color=color())
                 await ctx.reply(embed=em, mention_author=False)
             else:
+                embeds = []
                 image = None
                 for res in results:
-                    if res.image_url.endswith("png") or res.image_url.endswith("jpg") or res.image_url.endswith("jpeg") or res.image_url.endswith("webp"):
+                    if isImage(res.image_url):
                         image = res.image_url
-                em=discord.Embed(
-                    title=f"Results for: `{query}`",
-                    color=color()
-                )
-                em.set_footer(text=f"Requested by {ctx.author} • Safe-Search: {safe_search}", icon_url=ctx.author.avatar_url)
-                if image is not None:
-                    em.set_thumbnail(url=image)
-                for result in results:
-                    if not value > 4:
-                        epic = results[int(value)]
-                        em.add_field(
-                            name=f" \uFEFF",
-                            value=f"**[{str(epic.title)}]({str(epic.url)})**\n{str(epic.description)}\n",
-                            inline=False
-                        )
-                        value+=1
-                await ctx.reply(embed=em, mention_author=False)
+                embeds = []
+                res = WrapList(results, 3)
+                for txt in res:
+                    em=discord.Embed(title=f"Results for: `{query}`", color=color())
+                    em.set_footer(text=f"Safe-Search: {safe_search} • Results: {len(results)}", icon_url=ctx.author.avatar_url)
+                    em.add_field(name=f"\uFEFF", value="\n".join(f"**[{str(res.title)}]({str(res.url)})**\n{str(res.description)}\n" for res in txt), inline=False)
+                    if image is not None:
+                        em.set_thumbnail(url=image)
+                    embeds.append(em)
+                pag = menus.MenuPages(Paginator(embeds, per_page=1))
+                await pag.start(ctx)
 
     @commands.command(aliases=["gimage"])
     @commands.cooldown(1, 5, commands.BucketType.user)
@@ -520,16 +515,20 @@ class Utility(commands.Cog):
             safe_search_setting=True
             safe_search="Enabled"
         async with ctx.typing():
-            results = await google.search(query, safesearch=safe_search_setting)
-            image = None
+            results = await google.search(query, safesearch=safe_search_setting, image_search=True)
+            images = []
             for res in results:
-                if res.image_url.endswith("png") or res.image_url.endswith("jpg") or res.image_url.endswith("jpeg") or res.image_url.endswith("webp"):
-                    image = res
-        if image is not None:
-            em=discord.Embed(title=f"Results for: `{query}`", description=f"[{image.title}]({image.url})", color=color())
-            em.set_footer(text=f"Requested by {ctx.author} • Safe-Search: {safe_search}", icon_url=ctx.author.avatar_url)
-            em.set_image(url=image.image_url)
-            await ctx.reply(embed=em, mention_author=False)
+                if isImage(res.image_url):
+                    images.append(res)
+        if images != [] and len(images) != 0:
+            embeds = []
+            for res in images:
+                em=discord.Embed(description=f"[{res.title}]({res.url})", color=color())
+                em.set_footer(text=f"Safe-Search: {safe_search} • Results: {len(images)}", icon_url=ctx.author.avatar_url)
+                em.set_image(url=res.image_url)
+                embeds.append(em)
+            pag = menus.MenuPages(Paginator(embeds, per_page=1))
+            await pag.start(ctx)
         else:
             em=discord.Embed(description=f"I couldn't find any images with the query `{query}`", color=color())
             await ctx.reply(embed=em, mention_author=False)
@@ -1539,14 +1538,17 @@ class Utility(commands.Cog):
                     #---------------------------------------
                     command_bucket = given_command._buckets
                     command_cooldown = command_bucket._cooldown
-                    cooldown_type = list(command_cooldown.type)[0]
-                    cooldown_per = round(command_cooldown.per)
-                    if cooldown_per > 59:
-                        cooldown_per = f"{round(cooldown_per / 60)} minutes"
+                    if command_cooldown is not None:
+                        cooldown_type = list(command_cooldown.type)[0]
+                        cooldown_per = round(command_cooldown.per)
+                        if cooldown_per > 59:
+                            cooldown_per = f"{round(cooldown_per / 60)} minutes"
+                        else:
+                            cooldown_per = f"{cooldown_per} seconds"
+                        cooldown_rate = command_cooldown.rate
+                        cooldown_msg = f"{''.join(f'{cooldown_rate} time' if str(cooldown_rate) == '1' else f'{cooldown_rate} times')} every {cooldown_per} per {cooldown_type}"
                     else:
-                        cooldown_per = f"{cooldown_per} seconds"
-                    cooldown_rate = command_cooldown.rate
-                    cooldown_msg = f"{''.join(f'{cooldown_rate} time' if str(cooldown_rate) == '1' else f'{cooldown_rate} times')} every {cooldown_per} per {cooldown_type}"
+                        cooldown_msg = "N/A"
                     #---------------------------------------
                     em=discord.Embed(
                         title=given_command.name,
