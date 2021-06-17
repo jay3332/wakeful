@@ -268,7 +268,7 @@ class Image(commands.Cog):
 
     @commands.command()
     @commands.cooldown(1,10,commands.BucketType.user)
-    async def pride(self, ctx, member : typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None, flag : str = "gay"):
+    async def pride(self, ctx, flag : str = "gay", member : typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
         url = getImage(ctx, member)
         async with ctx.typing():
             img = await dagpi.image_process(asyncdagpi.ImageFeatures.pride(), url=str(url), flag=flag)
