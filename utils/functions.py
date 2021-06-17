@@ -25,13 +25,25 @@ def isImage(url):
         return True
     return False
 
-def getImage(ctx : commands.Context, url : typing.Union[discord.Member, str] = None):
-    if url is not None:
-        if isinstance(url, discord.Member):
-            return str(url.avatar_url_as(format="png", size=1024))
-        elif re.search(r"http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*(),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+", url) and isImage(url):
+def getImage(ctx : commands.Context, url : typing.Union[discord.Member, discord.Emoji, discord.PartialEmoji, None, str] = None):
+    if url is None:
+        return str(ctx.author.avatar_url_as(format="png", size=1024))
+
+    if isinstance(url, discord.Member):
+        return str(url.avatar_url_as(format="png", size=1024))
+    elif isinstance(url, str):
+        if re.search(r"http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*(),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+", url) and isImage(url):
             return url
+
+    if isinstance(url, discord.Emoji) or isinstance(url, discord.PartialEmoji):
+        return url.url
     
+    if ctx.message.reference:
+        ref = ctx.message.reference.resolved
+        if ref.embeds:
+            if ref.embeds[0].image.url != discord.Embed.Empty:
+                return ref.embeds[0].image.url
+
     if ctx.message.attachments:
         if isImage(ctx.message.attachments[0].url) or isImage(ctx.message.attachments[0].proxy_url):
             return ctx.message.attachments[0].proxy_url or ctx.message.attachments[0].url

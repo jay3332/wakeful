@@ -45,7 +45,7 @@ class Image(commands.Cog):
 
     @commands.command(aliases=["circle", "round", "circular"])
     @commands.cooldown(1,15,commands.BucketType.user)
-    async def rounden(self, ctx, member : discord.Member = None):
+    async def rounden(self, ctx, member : typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
         url = getImage(ctx, member)
         async with ctx.typing():
             img = await self.bot.session.get(str(url))
@@ -57,7 +57,7 @@ class Image(commands.Cog):
 
     @commands.command()
     @commands.cooldown(1,10,commands.BucketType.user)
-    async def pixel(self, ctx, member : discord.Member = None):
+    async def pixel(self, ctx, member : typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
         url = getImage(ctx, member)
         async with ctx.typing():
             img = await dagpi.image_process(asyncdagpi.ImageFeatures.pixel(), url=str(url))
@@ -69,7 +69,7 @@ class Image(commands.Cog):
 
     @commands.command()
     @commands.cooldown(1,10,commands.BucketType.user)
-    async def america(self, ctx, member : discord.Member = None):
+    async def america(self, ctx, member : typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
         url = getImage(ctx, member)
         async with ctx.typing():
             img = await dagpi.image_process(asyncdagpi.ImageFeatures.america(), url=str(url))
@@ -81,7 +81,7 @@ class Image(commands.Cog):
 
     @commands.command()
     @commands.cooldown(1,10,commands.BucketType.user)
-    async def triggered(self, ctx, member : discord.Member = None):
+    async def triggered(self, ctx, member : typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
         url = getImage(ctx, member)
         async with ctx.typing():
             img = await dagpi.image_process(asyncdagpi.ImageFeatures.triggered(), url=str(url))
@@ -93,7 +93,7 @@ class Image(commands.Cog):
 
     @commands.command()
     @commands.cooldown(1,10,commands.BucketType.user)
-    async def wasted(self, ctx, member : discord.Member = None):
+    async def wasted(self, ctx, member : typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
         url = getImage(ctx, member)
         async with ctx.typing():
             img = await dagpi.image_process(asyncdagpi.ImageFeatures.wasted(), url=str(url))
@@ -105,7 +105,7 @@ class Image(commands.Cog):
 
     @commands.command()
     @commands.cooldown(1,10,commands.BucketType.user)
-    async def invert(self, ctx, member : discord.Member = None):
+    async def invert(self, ctx, member : typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
         url = getImage(ctx, member)
         async with ctx.typing():
             img = await dagpi.image_process(asyncdagpi.ImageFeatures.invert(), url=str(url))
@@ -117,7 +117,7 @@ class Image(commands.Cog):
 
     @commands.command()
     @commands.cooldown(1,10,commands.BucketType.user)
-    async def sobel(self, ctx, member : discord.Member = None):
+    async def sobel(self, ctx, member : typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
         url = getImage(ctx, member)
         async with ctx.typing():
             img = await dagpi.image_process(asyncdagpi.ImageFeatures.sobel(), url=str(url))
@@ -129,7 +129,7 @@ class Image(commands.Cog):
 
     @commands.command()
     @commands.cooldown(1,10,commands.BucketType.user)
-    async def triangle(self, ctx, member : discord.Member = None):
+    async def triangle(self, ctx, member : typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
         url = getImage(ctx, member)
         async with ctx.typing():
             img = await dagpi.image_process(asyncdagpi.ImageFeatures.triangle(), url=str(url))
@@ -141,7 +141,7 @@ class Image(commands.Cog):
 
     @commands.command()
     @commands.cooldown(1,10,commands.BucketType.user)
-    async def blur(self, ctx, member : discord.Member = None):
+    async def blur(self, ctx, member : typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
         url = getImage(ctx, member)
         async with ctx.typing():
             img = await dagpi.image_process(asyncdagpi.ImageFeatures.blur(), url=str(url))
@@ -153,7 +153,7 @@ class Image(commands.Cog):
 
     @commands.command()
     @commands.cooldown(1,10,commands.BucketType.user)
-    async def angel(self, ctx, member : discord.Member = None):
+    async def angel(self, ctx, member : typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
         url = getImage(ctx, member)
         async with ctx.typing():
             img = await dagpi.image_process(asyncdagpi.ImageFeatures.angel(), url=str(url))
@@ -165,7 +165,7 @@ class Image(commands.Cog):
 
     @commands.command(aliases=["s8n"])
     @commands.cooldown(1,10,commands.BucketType.user)
-    async def satan(self, ctx, member : discord.Member = None):
+    async def satan(self, ctx, member : typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
         url = getImage(ctx, member)
         async with ctx.typing():
             img = await dagpi.image_process(asyncdagpi.ImageFeatures.satan(), url=str(url))
@@ -177,7 +177,7 @@ class Image(commands.Cog):
 
     @commands.command()
     @commands.cooldown(1,10,commands.BucketType.user)
-    async def delete(self, ctx, member : discord.Member = None):
+    async def delete(self, ctx, member : typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
         url = getImage(ctx, member)
         async with ctx.typing():
             img = await dagpi.image_process(asyncdagpi.ImageFeatures.delete(), url=str(url))
@@ -189,7 +189,7 @@ class Image(commands.Cog):
 
     @commands.command()
     @commands.cooldown(1,10,commands.BucketType.user)
-    async def fedora(self, ctx, member : discord.Member = None):
+    async def fedora(self, ctx, member : typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
         url = getImage(ctx, member)
         async with ctx.typing():
             img = await dagpi.image_process(asyncdagpi.ImageFeatures.fedora(), url=str(url))
@@ -201,7 +201,7 @@ class Image(commands.Cog):
 
     @commands.command(aliases=["hitler", "wth"])
     @commands.cooldown(1,10,commands.BucketType.user)
-    async def worsethanhitler(self, ctx, member : discord.Member = None):
+    async def worsethanhitler(self, ctx, member : typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
         url = getImage(ctx, member)
         async with ctx.typing():
             img = await dagpi.image_process(asyncdagpi.ImageFeatures.hitler(), url=str(url))
@@ -213,7 +213,7 @@ class Image(commands.Cog):
 
     @commands.command()
     @commands.cooldown(1,10,commands.BucketType.user)
-    async def wanted(self, ctx, member : discord.Member = None):
+    async def wanted(self, ctx, member : typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
         url = getImage(ctx, member)
         async with ctx.typing():
             img = await dagpi.image_process(asyncdagpi.ImageFeatures.wanted(), url=str(url))
@@ -247,7 +247,7 @@ class Image(commands.Cog):
 
     @commands.command()
     @commands.cooldown(1,10,commands.BucketType.user)
-    async def jail(self, ctx, member : discord.Member = None):
+    async def jail(self, ctx, member : typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
         if member is None:
             if ctx.message.attachments:
                 if ctx.message.attachments[0].url.endswith("png") or ctx.message.attachments[0].url.endswith("jpg") or ctx.message.attachments[0].url.endswith("jpeg") or ctx.message.attachments[0].url.endswith("webp"):
@@ -268,7 +268,7 @@ class Image(commands.Cog):
 
     @commands.command()
     @commands.cooldown(1,10,commands.BucketType.user)
-    async def pride(self, ctx, flag : str = "gay", member : discord.Member = None):
+    async def pride(self, ctx, member : typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None, flag : str = "gay"):
         url = getImage(ctx, member)
         async with ctx.typing():
             img = await dagpi.image_process(asyncdagpi.ImageFeatures.pride(), url=str(url), flag=flag)
@@ -280,7 +280,7 @@ class Image(commands.Cog):
 
     @commands.command()
     @commands.cooldown(1,10,commands.BucketType.user)
-    async def trash(self, ctx, member : discord.Member = None):
+    async def trash(self, ctx, member : typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
         url = getImage(ctx, member)
         async with ctx.typing():
             img = await dagpi.image_process(asyncdagpi.ImageFeatures.trash(), url=str(url))
@@ -292,7 +292,7 @@ class Image(commands.Cog):
 
     @commands.command()
     @commands.cooldown(1,10,commands.BucketType.user)
-    async def magik(self, ctx, member : discord.Member = None):
+    async def magik(self, ctx, member : typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
         url = getImage(ctx, member)
         async with ctx.typing():
             img = await dagpi.image_process(asyncdagpi.ImageFeatures.magik(), url=str(url))
@@ -304,7 +304,7 @@ class Image(commands.Cog):
 
     @commands.command()
     @commands.cooldown(1,10,commands.BucketType.user)
-    async def paint(self, ctx, member : discord.Member = None):
+    async def paint(self, ctx, member : typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
         url = getImage(ctx, member)
         async with ctx.typing():
             img = await dagpi.image_process(asyncdagpi.ImageFeatures.paint(), url=str(url))
@@ -316,7 +316,7 @@ class Image(commands.Cog):
 
     @commands.command()
     @commands.cooldown(1,10,commands.BucketType.user)
-    async def captcha(self, ctx, text : str, member : discord.Member = None):
+    async def captcha(self, ctx, text : str, member : typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
         url = getImage(ctx, member)
         async with ctx.typing():
             img = await dagpi.image_process(asyncdagpi.ImageFeatures.captcha(), url=str(url), text=text)
@@ -341,7 +341,7 @@ class Image(commands.Cog):
 
     @commands.command()
     @commands.cooldown(1,15,commands.BucketType.user)
-    async def stickbug(self, ctx, member : discord.Member = None):
+    async def stickbug(self, ctx, member : typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
         url = getImage(ctx, member)
         async with ctx.typing():
             res = await self.bot.session.get(f"https://nekobot.xyz/api/imagegen?type=stickbug&url={url}")
@@ -381,7 +381,7 @@ class Image(commands.Cog):
 
     @commands.command(aliases=["iphonex"])
     @commands.cooldown(1,5,commands.BucketType.user)
-    async def iphone(self, ctx, member : discord.Member = None):
+    async def iphone(self, ctx, member : typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
         url = getImage(ctx, member)
         async with ctx.typing():
             res = await self.bot.session.get(f"https://nekobot.xyz/api/imagegen?type=iphonex&url={url}")
