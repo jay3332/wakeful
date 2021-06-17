@@ -4,7 +4,7 @@ from fuzzywuzzy import fuzz
 from gtts import gTTS
 from jishaku.functools import executor_function
 from utils.get import *
-from utils.functions import getFile
+from utils.functions import *
 
 dagpi = asyncdagpi.Client(get_config("DAGPI"))
 

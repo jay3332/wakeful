@@ -80,30 +80,32 @@ class Errors(commands.Cog):
             await ctx.reply(embed=em, mention_author=False)
 
         elif isinstance(error, commands.BotMissingPermissions):
-            em=discord.Embed(description=f"I don't have permission to do this", color=color())
+            perms = ", ".join(perm.replace("_", " ").lower() for perm in error.missing_perms)
+            em=discord.Embed(description=f"I need {perms} permissions to execute this command", color=color())
             await ctx.reply(embed=em, mention_author=False)
 
         elif isinstance(error, commands.MissingPermissions):
-            em=discord.Embed(description=f"You don't have permission to do this", color=color())
-            await ctx.reply(embed=em, mention_author=False)
-
-        elif isinstance(error, commands.MissingAnyRole):
-            em=discord.Embed(description=f"You don't have permission to do this", color=color())
+            perms = ", ".join(perm.replace("_", " ").lower() for perm in error.missing_perms)
+            em=discord.Embed(description=f"You need {perms} permissions to execute this command", color=color())
             await ctx.reply(embed=em, mention_author=False)
 
         elif isinstance(error, commands.NotOwner):
             if list(error.args) != [] and len(list(error.args)) != 0:
                 msg = list(error.args)[0]
                 em=discord.Embed(description=msg, color=color())
-                await ctx.reply(embed=em, mention_author=False)
-            else:
-                em=discord.Embed(description="You aren't allowed to execute this command", color=color())
-                await ctx.reply(embed=em, mention_author=False)
+                return await ctx.reply(embed=em, mention_author=False)
+            em=discord.Embed(description="You aren't allowed to execute this command", color=color())
+            await ctx.reply(embed=em, mention_author=False)
 
         elif isinstance(error, commands.CommandInvokeError):
             error = error.original
             if isinstance(error, TooLong):
                 await ctx.reply(str(error), mention_author=False, allowed_mentions=discord.AllowedMentions.none())
+
+            elif isinstance(error, commands.BotMissingPermissions):
+                perms = ", ".join(perm.replace("_", " ").lower() for perm in error.missing_perms)
+                em=discord.Embed(description=f"I need {perms} permissions to execute this command", color=color())
+                await ctx.reply(embed=em, mention_author=False)
 
             elif isinstance(error, discord.Forbidden):
                 em=discord.Embed(description=f"I don't have permission to do this", color=color())

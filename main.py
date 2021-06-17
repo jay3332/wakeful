@@ -10,8 +10,6 @@ from utils.get import *
 with open('config.json') as f:
     conf = json.load(f)
 
-devprefix = conf["DEVPREFIX"] # the prefix for the development version
-
 
 async def get_prefix(bot, message):
     await bot.wait_until_ready()
@@ -127,7 +125,6 @@ bot = wakeful(command_prefix=get_prefix, case_insensitive=True, ShardCount=10, i
 bot.remove_command("help")
 
 token = conf["TOKEN"]
-devtoken = conf["DEVTOKEN"]
 os.environ["JISHAKU_NO_UNDERSCORE"] = "True"
 os.environ["JISHAKU_NO_DM_TRACEBACK"] = "True" 
 os.environ["JISHAKU_HIDE"] = "True"

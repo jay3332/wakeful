@@ -88,6 +88,7 @@ class Moderation(commands.Cog):
 
     @commands.command()
     @commands.guild_only()
+    @commands.bot_has_guild_permissions(ban_members=True)
     @commands.has_guild_permissions(ban_members=True)
     @commands.cooldown(1,5,commands.BucketType.user)
     async def ban(self, ctx, member : discord.Member, *, reason : str = None):
@@ -103,6 +104,7 @@ class Moderation(commands.Cog):
 
     @commands.command()
     @commands.guild_only()
+    @commands.bot_has_guild_permissions(kick_members=True)
     @commands.has_guild_permissions(kick_members=True)
     @commands.cooldown(1,5,commands.BucketType.user)
     async def kick(self, ctx, member : discord.Member, *, reason : str = None):
@@ -119,13 +121,13 @@ class Moderation(commands.Cog):
     @commands.command(aliases=["clear"])
     @commands.guild_only()
     @commands.has_guild_permissions(manage_messages=True)
+    @commands.bot_has_guild_permissions(manage_messages=True)
     @commands.cooldown(1,5,commands.BucketType.user)
     async def purge(self, ctx, amount : int = 10):
         if not amount > 100:
             e = await ctx.channel.purge(limit=amount)
             em=discord.Embed(description=f"I've successfully purged `{len(e)}` messages", color=color())
-            
-            msg = await ctx.reply(embed=em, mention_author=False, delete_after=2)
+            await ctx.reply(embed=em, mention_author=False, delete_after=2)
         else:
             await ctx.message.add_reaction(self.bot.icons["redtick"])
             em=discord.Embed(description=f"The maximum amount you can purge is `100`", color=color())
@@ -134,11 +136,12 @@ class Moderation(commands.Cog):
     @commands.command()
     @commands.guild_only()
     @commands.has_guild_permissions(manage_channels=True)
+    @commands.bot_has_guild_permissions(manage_channels=True)
     @commands.cooldown(1,5,commands.BucketType.user)
     async def nuke(self, ctx, channel : discord.TextChannel = None):
         if channel is None:
             channel = ctx.channel
-        em=discord.Embed(description="Are you sure you want to do this? this will delete all pins & messages", color=color())
+        em=discord.Embed(description="Are you sure you want to execute this command? This will delete all pins & messages", color=color())
         msg = await ctx.reply(embed=em, mention_author=False)
         await msg.add_reaction(self.bot.icons["greentick"])
         await msg.add_reaction(self.bot.icons["redtick"])
@@ -154,6 +157,7 @@ class Moderation(commands.Cog):
     @commands.command(aliases=["nick"])
     @commands.guild_only()
     @commands.has_guild_permissions(manage_nicknames=True)
+    @commands.bot_has_guild_permissions(manage_nicknames=True)
     @commands.cooldown(1,5,commands.BucketType.user)
     async def nickname(self, ctx, member : discord.Member, *, nickname : str = ""):
         if ctx.author.top_role.position > member.top_role.position:
@@ -167,6 +171,7 @@ class Moderation(commands.Cog):
     @commands.command(aliases=["modnick", "moderatenick", "modnickname"])
     @commands.guild_only()
     @commands.has_guild_permissions(manage_nicknames=True)
+    @commands.bot_has_guild_permissions(manage_nicknames=True)
     @commands.cooldown(1,5,commands.BucketType.user)
     async def moderatenickname(self, ctx, member : discord.Member):
         if ctx.author.top_role.position > member.top_role.position:

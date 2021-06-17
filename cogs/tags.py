@@ -94,7 +94,7 @@ class Tags(commands.Cog):
             try:
                 author = (ctx.guild.get_member(int(author))).mention
             except Exception:
-                author = "None"
+                author = "N/A"
 
             em=discord.Embed(title="", color=color())
             em.add_field(name="Name", value=name, inline=True)

@@ -1,6 +1,6 @@
 import discord, datetime, async_cse, psutil, humanize, os, sys, inspect, mystbin, googletrans, asyncio, aiohttp, random, time, lyricsgenius
-from discord.channel import TextChannel
-import asyncdagpi, hashlib, asyncpg, io, typing, gdshortener, pathlib, textwrap, async_tio
+from discord.ext.commands.core import cooldown
+import asyncdagpi, hashlib, asyncpg, io, typing, gdshortener, pathlib, textwrap, async_tio, zipfile
 import mathjspy, pytube, youtube_dl, re 
 
 from discord.ext import commands, menus
@@ -45,6 +45,15 @@ def do_translate(output, text):
 @executor_function
 def get_song(song, artist = None):
     return genius.search_song(title=song, artist=artist)
+
+@executor_function
+def download_emojis(emojis : tuple):
+    file_ = io.BytesIO()
+    with zipfile.ZipFile(file_, mode="w", compression=getattr(zipfile, "ZIP_DEFLATED"), compresslevel=9) as zipfile_:
+        for a, b in emojis:
+            zipfile_.writestr(a, b.getvalue())
+    file_.seek(0)
+    return discord.File(file_, "emojis.zip")
 
 @executor_function
 def download(bot, url):
@@ -409,21 +418,21 @@ class Utility(commands.Cog):
             res = await self.bot.session.get(f"https://pypi.org/pypi/{package}/json")
             json = await res.json()
             name = json["info"]["name"] + " " + json["info"]["version"]
-            author = json["info"]["author"] or "None"
-            author_email = json["info"]["author_email"] or "None"
-            url = json["info"]["project_url"] or "None"
-            description = json["info"]["summary"] or "None"
-            author = json["info"]["author"] or "None"
-            license_ = json["info"]["license"] or "None"
+            author = json["info"]["author"] or "N/A"
+            author_email = json["info"]["author_email"] or "N/A"
+            url = json["info"]["project_url"] or "N/A"
+            description = json["info"]["summary"] or "N/A"
+            author = json["info"]["author"] or "N/A"
+            license_ = json["info"]["license"] or "N/A"
             try:
-                documentation = json["info"]["project_urls"]["Documentation"] or "None"
+                documentation = json["info"]["project_urls"]["Documentation"] or "N/A"
             except Exception:
-                documentation = "None"
+                documentation = "N/A"
             try:
-                website = json["info"]["project_urls"]["Homepage"] or "None"
+                website = json["info"]["project_urls"]["Homepage"] or "N/A"
             except Exception:
-                website = "None"
-            keywords = json["info"]["keywords"] or "None"
+                website = "N/A"
+            keywords = json["info"]["keywords"] or "N/A"
             em=discord.Embed(
                 title=name,
                 description=f"""
@@ -575,7 +584,7 @@ class Utility(commands.Cog):
         try:
             booster_role = ctx.guild.premium_subscriber_role.mention 
         except AttributeError:
-            booster_role = "None"
+            booster_role = "N/A"
         created_at = ctx.guild.created_at.strftime("%d/%m/%Y at %H:%M:%S")
         em=discord.Embed(title=ctx.guild.name, description=f"{description}", color=color())
         em.set_image(url=ctx.guild.banner_url)
@@ -614,7 +623,7 @@ class Utility(commands.Cog):
         elif "offline" != str(member.web_status):
             platform = "Web"
         else:
-            platform = "None"
+            platform = "N/A"
 
         created_at = member.created_at.strftime("%d/%m/%Y at %H:%M:%S")
         joined_at = member.joined_at.strftime("%d/%m/%Y at %H:%M:%S")
@@ -622,7 +631,7 @@ class Utility(commands.Cog):
         pronoun = await get_pronoun(self.bot, member)
 
         if member.top_role.name == "@everyone":
-            top_role="None"
+            top_role="N/A"
         else:
             top_role=member.top_role.mention
 
@@ -1042,7 +1051,7 @@ class Utility(commands.Cog):
                 try:
                     type = str(activity.type).lower().split("activitytype.")[1].title()
                 except Exception:
-                    type = "None"
+                    type = "N/A"
                 em.add_field(
                     name="Unknown",
                     value=f"""
@@ -1089,9 +1098,17 @@ class Utility(commands.Cog):
     @commands.command(aliases=["run", "tio"])
     @commands.cooldown(1,10,commands.BucketType.user)
     async def execute(self, ctx, language, *, code : codeblock_converter):
+        res = (code.content
+            .replace("{author.name}", ctx.author.name)
+            .replace("{author.id}", str(ctx.author.id))
+            .replace("{author.nick}", ctx.author.nick)
+            .replace("{server.name}", ctx.guild.name)
+            .replace("{server.members}", str(ctx.guild.member_count))
+            .replace("{channel.name}", ctx.channel.name)
+            .replace("{channel.topic}", ctx.channel.topic))
         tio= await async_tio.Tio()
         async with ctx.typing():
-            res = await tio.execute(code.content, language=language)
+            res = await tio.execute(res, language=language)
             await tio.close()
         if len(res.output) > 2000:
             f = await getFile(res.output, filename="output")
@@ -1163,6 +1180,19 @@ class Utility(commands.Cog):
                 await ctx.reply(embed=em, mention_author=False)
 
     @commands.command()
+    @commands.has_guild_permissions(manage_emojis=True)
+    @commands.cooldown(1,15,commands.BucketType.user)
+    async def dumpemojis(self, ctx):
+        emojis = []
+        async  with ctx.typing():
+            for e in ctx.guild.emojis:
+                res = await (e.url_as()).read()
+                e = (f"{e.name}.png" if not e.animated else f"{e.name}.gif", io.BytesIO(res))
+                emojis.append(e)
+            res = await download_emojis(emojis)
+        await ctx.reply(file=res, mention_author=False)
+
+    @commands.command()
     @commands.cooldown(1,5,commands.BucketType.user)
     async def snipe(self, ctx):
         try:
@@ -1171,7 +1201,7 @@ class Utility(commands.Cog):
             em=discord.Embed(description=f"There's no message to snipe", color=color())
             await ctx.reply(embed=em, mention_author=False)
         else:
-            res = WrapText(msg.content)
+            res = WrapText(msg.content, 2048)
             for w in res:
                 print(len(w))
             embeds = []
@@ -1328,8 +1358,8 @@ class Utility(commands.Cog):
                 background = res["animated_background_url"]
             avatar = res["avatar"]
             level = res["level"]["value"]
-            location = "".join("None" if res["location"] == None else res["location"])
-            real_name = "".join("None" if res["real_name"] == "" else res["real_name"])
+            location = "".join("N/A" if res["location"] == None else res["location"])
+            real_name = "".join("N/A" if res["real_name"] == "" else res["real_name"])
             if res["primary_group"] is not None:
                 group = res["primary_group"]["name"]
                 group_url = res["primary_group"]["url"]
@@ -1339,8 +1369,8 @@ class Utility(commands.Cog):
             em.add_field(name="Level", value=level, inline=True)
             em.add_field(name="Real Name", value=real_name, inline=True)
             em.add_field(name="Location", value=location, inline=True)
-            em.add_field(name="Primary Group", value="".join(f"[{group}]({group_url})" if group is not None else "None"), inline=True)
-            em.add_field(name="Background URL", value="".join(f"[Click here]({background})" if background is not None else "None"), inline=True)
+            em.add_field(name="Primary Group", value="".join(f"[{group}]({group_url})" if group is not None else "N/A"), inline=True)
+            em.add_field(name="Background URL", value="".join(f"[Click here]({background})" if background is not None else "N/A"), inline=True)
             if avatar is not None:
                 em.set_thumbnail(url=avatar)
             await ctx.reply(embed=em, mention_author=False)
@@ -1478,7 +1508,7 @@ class Utility(commands.Cog):
                     try:
                         command_subcommands = "> " + ", ".join(f"`{command.name}`" for command in given_command.commands if not command.hidden or not command.name in disabled)
                     except Exception:
-                        command_subcommands = "None"
+                        command_subcommands = "N/A"
                     #-------------------------------------
                     if given_command.usage is not None:
                         command_usage = given_command.usage
@@ -1493,6 +1523,17 @@ class Utility(commands.Cog):
                                     parameters[str(param)] = "optional"
                         command_usage = " ".join(f"<{param}>" if dict(parameters)[param] == "required" else f"[{param}]" for param in list(parameters))
                     #---------------------------------------
+                    command_bucket = given_command._buckets
+                    command_cooldown = command_bucket._cooldown
+                    cooldown_type = list(command_cooldown.type)[0]
+                    cooldown_per = round(command_cooldown.per)
+                    if cooldown_per > 59:
+                        cooldown_per = f"{round(cooldown_per / 60)} minutes"
+                    else:
+                        cooldown_per = f"{cooldown_per} seconds"
+                    cooldown_rate = command_cooldown.rate
+                    cooldown_msg = f"{''.join(f'{cooldown_rate} time' if str(cooldown_rate) == '1' else f'{cooldown_rate} times')} every {cooldown_per} per {cooldown_type}"
+                    #---------------------------------------
                     em=discord.Embed(
                         title=given_command.name,
                         description=given_command.description,
@@ -1500,10 +1541,11 @@ class Utility(commands.Cog):
                     )
                     
                     em.add_field(name="Usage", value=f"{prefix}{given_command.name} {command_usage}", inline=False)
+                    em.add_field(name="Cooldown", value=cooldown_msg, inline=False)
                     if given_command.aliases:
                         em.add_field(name=f"Aliases [{len(given_command.aliases)}]", value="> " + ", ".join(f"`{alias}`" for alias in given_command.aliases), inline=False)
                     else:
-                        em.add_field(name="Aliases [0]", value="None", inline=False)
+                        em.add_field(name="Aliases [0]", value="N/A", inline=False)
                     try:
                         if is_mod(self.bot, ctx.author):
                             commands_ = [cmd for cmd in given_command.commands]
@@ -1514,7 +1556,7 @@ class Utility(commands.Cog):
                     try:
                         em.add_field(name=f"Subcommands [{''.join(str(len(commands_)) if str(commands_) != 'N/A' else '0')}]", value=command_subcommands, inline=False)
                     except AttributeError:
-                        em.add_field(name=f"Subcommands [0]", value="None", inline=False)
+                        em.add_field(name=f"Subcommands [0]", value="N/A", inline=False)
                     em.add_field(name="Category", value=given_command.cog_name, inline=False)
                     await ctx.reply(embed=em, mention_author=False)
                 else:
