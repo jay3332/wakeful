@@ -132,13 +132,23 @@ class Utility(commands.Cog):
 
     @commands.command()
     @commands.cooldown(1,5,commands.BucketType.user)
-    async def lyrics(self, ctx, artist, *, song):
+    async def lyrics(self, ctx, *, song):
+        song_name = song.replace(" --txt", "")
         async with ctx.typing():
-            song = await get_song(song=song, artist=artist)
-        if song is None:
-            em=discord.Embed(description=f"I couldn't find a song with the name `{song}`", color=color())
+            res = await get_song(song=song_name)
+        if res is None:
+            em=discord.Embed(description=f"I couldn't find a song with the name `{song_name}`", color=color())
             return await ctx.reply(embed=em, mention_author=False)
-        await ctx.reply(file=await getFile(song.lyrics, filename=f"{song.title}_lyrics"), mention_author=False)
+        if not song.endswith("--txt"):
+            text = WrapText(res.lyrics, 2024)
+            embeds = []
+            for txt in text:
+                em=discord.Embed(title=f"{res.title} Lyrics", description=txt, color=color())
+                embeds.append(em)
+            pag = menus.MenuPages(Paginator(embeds, per_page=1))
+            await pag.start(ctx)
+        else:
+            await ctx.reply(file=await getFile(res.lyrics, filename=f"{res.title}_lyrics"), mention_author=False)
         
     @commands.command(aliases=["content"])
     @commands.cooldown(1,5,commands.BucketType.user)
