@@ -275,21 +275,24 @@ class Tags(commands.Cog):
             em=discord.Embed(description=f"There are no tags on this guild", color=color())
             await ctx.reply(embed=em, mention_author=False)
 
-    @commands.command()
+    @tag.command(name="from", aliases=["by"])
     @commands.cooldown(1,5,commands.BucketType.user)
-    async def tags(self, ctx):
-        records = sorted(await self.bot.db.fetch("SELECT * FROM tags WHERE guild = $1 AND author = $2", ctx.guild.id, ctx.author.id))
+    async def _from(self, ctx, member : discord.Member = None):
+        if member is None:
+            member = ctx.author
+
+        records = sorted(await self.bot.db.fetch("SELECT * FROM tags WHERE guild = $1 AND author = $2", ctx.guild.id, member.id))
         if records != [] and len(records) != 0:
             res = WrapList(records, 6)
             embeds = []
             for txt in res:
                 em=discord.Embed(description="\n".join(f"{list(records).index(text)+1}. {text['name']}" for text in txt), color=color())
-                em.set_author(name=ctx.author, icon_url=ctx.author.avatar_url)
+                em.set_author(name=member, icon_url=member.avatar_url)
                 embeds.append(em)
             pag = menus.MenuPages(Paginator(embeds, per_page=1))
             await pag.start(ctx)
         else:
-            em=discord.Embed(description=f"There are no tags on this guild", color=color())
+            em=discord.Embed(description=f"{member.mention} does not have any tags on this guild", color=color())
             await ctx.reply(embed=em, mention_author=False)
 
 def setup(bot):

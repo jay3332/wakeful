@@ -1507,7 +1507,24 @@ class Utility(commands.Cog):
             )
             await ctx.reply(embed=em, mention_author=False)
         else:
-            if self.bot.get_command(str(command)) is not None:
+            disabled = await self.bot.db.fetchrow("SELECT commands FROM commands WHERE guild = $1", ctx.guild.id)
+            try:
+                disabled = disabled["commands"]
+            except Exception:
+                disabled = []
+            else:
+                disabled = disabled.split(",")
+            given_cog = get_cog(self.bot, command)
+            if given_cog is not None:
+                if is_mod(self.bot, ctx.author):
+                    commands_ = [cmd for cmd in given_cog.walk_commands() if cmd.parent is None]
+                else:
+                    commands_ = [cmd for cmd in given_cog.walk_commands() if not cmd.hidden and not cmd.name in disabled and cmd.parent is None]
+                if commands_ is not None and commands_ != []:
+                    em=discord.Embed(title=f"{given_cog.qualified_name} commands [{len(commands_)}]", description=f"{given_cog.description}\n\n> "+", ".join(f"`{cmd.name}`" for cmd in commands_), color=color())
+                    await ctx.reply(embed=em, mention_author=False)
+
+            elif self.bot.get_command(str(command)) is not None:
                 given_command = self.bot.get_command(str(command))
                 disabled = await self.bot.db.fetchrow("SELECT commands FROM commands WHERE guild = $1", ctx.guild.id)
                 try:
@@ -1579,28 +1596,8 @@ class Utility(commands.Cog):
                     em=discord.Embed(description=f"This command does not exist", color=color())
                     await ctx.reply(embed=em, mention_author=False)
             else:
-                disabled = await self.bot.db.fetchrow("SELECT commands FROM commands WHERE guild = $1", ctx.guild.id)
-                try:
-                    disabled = disabled["commands"]
-                except Exception:
-                    disabled = []
-                else:
-                    disabled = disabled.split(",")
-                given_cog = get_cog(self.bot, command)
-                if given_cog is not None:
-                    if is_mod(self.bot, ctx.author):
-                        commands_ = [cmd for cmd in given_cog.walk_commands() if cmd.parent is None]
-                    else:
-                        commands_ = [cmd for cmd in given_cog.walk_commands() if not cmd.hidden and not cmd.name in disabled and cmd.parent is None]
-                    if commands_ is not None and commands_ != []:
-                        em=discord.Embed(title=f"{given_cog.qualified_name} commands [{len(commands_)}]", description=f"{given_cog.description}\n\n> "+", ".join(f"`{cmd.name}`" for cmd in commands_), color=color())
-                        await ctx.reply(embed=em, mention_author=False)
-                    else:
-                        em=discord.Embed(description=f"There isn't a cog / command with the name `{command}`", color=color())
-                        await ctx.reply(embed=em, mention_author=False)
-                else:
-                    em=discord.Embed(description=f"There isn't a cog / command with the name `{command}`", color=color())
-                    await ctx.reply(embed=em, mention_author=False)
+                em=discord.Embed(description=f"There isn't a cog / command with the name `{command}`", color=color())
+                await ctx.reply(embed=em, mention_author=False)
 
     @help.command()
     @commands.cooldown(1,5,commands.BucketType.user)
