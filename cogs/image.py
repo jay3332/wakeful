@@ -62,7 +62,7 @@ class Image(commands.Cog):
         async with ctx.typing():
             img = await dagpi.image_process(asyncdagpi.ImageFeatures.pixel(), url=str(url))
             file=discord.File(img.image, f"{ctx.command.name}.png")
-            em=discord.Embed(color=color(), timestamp=datetime.datetime.utcnow())
+            em=discord.Embed(color=color())
             em.set_image(url=f"attachment://{ctx.command.name}.png")
             em.set_footer(text=f"Powered by dagpi.xyz", icon_url=ctx.author.avatar_url)
         await ctx.send(file=file, embed=em)
@@ -74,7 +74,7 @@ class Image(commands.Cog):
         async with ctx.typing():
             img = await dagpi.image_process(asyncdagpi.ImageFeatures.america(), url=str(url))
             file=discord.File(img.image, f"{ctx.command.name}.png")
-            em=discord.Embed(color=color(), timestamp=datetime.datetime.utcnow())
+            em=discord.Embed(color=color())
             em.set_image(url=f"attachment://{ctx.command.name}.png")
             em.set_footer(text=f"Powered by dagpi.xyz", icon_url=ctx.author.avatar_url)
         await ctx.send(file=file, embed=em)
@@ -86,7 +86,7 @@ class Image(commands.Cog):
         async with ctx.typing():
             img = await dagpi.image_process(asyncdagpi.ImageFeatures.triggered(), url=str(url))
             file=discord.File(img.image, f"{ctx.command.name}.gif")
-            em=discord.Embed(color=color(), timestamp=datetime.datetime.utcnow())
+            em=discord.Embed(color=color())
             em.set_image(url=f"attachment://{ctx.command.name}.gif")
             em.set_footer(text=f"Powered by dagpi.xyz", icon_url=ctx.author.avatar_url)
         await ctx.send(file=file, embed=em)
@@ -98,7 +98,7 @@ class Image(commands.Cog):
         async with ctx.typing():
             img = await dagpi.image_process(asyncdagpi.ImageFeatures.wasted(), url=str(url))
             file=discord.File(img.image, f"{ctx.command.name}.png")
-            em=discord.Embed(color=color(), timestamp=datetime.datetime.utcnow())
+            em=discord.Embed(color=color())
             em.set_image(url=f"attachment://{ctx.command.name}.png")
             em.set_footer(text=f"Powered by dagpi.xyz", icon_url=ctx.author.avatar_url)
         await ctx.send(file=file, embed=em)
@@ -110,7 +110,7 @@ class Image(commands.Cog):
         async with ctx.typing():
             img = await dagpi.image_process(asyncdagpi.ImageFeatures.invert(), url=str(url))
             file=discord.File(img.image, f"{ctx.command.name}.png")
-            em=discord.Embed(color=color(), timestamp=datetime.datetime.utcnow())
+            em=discord.Embed(color=color())
             em.set_image(url=f"attachment://{ctx.command.name}.png")
             em.set_footer(text=f"Powered by dagpi.xyz", icon_url=ctx.author.avatar_url)
         await ctx.send(file=file, embed=em)
@@ -122,7 +122,7 @@ class Image(commands.Cog):
         async with ctx.typing():
             img = await dagpi.image_process(asyncdagpi.ImageFeatures.sobel(), url=str(url))
             file=discord.File(img.image, f"{ctx.command.name}.png")
-            em=discord.Embed(color=color(), timestamp=datetime.datetime.utcnow())
+            em=discord.Embed(color=color())
             em.set_image(url=f"attachment://{ctx.command.name}.png")
             em.set_footer(text=f"Powered by dagpi.xyz", icon_url=ctx.author.avatar_url)
         await ctx.send(file=file, embed=em)
@@ -134,7 +134,7 @@ class Image(commands.Cog):
         async with ctx.typing():
             img = await dagpi.image_process(asyncdagpi.ImageFeatures.triangle(), url=str(url))
             file=discord.File(img.image, f"{ctx.command.name}.png")
-            em=discord.Embed(color=color(), timestamp=datetime.datetime.utcnow())
+            em=discord.Embed(color=color())
             em.set_image(url=f"attachment://{ctx.command.name}.png")
             em.set_footer(text=f"Powered by dagpi.xyz", icon_url=ctx.author.avatar_url)
         await ctx.send(file=file, embed=em)
@@ -146,7 +146,7 @@ class Image(commands.Cog):
         async with ctx.typing():
             img = await dagpi.image_process(asyncdagpi.ImageFeatures.blur(), url=str(url))
             file=discord.File(img.image, f"{ctx.command.name}.png")
-            em=discord.Embed(color=color(), timestamp=datetime.datetime.utcnow())
+            em=discord.Embed(color=color())
             em.set_image(url=f"attachment://{ctx.command.name}.png")
             em.set_footer(text=f"Powered by dagpi.xyz", icon_url=ctx.author.avatar_url)
         await ctx.send(file=file, embed=em)
@@ -158,7 +158,7 @@ class Image(commands.Cog):
         async with ctx.typing():
             img = await dagpi.image_process(asyncdagpi.ImageFeatures.angel(), url=str(url))
             file=discord.File(img.image, f"{ctx.command.name}.png")
-            em=discord.Embed(color=color(), timestamp=datetime.datetime.utcnow())
+            em=discord.Embed(color=color())
             em.set_image(url=f"attachment://{ctx.command.name}.png")
             em.set_footer(text=f"Powered by dagpi.xyz", icon_url=ctx.author.avatar_url)
         await ctx.send(file=file, embed=em)
@@ -170,7 +170,7 @@ class Image(commands.Cog):
         async with ctx.typing():
             img = await dagpi.image_process(asyncdagpi.ImageFeatures.satan(), url=str(url))
             file=discord.File(img.image, f"{ctx.command.name}.png")
-            em=discord.Embed(color=color(), timestamp=datetime.datetime.utcnow())
+            em=discord.Embed(color=color())
             em.set_image(url=f"attachment://{ctx.command.name}.png")
             em.set_footer(text=f"Powered by dagpi.xyz", icon_url=ctx.author.avatar_url)
         await ctx.send(file=file, embed=em)
@@ -182,7 +182,7 @@ class Image(commands.Cog):
         async with ctx.typing():
             img = await dagpi.image_process(asyncdagpi.ImageFeatures.delete(), url=str(url))
             file=discord.File(img.image, f"{ctx.command.name}.png")
-            em=discord.Embed(color=color(), timestamp=datetime.datetime.utcnow())
+            em=discord.Embed(color=color())
             em.set_image(url=f"attachment://{ctx.command.name}.png")
             em.set_footer(text=f"Powered by dagpi.xyz", icon_url=ctx.author.avatar_url)
         await ctx.send(file=file, embed=em)
@@ -194,7 +194,7 @@ class Image(commands.Cog):
         async with ctx.typing():
             img = await dagpi.image_process(asyncdagpi.ImageFeatures.fedora(), url=str(url))
             file=discord.File(img.image, f"{ctx.command.name}.png")
-            em=discord.Embed(color=color(), timestamp=datetime.datetime.utcnow())
+            em=discord.Embed(color=color())
             em.set_image(url=f"attachment://{ctx.command.name}.png")
             em.set_footer(text=f"Powered by dagpi.xyz", icon_url=ctx.author.avatar_url)
         await ctx.send(file=file, embed=em)
@@ -206,7 +206,7 @@ class Image(commands.Cog):
         async with ctx.typing():
             img = await dagpi.image_process(asyncdagpi.ImageFeatures.hitler(), url=str(url))
             file=discord.File(img.image, f"{ctx.command.name}.png")
-            em=discord.Embed(color=color(), timestamp=datetime.datetime.utcnow())
+            em=discord.Embed(color=color())
             em.set_image(url=f"attachment://{ctx.command.name}.png")
             em.set_footer(text=f"Powered by dagpi.xyz", icon_url=ctx.author.avatar_url)
         await ctx.send(file=file, embed=em)
@@ -218,7 +218,7 @@ class Image(commands.Cog):
         async with ctx.typing():
             img = await dagpi.image_process(asyncdagpi.ImageFeatures.wanted(), url=str(url))
             file=discord.File(img.image, f"{ctx.command.name}.png")
-            em=discord.Embed(color=color(), timestamp=datetime.datetime.utcnow())
+            em=discord.Embed(color=color())
             em.set_image(url=f"attachment://{ctx.command.name}.png")
             em.set_footer(text=f"Powered by dagpi.xyz", icon_url=ctx.author.avatar_url)
         await ctx.send(file=file, embed=em)
@@ -229,7 +229,7 @@ class Image(commands.Cog):
         async with ctx.typing():
             img = await dagpi.image_process(asyncdagpi.ImageFeatures.youtube(), url=getImage(ctx, member), username=member.display_name, text=text)
             file=discord.File(img.image, f"{ctx.command.name}.png")
-            em=discord.Embed(color=color(), timestamp=datetime.datetime.utcnow())
+            em=discord.Embed(color=color())
             em.set_image(url=f"attachment://{ctx.command.name}.png")
             em.set_footer(text=f"Powered by dagpi.xyz", icon_url=ctx.author.avatar_url)
         await ctx.send(file=file, embed=em)
@@ -240,7 +240,7 @@ class Image(commands.Cog):
         async with ctx.typing():
             img = await dagpi.image_process(asyncdagpi.ImageFeatures.discord(), url=str(member.avatar_url_as(format="png")), username=member.display_name, text=text)
             file=discord.File(img.image, f"{ctx.command.name}.png")
-            em=discord.Embed(color=color(), timestamp=datetime.datetime.utcnow())
+            em=discord.Embed(color=color())
             em.set_image(url=f"attachment://{ctx.command.name}.png")
             em.set_footer(text=f"Powered by dagpi.xyz", icon_url=ctx.author.avatar_url)
         await ctx.send(file=file, embed=em)
@@ -261,7 +261,7 @@ class Image(commands.Cog):
         async with ctx.typing():
             img = await dagpi.image_process(asyncdagpi.ImageFeatures.jail(), url=str(url))
             file=discord.File(img.image, f"{ctx.command.name}.png")
-            em=discord.Embed(color=color(), timestamp=datetime.datetime.utcnow())
+            em=discord.Embed(color=color())
             em.set_image(url=f"attachment://{ctx.command.name}.png")
             em.set_footer(text=f"Powered by dagpi.xyz", icon_url=ctx.author.avatar_url)
         await ctx.send(file=file, embed=em)
@@ -273,7 +273,7 @@ class Image(commands.Cog):
         async with ctx.typing():
             img = await dagpi.image_process(asyncdagpi.ImageFeatures.pride(), url=str(url), flag=flag)
             file=discord.File(img.image, f"{ctx.command.name}.png")
-            em=discord.Embed(color=color(), timestamp=datetime.datetime.utcnow())
+            em=discord.Embed(color=color())
             em.set_image(url=f"attachment://{ctx.command.name}.png")
             em.set_footer(text=f"Powered by dagpi.xyz", icon_url=ctx.author.avatar_url)
         await ctx.send(file=file, embed=em)
@@ -285,7 +285,7 @@ class Image(commands.Cog):
         async with ctx.typing():
             img = await dagpi.image_process(asyncdagpi.ImageFeatures.trash(), url=str(url))
             file=discord.File(img.image, f"{ctx.command.name}.png")
-            em=discord.Embed(color=color(), timestamp=datetime.datetime.utcnow())
+            em=discord.Embed(color=color())
             em.set_image(url=f"attachment://{ctx.command.name}.png")
             em.set_footer(text=f"Powered by dagpi.xyz", icon_url=ctx.author.avatar_url)
         await ctx.send(file=file, embed=em)
@@ -297,7 +297,7 @@ class Image(commands.Cog):
         async with ctx.typing():
             img = await dagpi.image_process(asyncdagpi.ImageFeatures.magik(), url=str(url))
             file=discord.File(img.image, f"{ctx.command.name}.gif")
-            em=discord.Embed(color=color(), timestamp=datetime.datetime.utcnow())
+            em=discord.Embed(color=color())
             em.set_image(url=f"attachment://{ctx.command.name}.gif")
             em.set_footer(text=f"Powered by dagpi.xyz", icon_url=ctx.author.avatar_url)
         await ctx.send(file=file, embed=em)
@@ -309,7 +309,7 @@ class Image(commands.Cog):
         async with ctx.typing():
             img = await dagpi.image_process(asyncdagpi.ImageFeatures.paint(), url=str(url))
             file=discord.File(img.image, f"{ctx.command.name}.png")
-            em=discord.Embed(color=color(), timestamp=datetime.datetime.utcnow())
+            em=discord.Embed(color=color())
             em.set_image(url=f"attachment://{ctx.command.name}.png")
             em.set_footer(text=f"Powered by dagpi.xyz", icon_url=ctx.author.avatar_url)
         await ctx.send(file=file, embed=em)
@@ -321,7 +321,7 @@ class Image(commands.Cog):
         async with ctx.typing():
             img = await dagpi.image_process(asyncdagpi.ImageFeatures.captcha(), url=str(url), text=text)
             file=discord.File(img.image, f"{ctx.command.name}.png")
-            em=discord.Embed(color=color(), timestamp=datetime.datetime.utcnow())
+            em=discord.Embed(color=color())
             em.set_image(url=f"attachment://{ctx.command.name}.png")
             em.set_footer(text=f"Powered by dagpi.xyz", icon_url=ctx.author.avatar_url)
         await ctx.send(file=file, embed=em)
@@ -387,7 +387,7 @@ class Image(commands.Cog):
             res = await self.bot.session.get(f"https://nekobot.xyz/api/imagegen?type=iphonex&url={url}")
             res = await res.json()
             image = res["message"]
-            em=discord.Embed(color=color(), timestamp=datetime.datetime.utcnow())
+            em=discord.Embed(color=color())
             em.set_image(url=image)
             em.set_footer(text=f"Powered by nekobot.xyz", icon_url=ctx.author.avatar_url)
         await ctx.reply(embed=em, mention_author=False)

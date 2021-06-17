@@ -1,5 +1,6 @@
 import discord, difflib, asyncio, traceback
 from jishaku.models import copy_context_with
+from jishaku.paginators import WrappedPaginator, PaginatorInterface
 from discord.ext import commands
 from utils.webhook import Webhook, AsyncWebhookAdapter
 from utils.checks import is_mod
@@ -117,7 +118,7 @@ class Errors(commands.Cog):
                 else:
                     em=discord.Embed(description=f"```py\n{error}```", color=color())
                     await ctx.reply(embed=em, mention_author=False)
-                    
+                
                 raise error
 
         else:
@@ -126,8 +127,8 @@ class Errors(commands.Cog):
                 await ctx.reply(f"```py\n{errormsg}```", mention_author=False, allowed_mentions=discord.AllowedMentions.none())
             else:
                 em=discord.Embed(description=f"```py\n{error}```", color=color())
-
-            await ctx.reply(embed=em, mention_author=False)
+                await ctx.reply(embed=em, mention_author=False)
+            
             raise error
 
     @commands.Cog.listener()

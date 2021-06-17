@@ -237,10 +237,6 @@ class Utility(commands.Cog):
     async def youtube(self, ctx, *, query):
         async with ctx.typing():
             data = await youtube(query)
-
-        print(data)
-
-        print(list(data))
         
         try:
             data = data["entries"]
@@ -271,9 +267,14 @@ class Utility(commands.Cog):
         else:
             start_time = datetime.datetime.utcnow()
 
+            em=discord.Embed(description=f"{self.bot.icons['loading']} Now downloading video", color=color())
+            msg = await ctx.reply(embed=em, mention_author=False)
 
             async with ctx.typing():
                 res = await download(self.bot, url)
+
+            em=discord.Embed(description=f"{self.bot.icons['loading']} Now uploading video", color=color())
+            await msg.edit(embed=em)
 
             delta = datetime.datetime.utcnow() - start_time
             hours, remainder = divmod(int(delta.total_seconds()), 3600)
@@ -306,8 +307,14 @@ class Utility(commands.Cog):
                 except KeyError:
                     data = data
 
+                em=discord.Embed(description=f"{self.bot.icons['loading']} Now downloading audio", color=color())
+                msg = await ctx.reply(embed=em, mention_author=False)
+
                 async with ctx.typing():
                     res = await (await self.bot.session.get(data["url"])).read()
+
+                em=discord.Embed(description=f"{self.bot.icons['loading']} Now uploading video", color=color())
+                await msg.edit(embed=em)
                 
                 delta = datetime.datetime.utcnow() - start_time
                 hours, remainder = divmod(int(delta.total_seconds()), 3600)
@@ -769,7 +776,6 @@ class Utility(commands.Cog):
                 else:
                     source_lines = ''.join(source_lines).split('\n')
                     src = textwrap.dedent("\n".join(line for line in source_lines))
-                    print(src)
                     await ctx.author.send(file=await getFile(src, "py"))
                     await ctx.message.add_reaction(self.bot.icons['greentick'])
 
@@ -1212,8 +1218,6 @@ class Utility(commands.Cog):
             await ctx.reply(embed=em, mention_author=False)
         else:
             res = WrapText(msg.content, 2048)
-            for w in res:
-                print(len(w))
             embeds = []
             for word in res:
                 em = discord.Embed(description=word, color=color())

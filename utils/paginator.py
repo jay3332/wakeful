@@ -19,7 +19,18 @@ class Paginator(menus.ListPageSource):
             return em
         return embed
 
+class TextPaginator(menus.ListPageSource):
+    async def format_page(self, menu, text):
+        return text
+
 def WrapText(text : str, length : int):
     wrapper = textwrap.TextWrapper(width=length)
     words = wrapper.wrap(text=text)
     return words
+
+def WrapList(list_ : list, length : int):
+    def chunks(seq, size):
+        for i in range(0, len(seq), size):
+            yield seq[i:i + size]
+
+    return list(chunks(list_, length))

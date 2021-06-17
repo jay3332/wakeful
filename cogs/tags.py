@@ -1,6 +1,7 @@
 import discord, datetime, string, time, humanize
-from discord.ext import commands
+from discord.ext import commands, menus
 from utils.get import *
+from utils.paginator import *
 
 async def exists(ctx, name):
     res = await ctx.bot.db.fetch("SELECT * FROM tags WHERE guild = $1", ctx.guild.id)
@@ -215,6 +216,24 @@ class Tags(commands.Cog):
                 await self.bot.db.execute("UPDATE tags SET author = $1 WHERE guild = $2 AND name = $3", ctx.author.id, ctx.guild.id, name_)
                 await ctx.message.add_reaction(self.bot.icons['greentick'])
 
+    @tag.command(aliases=["give"])
+    @commands.cooldown(1,5,commands.BucketType.user)
+    async def transfer(self, ctx, name, member : discord.Member):
+        if not await exists(ctx, name):
+            await ctx.message.add_reaction(self.bot.icons['redtick'])
+            em=discord.Embed(description=f"There is no tag with the name `{name}` on this guild", color=color())
+            await ctx.reply(embed=em, mention_author=False)
+        elif not await is_owner(ctx, name):
+            await ctx.message.add_reaction(self.bot.icons['redtick'])
+            em=discord.Embed(description=f"You don't own this tag", color=color())
+            await ctx.reply(embed=em, mention_author=False)
+        else:
+            tag = await get_tag(ctx, name)
+            name_ = dict(tag)["name"]
+            await self.bot.db.execute("UPDATE tags SET author = $1 WHERE guild = $2 AND name = $3", member.id, ctx.guild.id, name_)
+            await ctx.message.add_reaction(self.bot.icons['greentick'])
+            await ctx.message.add_reaction(self.bot.icons['greentick'])
+
     @tag.command()
     @commands.cooldown(1,5,commands.BucketType.user)
     async def search(self, ctx, *, query):
@@ -222,16 +241,18 @@ class Tags(commands.Cog):
         records = []
         for record in res:
             if query.lower() in dict(record)["name"].lower():
-                if len(records) < 6:
-                    records.append(record)
+                records.append(record)
         if records != [] and len(records) != 0:
-            em=discord.Embed(title=f"Search: {query}", description="\n".join(f"`{dict(rec)['name']}`" for rec in records), color=color())
-            await ctx.reply(embed=em, mention_author=False)
+            res = WrapList(records, 6)
+            embeds = []
+            for txt in res:
+                em=discord.Embed(description="\n".join(f"{list(records).index(text)+1}. {text['name']}" for text in txt), color=color())
+                embeds.append(em)
+            pag = menus.MenuPages(Paginator(embeds, per_page=1))
+            await pag.start(ctx)
         else:
             em=discord.Embed(description=f"There are no tags with `{query}` in the name", color=color())
             await ctx.reply(embed=em, mention_author=False)
-
-
 
 def setup(bot):
     bot.add_cog(Tags(bot))
