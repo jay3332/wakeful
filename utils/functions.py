@@ -26,6 +26,12 @@ def isImage(url):
     return False
 
 def getImage(ctx : commands.Context, url : typing.Union[discord.Member, discord.Emoji, discord.PartialEmoji, None, str] = None):
+    if ctx.message.reference:
+            ref = ctx.message.reference.resolved
+            if ref.embeds:
+                if ref.embeds[0].image.url != discord.Embed.Empty:
+                    return ref.embeds[0].image.url
+
     if url is None:
         return str(ctx.author.avatar_url_as(format="png", size=1024))
 
@@ -37,12 +43,6 @@ def getImage(ctx : commands.Context, url : typing.Union[discord.Member, discord.
 
     if isinstance(url, discord.Emoji) or isinstance(url, discord.PartialEmoji):
         return url.url
-    
-    if ctx.message.reference:
-        ref = ctx.message.reference.resolved
-        if ref.embeds:
-            if ref.embeds[0].image.url != discord.Embed.Empty:
-                return ref.embeds[0].image.url
 
     if ctx.message.attachments:
         if isImage(ctx.message.attachments[0].url) or isImage(ctx.message.attachments[0].proxy_url):
