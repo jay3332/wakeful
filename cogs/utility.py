@@ -497,7 +497,7 @@ class Utility(commands.Cog):
                 res = WrapList(results, 3)
                 for txt in res:
                     em=discord.Embed(title=f"Results for: `{query}`", color=color())
-                    em.set_footer(text=f"Safe-Search: {safe_search} • Results: {len(results)}", icon_url=ctx.author.avatar_url)
+                    em.set_footer(text=f"Safe-Search: {safe_search}", icon_url=ctx.author.avatar_url)
                     em.add_field(name=f"\uFEFF", value="\n".join(f"**[{str(res.title)}]({str(res.url)})**\n{str(res.description)}\n" for res in txt), inline=False)
                     if image is not None:
                         em.set_thumbnail(url=image)
@@ -524,7 +524,7 @@ class Utility(commands.Cog):
             embeds = []
             for res in images:
                 em=discord.Embed(description=f"[{res.title}]({res.url})", color=color())
-                em.set_footer(text=f"Safe-Search: {safe_search} • Results: {len(images)}", icon_url=ctx.author.avatar_url)
+                em.set_footer(text=f"Safe-Search: {safe_search}", icon_url=ctx.author.avatar_url)
                 em.set_image(url=res.image_url)
                 embeds.append(em)
             pag = menus.MenuPages(Paginator(embeds, per_page=1))
