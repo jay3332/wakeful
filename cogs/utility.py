@@ -1811,8 +1811,6 @@ class Utility(commands.Cog):
     async def ocr(self, ctx, url : typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
         url = getImage(ctx, url)
 
-        url = url.replace("cdn.discordapp.com", "media.discordapp.com")
-
         res = await self.bot.session.get(url)
 
         image = await res.read()
@@ -1831,7 +1829,7 @@ class Utility(commands.Cog):
         async with ctx.typing():
             res = (await (await self.bot.session.get("https://idevision.net/api/public/ocr", headers={"Authorization":get_config("IDEVISION")}, params={"filetype":filetype}, data=image)).json())["data"]
 
-        if res != "":
+        if len(res) != 0:
             text = WrapText(res, 2048)
             embeds = []
             for txt in text:

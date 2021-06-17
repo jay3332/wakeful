@@ -1,5 +1,4 @@
-import tempfile
-import discord, DiscordUtils, humanize, re, asyncio, datetime
+import discord, DiscordUtils, humanize, re, datetime
 from discord.ext import commands
 from utils.get import *
 from jishaku.models import copy_context_with
@@ -46,6 +45,8 @@ class Music(commands.Cog):
         except AttributeError:
             em=discord.Embed(description="You have to join a voice channel to use this command", color=color())
             await ctx.reply(embed=em, mention_author=False)
+        except discord.ClientException:
+            await ctx.voice_state.voice.move_to(ctx.author.voice.channel)
         else:
             await ctx.guild.change_voice_state(channel=ctx.author.voice.channel,self_deaf=True)
 
@@ -91,13 +92,6 @@ class Music(commands.Cog):
             else:
                 await player.queue(url, search=True)
             await ctx.message.add_reaction(self.bot.icons["greentick"])
-            try:
-                reaction, user = await self.bot.wait_for("reaction_add", check=lambda reaction, user: str(reaction.emoji) == self.bot.icons['info']  and reaction.message == ctx.message and not user.bot and user == ctx.author, timeout=15)
-            except asyncio.TimeoutError:
-                pass
-            else:
-                alt_ctx = await copy_context_with(ctx, author=user, content=f"{ctx.prefix}nowplaying")
-                await self.bot.invoke(alt_ctx)
 
     @commands.command()
     async def pause(self, ctx):

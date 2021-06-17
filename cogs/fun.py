@@ -7,18 +7,24 @@ from jishaku.functools import executor_function
 from utils.get import *
 from utils.functions import *
 from akinator.async_aki import Akinator
+from cogs.music import is_vc
+from cogs.utility import cleanup, make
 
 dagpi = asyncdagpi.Client(get_config("DAGPI"))
 akin = Akinator()
 
 @executor_function
-def do_tts(language, message):
-    epix = io.BytesIO()
-    tts = gTTS(text=message, lang=language)
-    tts.write_to_fp(epix)
-    epix.seek(0)
-    file = discord.File(epix, f"{message}.wav")
-    return file
+def do_tts(message):
+    array = io.BytesIO()
+    tts = gTTS(text=message, lang="en")
+    tts.write_to_fp(array)
+    array.seek(0)
+    return array
+
+@executor_function
+def vctts(message, path):
+    res = gTTS(text=message, lang="en")
+    res.save(f"{path.name}/file.wav")
 
 @executor_function
 def typeracer(img, sentence):
@@ -41,8 +47,52 @@ class Fun(commands.Cog):
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def tts(self, ctx, *, message):
         async with ctx.typing():
-            file = await do_tts("en", message)
-        await ctx.reply(file=file, mention_author=False)
+            file = await do_tts(message)
+        await ctx.reply(file=discord.File(file, f"{message}.wav"), mention_author=False)
+
+    @commands.group(aliases=["vctts"], invoke_without_command=True)
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    async def voicechattts(self, ctx, *, message):
+        if not is_vc(ctx, ctx.author):
+            await ctx.message.add_reaction(self.bot.icons["redtick"])
+            em=discord.Embed(description=f"You are not in my voice channel", color=color())
+            return await ctx.reply(embed=em, mention_author=False)
+
+        path = await make()
+
+        async with ctx.typing():
+            await vctts(message, path)
+
+        try:
+            await ctx.author.voice.channel.connect()
+        except AttributeError:
+            em=discord.Embed(description="You have to join a voice channel to use this command", color=color())
+            return await ctx.reply(embed=em, mention_author=False)
+        except discord.ClientException:
+            pass
+        else:
+            await ctx.guild.change_voice_state(channel=ctx.author.voice.channel, self_deaf=True)
+
+        source = discord.PCMVolumeTransformer(discord.FFmpegPCMAudio(f"{path.name}/file.wav"), volume=100)
+        ctx.voice_client.play(source, after=lambda e: '')
+
+        await ctx.message.add_reaction(self.bot.icons["greentick"])
+
+    @voicechattts.command(name="stop")
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    async def _stop(self, ctx):
+        if not is_vc(ctx, ctx.author) and ctx.voice_client is not None:
+            await ctx.message.add_reaction(self.bot.icons["redtick"])
+            em=discord.Embed(description=f"You are not in my voice channel", color=color())
+            return await ctx.reply(embed=em, mention_author=False)
+
+        if not ctx.voice_client.is_playing():
+            await ctx.message.add_reaction(self.bot.icons["redtick"])
+            em=discord.Embed(description=f"I am currently not playing anything", color=color())
+            return await ctx.reply(embed=em, mention_author=False)
+
+        ctx.voice_client.stop()
+        await ctx.message.add_reaction(self.bot.icons["greentick"])
     
     @commands.command(aliases=["aki"])
     @commands.cooldown(1, 15, commands.BucketType.guild)

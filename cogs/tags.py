@@ -257,7 +257,7 @@ class Tags(commands.Cog):
     @commands.command()
     @commands.cooldown(1,5,commands.BucketType.user)
     async def tags(self, ctx):
-        records = await self.bot.db.fetch("SELECT * FROM tags WHERE guild = $1", ctx.guild.id)
+        records = sorted(await self.bot.db.fetch("SELECT * FROM tags WHERE guild = $1", ctx.guild.id))
         if records != [] and len(records) != 0:
             res = WrapList(records, 6)
             embeds = []
