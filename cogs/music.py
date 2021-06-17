@@ -17,6 +17,9 @@ def is_vc(ctx : commands.Context, member : discord.Member):
         return False
 
 class Music(commands.Cog):
+
+    """Broken and shitty music commands, but I had to add them, as every other bot already has 'em"""
+
     def __init__(self, bot):
         self.bot = bot
         self.music = DiscordUtils.Music()

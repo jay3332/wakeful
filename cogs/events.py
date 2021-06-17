@@ -76,6 +76,10 @@ class Errors(commands.Cog):
                     em=discord.Embed(description=f"`{cmd}` is not a valid command", color=color())
                     m = await ctx.reply(embed=em, mention_author=False, delete_after=3)
 
+        elif isinstance(error, commands.NSFWChannelRequired):
+            em=discord.Embed(description=f"This command has to be executed in an nsfw channel", color=color())
+            await ctx.reply(embed=em, mention_author=False)
+
         elif isinstance(error, commands.MemberNotFound):
             em=discord.Embed(description=f"Couldn't find member `{error.argument}`", color=color())
             await ctx.reply(embed=em, mention_author=False)
