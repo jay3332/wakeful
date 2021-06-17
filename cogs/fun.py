@@ -86,7 +86,7 @@ class Fun(commands.Cog):
                 reaction, user = await self.bot.wait_for("reaction_add", timeout=30, check=lambda reaction, user: user == ctx.author and str(reaction.emoji) in emojis and reaction.message == msg)
             except asyncio.TimeoutError:
                 em=discord.Embed(description="The game has been stopped as you've not been responding for 30 seconds", color=color())
-                await msg.reply(embed=em, mention_author=False)
+                await msg.edit(embed=em)
                 self.bot.games["akinator"].pop(str(ctx.guild.id))
                 break
             else:
