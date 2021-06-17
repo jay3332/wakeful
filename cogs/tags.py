@@ -1,3 +1,4 @@
+from utils.functions import getFile
 import discord, datetime, string, time, humanize
 from discord.ext import commands, menus
 from utils.get import *
@@ -254,15 +255,36 @@ class Tags(commands.Cog):
             em=discord.Embed(description=f"There are no tags with `{query}` in the name", color=color())
             await ctx.reply(embed=em, mention_author=False)
 
+    @tag.command()
+    @commands.cooldown(1,5,commands.BucketType.user)
+    async def all(self, ctx):
+        records = sorted(await self.bot.db.fetch("SELECT * FROM tags WHERE guild = $1", ctx.guild.id))
+        if records != [] and len(records) != 0:
+            if ctx.message.content.endswith(" --txt"):
+                text = "\n".join(f"{text['name']}" for text in records)
+                return await ctx.reply(file=await getFile(text, filename="tags"), mention_author=False)
+
+            res = WrapList(records, 6)
+            embeds = []
+            for txt in res:
+                em=discord.Embed(description="\n".join(f"{list(records).index(text)+1}. {text['name']}" for text in txt), color=color())
+                embeds.append(em)
+            pag = menus.MenuPages(Paginator(embeds, per_page=1))
+            await pag.start(ctx)
+        else:
+            em=discord.Embed(description=f"There are no tags on this guild", color=color())
+            await ctx.reply(embed=em, mention_author=False)
+
     @commands.command()
     @commands.cooldown(1,5,commands.BucketType.user)
     async def tags(self, ctx):
-        records = sorted(await self.bot.db.fetch("SELECT * FROM tags WHERE guild = $1", ctx.guild.id))
+        records = sorted(await self.bot.db.fetch("SELECT * FROM tags WHERE guild = $1 AND author = $2", ctx.guild.id, ctx.author.id))
         if records != [] and len(records) != 0:
             res = WrapList(records, 6)
             embeds = []
             for txt in res:
                 em=discord.Embed(description="\n".join(f"{list(records).index(text)+1}. {text['name']}" for text in txt), color=color())
+                em.set_author(name=ctx.author, icon_url=ctx.author.avatar_url)
                 embeds.append(em)
             pag = menus.MenuPages(Paginator(embeds, per_page=1))
             await pag.start(ctx)
