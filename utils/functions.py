@@ -32,6 +32,11 @@ def getImage(ctx : commands.Context, url : typing.Union[discord.Member, discord.
             if ref.embeds[0].image.url != discord.Embed.Empty:
                 if isImage(ref.embeds[0].image.url):
                     return ref.embeds[0].image.url
+                    
+        elif ref.attachments:
+            url = ref.attachments[0].url or ref.attachments[0].proxy_url
+            if isImage(url):
+                return url
 
     if url is None:
         return str(ctx.author.avatar_url_as(format="png", size=1024))

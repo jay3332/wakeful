@@ -1125,11 +1125,11 @@ class Utility(commands.Cog):
         async with ctx.typing():
             res = await tio.execute(res, language=language)
             await tio.close()
-        if len(res.output) > 2000:
-            f = await getFile(res.output, filename="output")
+        if len(res.stdout) > 2000:
+            f = await getFile(res.stdout, filename="output")
             await ctx.reply(file=f, mention_author=False, allowed_mentions=discord.AllowedMentions.none())
         else:
-            await ctx.reply(f"```\n{res.output}```", mention_author=False, allowed_mentions=discord.AllowedMentions.none())
+            await ctx.reply(f"```\n{res.stdout}```", mention_author=False, allowed_mentions=discord.AllowedMentions.none())
 
     @commands.command(aliases=["fortnite", "fn", "fnstats"])
     @commands.cooldown(1,5,commands.BucketType.user)
@@ -1808,17 +1808,8 @@ class Utility(commands.Cog):
 
     @commands.command()
     @commands.cooldown(1,10,commands.BucketType.user)
-    async def ocr(self, ctx, member : discord.Member = None):
-        if member is None:
-            if ctx.message.attachments:
-                if ctx.message.attachments[0].url.endswith("png") or ctx.message.attachments[0].url.endswith("jpg") or ctx.message.attachments[0].url.endswith("jpeg") or ctx.message.attachments[0].url.endswith("webp"):
-                    url = ctx.message.attachments[0].proxy_url or ctx.message.attachments[0].url
-                else:
-                    url = ctx.author.avatar_url_as(format="png", size=1024)
-            else:
-                url = ctx.author.avatar_url_as(format="png", size=1024)
-        else:
-            url = member.avatar_url_as(format="png", size=1024)
+    async def ocr(self, ctx, url : typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
+        url = getImage(ctx, url)
 
         url = url.replace("cdn.discordapp.com", "media.discordapp.com")
 
@@ -1841,9 +1832,14 @@ class Utility(commands.Cog):
             res = (await (await self.bot.session.get("https://idevision.net/api/public/ocr", headers={"Authorization":get_config("IDEVISION")}, params={"filetype":filetype}, data=image)).json())["data"]
 
         if res != "":
-            em=discord.Embed(color=color())
-            em.set_footer(text=f"Powered by idevision.net", icon_url=ctx.author.avatar_url)
-            await ctx.reply(embed=em, mention_author=False, file=await getFile(res))
+            text = WrapText(res, 2048)
+            embeds = []
+            for txt in text:
+                em=discord.Embed(description=txt, color=color())
+                em.set_footer(text=f"Powered by idevision.net", icon_url=ctx.author.avatar_url)
+                embeds.append(em)
+            pag = menus.MenuPages(Paginator(embeds, per_page=1))
+            await pag.start(ctx)
         else:
             em=discord.Embed(description=f"I couldn't read what your image says", color=color())
             await ctx.reply(embed=em, mention_author=False)

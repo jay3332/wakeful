@@ -1,4 +1,4 @@
-import discord, difflib, asyncio, traceback
+import discord, difflib, asyncio, traceback, aiohttp
 from jishaku.models import copy_context_with
 from jishaku.paginators import WrappedPaginator, PaginatorInterface
 from discord.ext import commands
@@ -103,6 +103,11 @@ class Errors(commands.Cog):
             if isinstance(error, TooLong):
                 await ctx.reply(str(error), mention_author=False, allowed_mentions=discord.AllowedMentions.none())
 
+            elif isinstance(error, aiohttp.ClientConnectionError):
+                address = f"{error.host}:{error.port}"
+                em=discord.Embed(description=f"I couldn't connect to `{address}`", color=color())
+                await ctx.reply(embed=em, mention_author=False)
+
             elif isinstance(error, commands.BotMissingPermissions):
                 perms = ", ".join(perm.replace("_", " ").lower() for perm in error.missing_perms)
                 em=discord.Embed(description=f"I need {perms} permissions to execute this command", color=color())
@@ -114,22 +119,30 @@ class Errors(commands.Cog):
             else:
                 if is_mod(self.bot, ctx.author):
                     errormsg = "".join(traceback.format_exception(type(error), error, error.__traceback__))
-                    await ctx.reply(f"```py\n{errormsg}```", mention_author=False, allowed_mentions=discord.AllowedMentions.none())
+                    try:
+                        await ctx.reply(f"```py\n{errormsg}```", mention_author=False, allowed_mentions=discord.AllowedMentions.none())
+                    except Exception:
+                        raise error
+                    else:
+                        raise error
                 else:
                     em=discord.Embed(description=f"```py\n{error}```", color=color())
                     await ctx.reply(embed=em, mention_author=False)
-                
-                raise error
+                    raise error
 
         else:
             if is_mod(self.bot, ctx.author):
                 errormsg = "".join(traceback.format_exception(type(error), error, error.__traceback__))
-                await ctx.reply(f"```py\n{errormsg}```", mention_author=False, allowed_mentions=discord.AllowedMentions.none())
+                try:
+                    await ctx.reply(f"```py\n{errormsg}```", mention_author=False, allowed_mentions=discord.AllowedMentions.none())
+                except Exception:
+                    raise error
+                else:
+                    raise error
             else:
                 em=discord.Embed(description=f"```py\n{error}```", color=color())
                 await ctx.reply(embed=em, mention_author=False)
-            
-            raise error
+                raise error
 
     @commands.Cog.listener()
     async def on_guild_join(self, guild):
