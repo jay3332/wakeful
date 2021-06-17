@@ -1114,13 +1114,13 @@ class Utility(commands.Cog):
     @commands.cooldown(1,10,commands.BucketType.user)
     async def execute(self, ctx, language, *, code : codeblock_converter):
         res = (code.content
-            .replace("{author.name}", ctx.author.name)
-            .replace("{author.id}", str(ctx.author.id))
-            .replace("{author.nick}", ctx.author.nick)
-            .replace("{server.name}", ctx.guild.name)
-            .replace("{server.members}", str(ctx.guild.member_count))
-            .replace("{channel.name}", ctx.channel.name)
-            .replace("{channel.topic}", ctx.channel.topic))
+            .replace("{author.name}", ''.join(ctx.author.name if ctx.author.name is not None else "None"))
+            .replace("{author.id}", ''.join(str(ctx.guild.id) if str(ctx.guild.id) is not None else "None"))
+            .replace("{author.nick}", ''.join(ctx.author.nick if ctx.author.nick is not None else "None"))
+            .replace("{server.name}", ''.join(ctx.guild.name if ctx.guild.name is not None else "None"))
+            .replace("{server.members}", ''.join(str(ctx.guild.member_count) if str(ctx.guild.member_count) is not None else "None"))
+            .replace("{channel.name}", ''.join(ctx.channel.name if ctx.channel.name is not None else "None"))
+            .replace("{channel.topic}", ''.join(ctx.channel.topic if ctx.channel.topic is not None else "None")))
         tio= await async_tio.Tio()
         async with ctx.typing():
             res = await tio.execute(res, language=language)
