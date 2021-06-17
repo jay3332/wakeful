@@ -161,7 +161,7 @@ class Utility(commands.Cog):
             em=discord.Embed(description=f"The message you replied to doesn't have any attachments", color=color())
             return await ctx.reply(embed=em, mention_author=False)
         res = (await ctx.message.reference.resolved.attachments[0].read()).decode()
-        text = WrapText(res)
+        text = WrapText(res, 2024)
         embeds = []
         filename = ctx.message.reference.resolved.attachments[0].filename.replace("_"," ").title()
         for txt in text:
