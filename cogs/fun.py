@@ -63,7 +63,7 @@ class Fun(commands.Cog):
 
         em=discord.Embed(description=f"{self.bot.icons['loading']} Now starting the game...", color=color())
         msg = await ctx.reply(embed=em, mention_author=False)
-        
+
         game = await akin.start_game()
 
         self.bot.games["akinator"][str(ctx.guild.id)] = {
@@ -87,6 +87,7 @@ class Fun(commands.Cog):
             except asyncio.TimeoutError:
                 em=discord.Embed(description="The game has been stopped as you've not been responding for 30 seconds", color=color())
                 await msg.reply(embed=em, mention_author=False)
+                self.bot.games["akinator"].pop(str(ctx.guild.id))
                 break
             else:
                 if str(reaction.emoji) == controls["yes"]:
