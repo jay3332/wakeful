@@ -249,7 +249,7 @@ class Admin(commands.Cog):
     async def simulate(self, ctx):
         await ctx.invoke(self.bot.get_command("help"), **{"command":ctx.command.name})
 
-    @simulate.command()
+    @simulate.command(aliases=["msg"])
     @commands.is_owner()
     async def message(self, ctx, member : discord.Member, *, message : str):
         msg: discord.Message = copy.copy(ctx.message)
@@ -261,7 +261,7 @@ class Admin(commands.Cog):
         self.bot.dispatch("message", msg)
         await ctx.message.add_reaction(self.bot.icons["greentick"])
 
-    @simulate.command()
+    @simulate.command(aliases=["del"])
     @commands.is_owner()
     async def delete(self, ctx, member : discord.Member, *, message : str):
         msg: discord.Message = copy.copy(ctx.message)
