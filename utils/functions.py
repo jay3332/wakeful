@@ -21,8 +21,10 @@ async def makeEmbed(context : commands.Context, embed : discord.Embed, mention :
         await context.reply(embed=discord.Embed().from_dict(embed), mention_author=mention)
 
 def isImage(url):
+    url = url.lower()
     if url.endswith("png") or url.endswith("jpg") or url.endswith("jpeg") or url.endswith("webp"):
         return True
+    print(url)
     return False
 
 def getImage(ctx : commands.Context, url : typing.Union[discord.Member, discord.Emoji, discord.PartialEmoji, None, str] = None):
@@ -38,9 +40,6 @@ def getImage(ctx : commands.Context, url : typing.Union[discord.Member, discord.
             if isImage(url):
                 return url
 
-    if url is None:
-        return str(ctx.author.avatar_url_as(format="png", size=1024))
-
     if isinstance(url, discord.Member):
         return str(url.avatar_url_as(format="png", size=1024))
     elif isinstance(url, str):
@@ -52,13 +51,15 @@ def getImage(ctx : commands.Context, url : typing.Union[discord.Member, discord.
 
     if ctx.message.attachments:
 
-        if isImage(ctx.message.attachments[0].url.lower()) or isImage(ctx.message.attachments[0].proxy_url.lower()):
-            return ctx.message.attachments[0].proxy_url.lower() or ctx.message.attachments[0].url.lower()
+        url = ctx.message.attachments[0].url or ctx.message.attachments[0].proxy_url
+
+        if isImage(url):
+            return ctx.message.attachments[0].proxy_url or ctx.message.attachments[0].url
 
         elif isinstance(url, discord.Member):
             return str(url.avatar_url_as(format="png", size=1024))
         else:
             return str(ctx.author.avatar_url_as(format="png", size=1024))
 
-    else:
+    elif url is None:
         return str(ctx.author.avatar_url_as(format="png", size=1024))
