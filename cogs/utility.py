@@ -313,7 +313,7 @@ class Utility(commands.Cog):
                 async with ctx.typing():
                     res = await (await self.bot.session.get(data["url"])).read()
 
-                em=discord.Embed(description=f"{self.bot.icons['loading']} Now uploading video", color=color())
+                em=discord.Embed(description=f"{self.bot.icons['loading']} Now uploading audio", color=color())
                 await msg.edit(embed=em)
                 
                 delta = datetime.datetime.utcnow() - start_time
