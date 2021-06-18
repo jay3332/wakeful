@@ -270,9 +270,9 @@ class Image(commands.Cog):
         url = getImage(ctx, member)
         async with ctx.typing():
             img = await dagpi.image_process(asyncdagpi.ImageFeatures.magik(), url=str(url))
-            file=discord.File(img.image, f"{ctx.command.name}.gif")
+            file=discord.File(img.image, f"{ctx.command.name}.png")
             em=discord.Embed(color=color())
-            em.set_image(url=f"attachment://{ctx.command.name}.gif")
+            em.set_image(url=f"attachment://{ctx.command.name}.png")
             em.set_footer(text=f"Powered by dagpi.xyz", icon_url=ctx.author.avatar_url)
         await ctx.send(file=file, embed=em)
 
