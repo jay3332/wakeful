@@ -1,4 +1,4 @@
-import json, discord, typing, functools, asyncio
+import json, discord, typing, functools, asyncio, aiohttp
 import youtube_dl as ydl
 
 def executor_function(sync_function: typing.Callable):
@@ -60,7 +60,10 @@ async def get_pronoun(bot : typing.Union[discord.Client, discord.ext.commands.Bo
         "avoid": "No pronoun, use name",
         "None": "N/A"
     }
-    res = await (await bot.session.get(f"https://pronoundb.org/api/v1/lookup?id={member.id}&platform=discord")).json()
+    try:
+        res = await (await bot.session.get(f"https://pronoundb.org/api/v1/lookup?id={member.id}&platform=discord")).json()
+    except aiohttp.ContentTypeError:
+        return "Unavailable"
     try:
         code = res["pronouns"]
     except KeyError:

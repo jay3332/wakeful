@@ -57,18 +57,17 @@ def download_emojis(emojis : tuple):
     return discord.File(file_, "emojis.zip")
 
 @executor_function
-def download(bot, url):
+def download(url):
     video = pytube.YouTube(str(url))
     if video.length > 900:
         raise TooLong
-    else:
-        res = video.streams.get_highest_resolution()
-        path = tempfile.TemporaryDirectory()
-        bot.directorys[path.name] = path
-        download = res.download(path.name)
-        file_ = discord.File(str(download))
-        path.cleanup()
-        return file_
+    
+    res = video.streams.get_highest_resolution()
+    path = tempfile.TemporaryDirectory()
+    download = res.download(path.name)
+    file_ = discord.File(str(download))
+    path.cleanup()
+    return file_
 
 class Utility(commands.Cog):
 
@@ -272,7 +271,7 @@ class Utility(commands.Cog):
             msg = await ctx.reply(embed=em, mention_author=False)
 
             async with ctx.typing():
-                res = await download(self.bot, url)
+                res = await download(url)
 
             em=discord.Embed(description=f"{self.bot.icons['loading']} Now uploading video", color=color())
             await msg.edit(embed=em)

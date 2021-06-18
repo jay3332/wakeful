@@ -18,23 +18,9 @@ def rounden(img, ellipse : tuple):
     output.putalpha(500)
     output.paste(0, mask=mask)
     output.convert('P', palette=Image.ADAPTIVE)
-    array = io.BytesIO()
-    output.save(array, format="png")
-    return discord.File(io.BytesIO(array.getvalue()), "circular.png")
-
-"""
-@executor_function
-def rectangle(img, size : tuple, color : str = None):
-    from PIL import Image, ImageDraw
-    image = Image.open(img)
-    image.putalpha(500)
-    draw = ImageDraw.Draw(image)
-    draw.rounded_rectangle(size, fill=color,
-                           width=3, radius=35)
-    array = io.BytesIO()
-    image.save(array, format="png")
-    return discord.File(io.BytesIO(array.getvalue()), "rectangle.png")
-"""
+    buffer = io.BytesIO()
+    output.save(buffer, format="png")
+    return discord.File(io.BytesIO(buffer.getvalue()), "circular.png")
 
 class Image(commands.Cog):
 
@@ -133,18 +119,6 @@ class Image(commands.Cog):
         url = getImage(ctx, member)
         async with ctx.typing():
             img = await dagpi.image_process(asyncdagpi.ImageFeatures.triangle(), url=str(url))
-            file=discord.File(img.image, f"{ctx.command.name}.png")
-            em=discord.Embed(color=color())
-            em.set_image(url=f"attachment://{ctx.command.name}.png")
-            em.set_footer(text=f"Powered by dagpi.xyz", icon_url=ctx.author.avatar_url)
-        await ctx.send(file=file, embed=em)
-
-    @commands.command()
-    @commands.cooldown(1,10,commands.BucketType.user)
-    async def blur(self, ctx, member : typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
-        url = getImage(ctx, member)
-        async with ctx.typing():
-            img = await dagpi.image_process(asyncdagpi.ImageFeatures.blur(), url=str(url))
             file=discord.File(img.image, f"{ctx.command.name}.png")
             em=discord.Embed(color=color())
             em.set_image(url=f"attachment://{ctx.command.name}.png")

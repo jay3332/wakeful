@@ -327,7 +327,7 @@ class Fun(commands.Cog):
         else:
             await ctx.invoke(self.bot.get_command("meme"))
 
-    @commands.command(aliases=["typerace"], description="Makes the bot send an image with text, which someone has to type in 20 seconds")
+    @commands.command(aliases=["typerace"])
     @commands.guild_only()
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def typeracer(self, ctx):

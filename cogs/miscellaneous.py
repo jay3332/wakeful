@@ -4,10 +4,11 @@ from utils.get import *
 
 
 class Miscellaneous(commands.Cog):
+    
+    """Commands that aren't really useful or fun, so commands that are just there"""
+
     def __init__(self, bot):
         self.bot = bot
-
-    """Commands that aren't really useful or fun, so commands that are just there"""
 
     @commands.command()
     @commands.cooldown(1,5,commands.BucketType.user)
@@ -15,6 +16,25 @@ class Miscellaneous(commands.Cog):
         async with ctx.typing():
             res = await (await self.bot.session.get(str(emoji.url))).read()
         await ctx.reply(file=discord.File(io.BytesIO(res), filename="emoji.png"), mention_author=False)
+
+    @commands.command()
+    @commands.cooldown(1,5,commands.BucketType.user)
+    async def poll(self, ctx, question, *, options):
+        options = options.split(",")
+        questions = {}
+        for a in options:
+            res = a.split("=")
+            questions[a] = {"question": res[0], "emoji": res[1]}
+
+        answers = "\n".join(f"{questions[e]['question']} - {questions[e]['emoji']}" for e in options)
+
+        em=discord.Embed(description=f"{question}\n\n{answers}", color=color())
+        em.set_author(name=ctx.author, icon_url=ctx.author.avatar_url)
+        msg = await ctx.reply(embed=em, mention_author=False)
+
+        for e in questions:
+            res = questions[e]["emoji"]
+            await msg.add_reaction(res)
 
 def setup(bot):
     bot.add_cog(Miscellaneous(bot))
