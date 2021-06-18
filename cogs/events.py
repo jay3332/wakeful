@@ -17,7 +17,7 @@ class Errors(commands.Cog):
         if not msg.author.bot and msg.guild is not None:
             res = await self.bot.db.fetchrow("SELECT commands FROM commands WHERE guild = $1", msg.guild.id)
             try:
-                res["commands"]
+                commands = res["commands"]
             except TypeError:
                 commands = ""
             commands = commands.split(",")
