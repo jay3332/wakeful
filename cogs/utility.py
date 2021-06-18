@@ -1877,18 +1877,16 @@ class Utility(commands.Cog):
         async with ctx.typing():
             res = (await (await self.bot.session.get("https://idevision.net/api/public/ocr", headers={"Authorization":get_config("IDEVISION")}, params={"filetype":filetype}, data=image)).json())["data"]
 
-        if len(res) != 0:
-            text = WrapText(res, 2048)
-            embeds = []
-            for txt in text:
-                em=discord.Embed(description=txt, color=color())
-                em.set_footer(text=f"Powered by idevision.net", icon_url=ctx.author.avatar_url)
-                embeds.append(em)
-            pag = menus.MenuPages(Paginator(embeds, per_page=1))
-            await pag.start(ctx)
-        else:
-            em=discord.Embed(description=f"I couldn't read what your image says", color=color())
-            await ctx.reply(embed=em, mention_author=False)
+        text = WrapText(res, 2048)
+        if len(text) == 0:
+            return await ctx.reply("I couldn't read what your image says", mention_author=False)
+        embeds = []
+        for txt in text:
+            em=discord.Embed(description=txt, color=color())
+            em.set_footer(text=f"Powered by idevision.net", icon_url=ctx.author.avatar_url)
+            embeds.append(em)
+        pag = menus.MenuPages(Paginator(embeds, per_page=1))
+        await pag.start(ctx)
 
 def setup(bot):
     bot.add_cog(Utility(bot))
