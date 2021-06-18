@@ -1019,7 +1019,7 @@ class MenuPages(Menu):
     @button(conf["ICONS"]["stop"], position=Last(2))
     async def stop_pages(self, payload):
         """stops the pagination session."""
-        self.stop()
+        await self.message.delete()
 
 class ListPageSource(PageSource):
     """A data source for a sequence of items.
