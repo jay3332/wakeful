@@ -1,6 +1,5 @@
 import discord, difflib, asyncio, traceback, aiohttp
 from jishaku.models import copy_context_with
-from jishaku.paginators import WrappedPaginator, PaginatorInterface
 from discord.ext import commands
 from utils.webhook import Webhook, AsyncWebhookAdapter
 from utils.checks import is_mod

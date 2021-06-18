@@ -52,8 +52,8 @@ def getImage(ctx : commands.Context, url : typing.Union[discord.Member, discord.
 
     if ctx.message.attachments:
 
-        if isImage(ctx.message.attachments[0].url) or isImage(ctx.message.attachments[0].proxy_url):
-            return ctx.message.attachments[0].proxy_url or ctx.message.attachments[0].url
+        if isImage(ctx.message.attachments[0].url.lower()) or isImage(ctx.message.attachments[0].proxy_url.lower()):
+            return ctx.message.attachments[0].proxy_url.lower() or ctx.message.attachments[0].url.lower()
 
         elif isinstance(url, discord.Member):
             return str(url.avatar_url_as(format="png", size=1024))
