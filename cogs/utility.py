@@ -146,10 +146,13 @@ class Utility(commands.Cog):
         if len(summary) == 0:
             return await ctx.reply(f"I couldn't find a wikipedia page with the query `{query}`", mention_author=False, allowed_mentions=discord.AllowedMentions.none())
         url = (await page.urls()).view
+        media = await page.media()
         text = WrapText(summary, 2048)
         embeds = []
         for txt in text:
             em=discord.Embed(title=title, description=str(txt), url=url, color=color())
+            if len(media) != 0 and media != []:
+                em.set_thumbnail(url=random.choice(media))
             embeds.append(em)
         pag = menus.MenuPages(Paginator(embeds, per_page=1))
         await pag.start(ctx)
