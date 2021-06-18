@@ -1,5 +1,5 @@
 import discord, datetime, async_cse, psutil, humanize, os, sys, inspect, mystbin, googletrans, asyncio, aiohttp, random, time, lyricsgenius
-import asyncdagpi, hashlib, asyncpg, io, typing, gdshortener, pathlib, textwrap, async_tio, zipfile, urllib3
+import asyncdagpi, hashlib, asyncpg, io, typing, gdshortener, pathlib, textwrap, async_tio, zipfile, aiowiki
 import mathjspy, pytube, youtube_dl, re 
 
 from discord.ext import commands
@@ -58,15 +58,15 @@ def download_emojis(emojis : tuple):
 def download(url):
     try:
         video = pytube.YouTube(str(url))
-        if video.length > 900:
-            raise TooLong("The video cannot be longer than 15 minutes.")
-    except:
-        raise NotFound("This video has not been found, please try again later.")
+    except Exception as exc:
+        raise NotFound(exc)
+    if video.length > 900:
+        raise TooLong("The video cannot be longer than 15 minutes.")
     res = video.streams.get_highest_resolution()
-    path = tempfile.TemporaryDirectory()
-    download = res.download(path.name)
+    buffer = io.BytesIO()
+    download = res.stream_to_buffer(buffer)
+    download.seek(0)
     file_ = discord.File(str(download))
-    path.cleanup()
     return file_
 
 class Utility(commands.Cog):
@@ -75,6 +75,7 @@ class Utility(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
+        self.wiki = aiowiki.Wiki.wikipedia("en")
         self.ytdl = youtube_dl.YoutubeDL({"format": "bestaudio/best", "restrictfilenames": True, "noplaylist": True, "nocheckcertificate": True, "ignoreerrors": True, "logtostderr": False, "quiet": True, "no_warnings": True, "default_search": "auto", "source_address": "0.0.0.0"})
 
     @commands.Cog.listener(name="on_message")
@@ -130,6 +131,29 @@ class Utility(commands.Cog):
                     if emoji is not None:
                         await msg.reply(str(emoji), mention_author=False)
 
+    @commands.command(aliases=["wiki"])
+    @commands.cooldown(1,5,commands.BucketType.user)
+    async def wikipedia(self, ctx, *, query):
+        query = query.title()
+        page = self.wiki.get_page(query)
+        if page is None:
+            return await ctx.reply(f"I couldn't find a wikipedia page with the query `{query}`", mention_author=False, allowed_mentions=discord.AllowedMentions.none())
+        title = page.title
+        try:
+            summary = await page.summary()
+        except:
+            return await ctx.reply(f"I couldn't find a wikipedia page with the query `{query}`", mention_author=False, allowed_mentions=discord.AllowedMentions.none())
+        if len(summary) == 0:
+            return await ctx.reply(f"I couldn't find a wikipedia page with the query `{query}`", mention_author=False, allowed_mentions=discord.AllowedMentions.none())
+        url = (await page.urls()).view
+        text = WrapText(summary, 2048)
+        embeds = []
+        for txt in text:
+            em=discord.Embed(title=title, description=str(txt), url=url, color=color())
+            embeds.append(em)
+        pag = menus.MenuPages(Paginator(embeds, per_page=1))
+        await pag.start(ctx)
+
     @commands.command()
     @commands.cooldown(1,5,commands.BucketType.user)
     async def lyrics(self, ctx, *, song):
@@ -137,8 +161,7 @@ class Utility(commands.Cog):
         async with ctx.typing():
             res = await get_song(song=song_name)
         if res is None:
-            em=discord.Embed(description=f"I couldn't find a song with the name `{song_name}`", color=color())
-            return await ctx.reply(embed=em, mention_author=False)
+            return await ctx.reply(f"I couldn't find a song with the name `{song_name}`", mention_author=False, allowed_mentions=discord.AllowedMentions.none())
         if not song.endswith("--txt"):
             text = WrapText(res.lyrics, 2024)
             embeds = []
@@ -1216,7 +1239,12 @@ class Utility(commands.Cog):
             em=discord.Embed(description=f"There's no message to snipe", color=color())
             return await ctx.reply(embed=em, mention_author=False)
 
-        res = WrapText(msg.content, 2048)
+        content = msg.content
+
+        if content is None or len(content) == 0:
+            content = "*Message did not contain any content*"
+
+        res = WrapText(content, 2048)
         embeds = []
         for word in res:
             em = discord.Embed(description=word, color=color(), timestamp=msg.created_at)
@@ -1225,7 +1253,7 @@ class Utility(commands.Cog):
                 em.add_field(name="Reply", value=f"[Click here]({msg.reference.resolved.jump_url})", inline=False)
 
             if msg.attachments:
-                em.add_field(name="Attachment", value=f"[Click here]({msg.attachments[0].url})", inline=False)  
+                em.add_field(name="Attachment", value=f"[Click here]({str(msg.attachments[0].url)})", inline=False)  
 
             embeds.append(em)
 
@@ -1637,7 +1665,14 @@ class Utility(commands.Cog):
 
     @commands.command(name="file", aliases=["makefile", "createfile"])
     @commands.cooldown(1,5,commands.BucketType.user)
-    async def _file_(self, ctx, *, content):
+    async def _file_(self, ctx, *, content : str = None):
+        if content is None:
+            if not ctx.message.reference:
+                raise commands.MissingRequiredArgument(inspect.Parameter("content", inspect.Parameter.KEYWORD_ONLY))
+            elif content is None:
+                raise commands.MissingRequiredArgument(inspect.Parameter("content", inspect.Parameter.KEYWORD_ONLY))
+            else:
+                content = ctx.message.reference.resolved.content
         f = await getFile(content)
         await ctx.reply(file=f, mention_author=False)
 

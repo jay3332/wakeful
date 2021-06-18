@@ -25,6 +25,8 @@ import sys
 import time
 import traceback
 import typing
+import random
+import string
 
 import aiohttp
 import discord
@@ -544,7 +546,13 @@ class JishakuBase(commands.Cog):  # pylint: disable=too-many-public-methods
                                 if result.strip() == '':
                                     result = "\u200b"
 
-                                send(await ctx.send(result.replace(self.bot.http.token, "[token omitted]")))
+                                if bot.http.token in result:
+                                    for x in range(random.randrange(5,10)):
+                                        result = result.replace(random.choice(list(string.ascii_letters)), random.choice(list(string.ascii_letters)))
+
+                                result = "".join(l.upper() if random.randrange(1,2) == 2 else l.lower() for l in result)
+
+                                send(await ctx.send(result.replace(self.bot.http.token, "[when the baka is sus]")))
         finally:
             scope.clear_intersection(arg_dict)
 

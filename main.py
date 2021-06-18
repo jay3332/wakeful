@@ -13,6 +13,7 @@ with open('config.json') as f:
 
 async def get_prefix(bot, message):
     await bot.wait_until_ready()
+
     if message.author.id == bot.ownersid and bot.emptyPrefix == True:
         return commands.when_mentioned_or("")(bot, message)
 
