@@ -1213,16 +1213,18 @@ class Utility(commands.Cog):
             msg = self.bot.message_cache[ctx.guild.id][ctx.channel.id]
         except KeyError:
             em=discord.Embed(description=f"There's no message to snipe", color=color())
-            await ctx.reply(embed=em, mention_author=False)
-        else:
-            res = WrapText(msg.content, 2048)
-            embeds = []
-            for word in res:
-                em = discord.Embed(description=word, color=color())
-                em.set_author(name=msg.author, icon_url=msg.author.avatar_url)
-                embeds.append(em)
-            pag = menus.MenuPages(Paginator(embeds, per_page=1))
-            await pag.start(ctx)
+            return await ctx.reply(embed=em, mention_author=False)
+            
+        res = WrapText(msg.content, 2048)
+        embeds = []
+        for word in res:
+            em = discord.Embed(description=word, color=color(), timestamp=msg.created_at)
+            em.set_author(name=msg.author, icon_url=msg.author.avatar_url)
+            if msg.reference:
+                em.add_field(name="Reply", value=f"[Click here]({msg.reference.resolved.jump_url})", inline=False)
+            embeds.append(em)
+        pag = menus.MenuPages(Paginator(embeds, per_page=1))
+        await pag.start(ctx)
 
     @commands.command(aliases=["ss"])
     @commands.is_nsfw()
