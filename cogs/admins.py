@@ -1,4 +1,4 @@
-import discord, asyncio, os, pwd, random, sys, importlib
+import discord, asyncio, os, pwd, sys, importlib, traceback
 from discord.ext import commands
 from utils.checks import is_mod
 from utils.functions import *
@@ -57,7 +57,7 @@ class Admin(commands.Cog):
                 try:
                     self.bot.reload_extension(cog)
                 except Exception as exc:
-                    errors[cog] = exc
+                    errors[cog] = "".join(traceback.format_exception(type(exc), exc, exc.__traceback__))
 
 
             modules = sys.modules.copy()
@@ -66,14 +66,14 @@ class Admin(commands.Cog):
                     try:
                         importlib.reload(sys.modules[modu])
                     except Exception as exc:
-                        errors[modu] = exc
+                        errors[modu] = "".join(traceback.format_exception(type(exc), exc, exc.__traceback__))
 
             if errors == {}:
                 await ctx.message.add_reaction(self.bot.icons["greentick"])
             else:
                 await ctx.message.add_reaction(self.bot.icons["redtick"])
                 em=discord.Embed(
-                    description='\n'.join(f"`{a}`\n{self.bot.icons['redtick']} `{errors[a]}`" for a in list(errors)),
+                    description='\n'.join(f"`{a}`\n{self.bot.icons['redtick']} ```py\n{errors[a]}```" for a in list(errors)),
                     color=color()
                 )
                 await ctx.reply(embed=em, mention_author=False)
@@ -84,8 +84,9 @@ class Admin(commands.Cog):
                 try:
                     modu = sys.modules[module]
                 except KeyError as exc:
+                    exc = "".join(traceback.format_exception(type(exc), exc, exc.__traceback__))
                     em=discord.Embed(
-                        description=exc,
+                        description=f"```py\n{exc}```",
                         color=color()
                     )
                     return await ctx.reply(embed=em, mention_author=False)
