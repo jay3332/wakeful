@@ -139,7 +139,7 @@ class Admin(commands.Cog):
                     .replace("{guilds}", str(len(self.bot.guilds))))
             await self.bot.change_presence(activity=discord.Streaming(name=str(game), url=f'https://www.twitch.tv/{url.lower()}'))
             await ctx.message.add_reaction(self.bot.icons['greentick'])
-            self.bot.status = ""
+            self.bot.status = game
 
     @status.command(hidden=True)
     async def playing(self, ctx, *, game):
@@ -149,7 +149,7 @@ class Admin(commands.Cog):
                     .replace("{guilds}", str(len(self.bot.guilds))))
             await self.bot.change_presence(activity=discord.Game(name=game))
             await ctx.message.add_reaction(self.bot.icons['greentick'])
-            self.bot.status = ""
+            self.bot.status = game
 
     @status.command(hidden=True)
     async def watching(self, ctx, *, game):
@@ -159,6 +159,7 @@ class Admin(commands.Cog):
                     .replace("{guilds}", str(len(self.bot.guilds))))
             await self.bot.change_presence(activity=discord.Activity(name=f"{game}", type=3))
             await ctx.message.add_reaction(self.bot.icons['greentick'])
+            self.bot.status = game
 
     @status.command(hidden=True)
     async def listening(self, ctx, *, game):
@@ -168,7 +169,7 @@ class Admin(commands.Cog):
                     .replace("{guilds}", str(len(self.bot.guilds))))
             await self.bot.change_presence(activity=discord.Activity(name=f"{game}", type=2))
             await ctx.message.add_reaction(self.bot.icons['greentick'])
-            self.bot.status = ""
+            self.bot.status = game
 
     @status.command(hidden=True)
     async def competing(self, ctx, *, game):
@@ -178,7 +179,7 @@ class Admin(commands.Cog):
                     .replace("{guilds}", str(len(self.bot.guilds))))
             await self.bot.change_presence(activity=discord.Activity(name=f"{game}", type=5))
             await ctx.message.add_reaction(self.bot.icons['greentick'])
-            self.bot.status = ""
+            self.bot.status = game
 
     @status.command(aliases=["default", "original"], hidden=True)
     async def reset(self, ctx):
