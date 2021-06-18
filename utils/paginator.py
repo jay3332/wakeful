@@ -1,5 +1,6 @@
 import discord, textwrap
-from discord.ext import menus, commands
+from utils import menus
+from discord.ext import commands
 from utils.get import *
 
 class Paginator(menus.ListPageSource):

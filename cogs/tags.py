@@ -1,6 +1,6 @@
 from utils.functions import getFile
 import discord, datetime, string, time, humanize
-from discord.ext import commands, menus
+from discord.ext import commands
 from utils.get import *
 from utils.paginator import *
 

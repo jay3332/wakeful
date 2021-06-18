@@ -1,10 +1,9 @@
 from asyncdagpi import image
 import discord, datetime, async_cse, psutil, humanize, os, sys, inspect, mystbin, googletrans, asyncio, aiohttp, random, time, lyricsgenius
-from discord.ext.commands.core import cooldown
 import asyncdagpi, hashlib, asyncpg, io, typing, gdshortener, pathlib, textwrap, async_tio, zipfile
 import mathjspy, pytube, youtube_dl, re 
 
-from discord.ext import commands, menus
+from discord.ext import commands
 from utils.webhook import Webhook, AsyncWebhookAdapter
 from utils.get import *
 from utils.paginator import Paginator
@@ -1223,7 +1222,12 @@ class Utility(commands.Cog):
             em.set_author(name=msg.author, icon_url=msg.author.avatar_url)
             if msg.reference:
                 em.add_field(name="Reply", value=f"[Click here]({msg.reference.resolved.jump_url})", inline=False)
+
+            if msg.attachments:
+                em.add_field(name="Attachment", value=f"[Click here]({msg.attachments[0].url})", inline=False)  
+
             embeds.append(em)
+
         pag = menus.MenuPages(Paginator(embeds, per_page=1))
         await pag.start(ctx)
 

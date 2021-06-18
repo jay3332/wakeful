@@ -21,6 +21,11 @@
         "arrow": "▶",
         "loading": "🔁",
         "shrug": "🤷",
+        "fullleft": "⏪",
+        "left": "◀",
+        "stop": "⏹️",
+        "right": "▶",
+        "fullright": "⏩",
         "info": "ℹ️"
     }
 }
