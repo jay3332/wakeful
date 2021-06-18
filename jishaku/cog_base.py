@@ -289,7 +289,7 @@ class JishakuBase(commands.Cog):  # pylint: disable=too-many-public-methods
 
         msg = await simulate_message(ctx, author=target, channel=ctx.channel, content="foo")
 
-        alt_ctx = await copy_context_with(ctx, author=target, content=await get_prefix(self.bot, msg) + command_string)
+        alt_ctx = await copy_context_with(ctx, author=target, content=await get_prefix(self.bot, msg)[0] + command_string)
 
         if alt_ctx.command is None:
             if alt_ctx.invoked_with is None:
