@@ -24,7 +24,6 @@ def isImage(url):
     url = url.lower()
     if url.endswith("png") or url.endswith("jpg") or url.endswith("jpeg") or url.endswith("webp"):
         return True
-    print(url)
     return False
 
 def getImage(ctx : commands.Context, url : typing.Union[discord.Member, discord.Emoji, discord.PartialEmoji, None, str] = None):
