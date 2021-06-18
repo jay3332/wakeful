@@ -1219,7 +1219,7 @@ class Utility(commands.Cog):
         embeds = []
         for word in res:
             em = discord.Embed(description=word, color=color(), timestamp=msg.created_at)
-            em.add_field(name="URL", value=f"[Click here]({msg.jump_url})", inline=False)
+            em.set_author(name=msg.author, icon_url=msg.author.avatar_url)
             if msg.reference:
                 em.add_field(name="Reply", value=f"[Click here]({msg.reference.resolved.jump_url})", inline=False)
             embeds.append(em)
