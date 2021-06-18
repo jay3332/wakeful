@@ -58,11 +58,20 @@ class Admin(commands.Cog):
                     self.bot.reload_extension(cog)
                 except Exception as exc:
                     errors[cog] = exc
-                    errors[cog] = exc
+
+
+            modules = sys.modules.copy()
+            for modu in modules:
+                if modu.startswith("utils."):
+                    try:
+                        importlib.reload(sys.modules[modu])
+                    except Exception as exc:
+                        errors[modu] = exc
 
             if errors == {}:
                 await ctx.message.add_reaction(self.bot.icons["greentick"])
             else:
+                await ctx.message.add_reaction(self.bot.icons["redtick"])
                 em=discord.Embed(
                     description='\n'.join(f"`{a}`\n{self.bot.icons['redtick']} `{errors[a]}`" for a in list(errors)),
                     color=color()
