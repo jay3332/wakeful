@@ -135,8 +135,8 @@ class Admin(commands.Cog):
     async def streaming(self, ctx, url, *, game):
         if is_mod(self.bot, ctx.author):
             game = (game
-                    .replace("{users}", len(self.bot.users))
-                    .replace("{guilds}", len(self.bot.guilds)))
+                    .replace("{users}", str(len(self.bot.users)))
+                    .replace("{guilds}", str(len(self.bot.guilds))))
             await self.bot.change_presence(activity=discord.Streaming(name=str(game), url=f'https://www.twitch.tv/{url.lower()}'))
             await ctx.message.add_reaction(self.bot.icons['greentick'])
             self.bot.status = ""
@@ -145,8 +145,8 @@ class Admin(commands.Cog):
     async def playing(self, ctx, *, game):
         if is_mod(self.bot, ctx.author):
             game = (game
-                    .replace("{users}", len(self.bot.users))
-                    .replace("{guilds}", len(self.bot.guilds)))
+                    .replace("{users}", str(len(self.bot.users)))
+                    .replace("{guilds}", str(len(self.bot.guilds))))
             await self.bot.change_presence(activity=discord.Game(name=game))
             await ctx.message.add_reaction(self.bot.icons['greentick'])
             self.bot.status = ""
@@ -155,8 +155,8 @@ class Admin(commands.Cog):
     async def watching(self, ctx, *, game):
         if is_mod(self.bot, ctx.author):
             game = (game
-                    .replace("{users}", len(self.bot.users))
-                    .replace("{guilds}", len(self.bot.guilds)))
+                    .replace("{users}", str(len(self.bot.users)))
+                    .replace("{guilds}", str(len(self.bot.guilds))))
             await self.bot.change_presence(activity=discord.Activity(name=f"{game}", type=3))
             await ctx.message.add_reaction(self.bot.icons['greentick'])
 
@@ -164,8 +164,8 @@ class Admin(commands.Cog):
     async def listening(self, ctx, *, game):
         if is_mod(self.bot, ctx.author):
             game = (game
-                    .replace("{users}", len(self.bot.users))
-                    .replace("{guilds}", len(self.bot.guilds)))
+                    .replace("{users}", str(len(self.bot.users)))
+                    .replace("{guilds}", str(len(self.bot.guilds))))
             await self.bot.change_presence(activity=discord.Activity(name=f"{game}", type=2))
             await ctx.message.add_reaction(self.bot.icons['greentick'])
             self.bot.status = ""
@@ -174,8 +174,8 @@ class Admin(commands.Cog):
     async def competing(self, ctx, *, game):
         if is_mod(self.bot, ctx.author):
             game = (game
-                    .replace("{users}", len(self.bot.users))
-                    .replace("{guilds}", len(self.bot.guilds)))
+                    .replace("{users}", str(len(self.bot.users)))
+                    .replace("{guilds}", str(len(self.bot.guilds))))
             await self.bot.change_presence(activity=discord.Activity(name=f"{game}", type=5))
             await ctx.message.add_reaction(self.bot.icons['greentick'])
             self.bot.status = ""
