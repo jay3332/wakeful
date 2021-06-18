@@ -50,7 +50,6 @@ __all__ = (
 )
 
 log = logging.getLogger(__name__)
-
 class WebhookAdapter:
     """Base class for all webhook adapters.
 

@@ -1,4 +1,4 @@
-import discord, asyncio, os, pwd, random
+import discord, asyncio, os, pwd, random, sys, importlib
 from discord.ext import commands
 from utils.checks import is_mod
 from utils.functions import *
@@ -46,6 +46,44 @@ class Admin(commands.Cog):
             await ctx.message.delete()
         except Exception:
             pass
+
+    @developer.command(aliases=["rl"])
+    @commands.is_owner()
+    async def reload(self, ctx, module : str = "all"):
+        if module == "all":
+            errors = {}
+            extensions = self.bot.extensions.copy()
+            for cog in extensions:
+                try:
+                    self.bot.reload_extension(cog)
+                except Exception as exc:
+                    errors[cog] = exc
+                    errors[cog] = exc
+
+            if errors == {}:
+                await ctx.message.add_reaction(self.bot.icons["greentick"])
+            else:
+                em=discord.Embed(
+                    description='\n'.join(f"`{a}`\n{self.bot.icons['redtick']} `{errors[a]}`" for a in list(errors)),
+                    color=color()
+                )
+                await ctx.reply(embed=em, mention_author=False)
+        else:
+            try:
+                self.bot.reload_extension(module)
+            except commands.ExtensionNotLoaded:
+                try:
+                    modu = sys.modules[module]
+                except KeyError as exc:
+                    em=discord.Embed(
+                        description=exc,
+                        color=color()
+                    )
+                    return await ctx.reply(embed=em, mention_author=False)
+                else:
+                    importlib.reload(modu)
+            await ctx.message.add_reaction(self.bot.icons["greentick"])
+
 
 
     @commands.group(invoke_without_command=True, hidden=True)

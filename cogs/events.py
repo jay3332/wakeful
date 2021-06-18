@@ -39,6 +39,9 @@ class Errors(commands.Cog):
     async def on_command_error(self, ctx, error):
         if isinstance(error, TooLong):
             await ctx.reply(str(error), mention_author=False, allowed_mentions=discord.AllowedMentions.none())
+
+        if isinstance(error, NotFound):
+            await ctx.reply(str(error), mention_author=False, allowed_mentions=discord.AllowedMentions.none())
             
         elif isinstance(error, commands.CommandOnCooldown):
             if not is_mod(self.bot, ctx.author):
@@ -110,6 +113,9 @@ class Errors(commands.Cog):
         elif isinstance(error, commands.CommandInvokeError):
             error = error.original
             if isinstance(error, TooLong):
+                await ctx.reply(str(error), mention_author=False, allowed_mentions=discord.AllowedMentions.none())
+
+            if isinstance(error, NotFound):
                 await ctx.reply(str(error), mention_author=False, allowed_mentions=discord.AllowedMentions.none())
 
             elif isinstance(error, aiohttp.ClientConnectionError):

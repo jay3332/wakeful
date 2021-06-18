@@ -1,6 +1,5 @@
-from asyncdagpi import image
 import discord, datetime, async_cse, psutil, humanize, os, sys, inspect, mystbin, googletrans, asyncio, aiohttp, random, time, lyricsgenius
-import asyncdagpi, hashlib, asyncpg, io, typing, gdshortener, pathlib, textwrap, async_tio, zipfile
+import asyncdagpi, hashlib, asyncpg, io, typing, gdshortener, pathlib, textwrap, async_tio, zipfile, urllib3
 import mathjspy, pytube, youtube_dl, re 
 
 from discord.ext import commands
@@ -57,10 +56,12 @@ def download_emojis(emojis : tuple):
 
 @executor_function
 def download(url):
-    video = pytube.YouTube(str(url))
-    if video.length > 900:
-        raise TooLong("The video cannot be longer than 15 minutes")
-    
+    try:
+        video = pytube.YouTube(str(url))
+        if video.length > 900:
+            raise TooLong("The video cannot be longer than 15 minutes.")
+    except:
+        raise NotFound("This video has not been found, please try again later.")
     res = video.streams.get_highest_resolution()
     path = tempfile.TemporaryDirectory()
     download = res.download(path.name)
@@ -296,7 +297,7 @@ class Utility(commands.Cog):
                 data = self.ytdl.extract_info(url, download=False)
 
             if data["duration"] > 900:
-                raise TooLong("The video cannot be longer than 15 minutes")()
+                raise TooLong("The video cannot be longer than 15 minutes.")
             else:
                 try:
                     data = data["entries"][0]
