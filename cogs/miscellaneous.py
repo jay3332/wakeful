@@ -1,6 +1,7 @@
 import discord, typing, io
 from discord.ext import commands
 from utils.get import *
+from __main__ import get_prefix
 
 
 class Miscellaneous(commands.Cog):
@@ -17,7 +18,9 @@ class Miscellaneous(commands.Cog):
             res = await (await self.bot.session.get(str(emoji.url))).read()
         await ctx.reply(file=discord.File(io.BytesIO(res), filename="emoji.png"), mention_author=False)
 
-    @commands.command()
+    @commands.command(description=f'''
+Example: `poll "Am I cool?" Yes=✅,No=❌`
+''')
     @commands.cooldown(1,5,commands.BucketType.user)
     async def poll(self, ctx, question, *, options):
         options = options.split(",")
