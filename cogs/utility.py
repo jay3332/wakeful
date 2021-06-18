@@ -1863,13 +1863,13 @@ class Utility(commands.Cog):
 
         image = await res.read()
 
-        if url.endswith("png"):
+        if url.lower().endswith("png"):
             filetype = "png"
-        elif url.endswith("jpg"):
+        elif url.lower().endswith("jpg"):
             filetype = "jpg"
-        elif url.endswith("jpeg"):
+        elif url.lower().endswith("jpeg"):
             filetype = "jpeg"
-        elif url.endswith("webp"):
+        elif url.lower().endswith("webp"):
             filetype = "webp"
         else:
             filetype = None
