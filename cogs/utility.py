@@ -727,7 +727,8 @@ class Utility(commands.Cog):
     @commands.command(aliases=["urban"])
     @commands.cooldown(1,5,commands.BucketType.user)
     async def urbandictionary(self, ctx, *, term):
-        res = await self.bot.session.get("http://api.urbandictionary.com/v0/define", params={"term": term})
+        async with ctx.typing():
+            res = await self.bot.session.get("http://api.urbandictionary.com/v0/define", params={"term": term})
         res = await res.json()
         if res["list"] != [] and len(res["list"]) != 0:
             embeds = []
