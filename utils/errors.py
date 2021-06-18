@@ -3,8 +3,8 @@ class Error(Exception):
 
 class TooLong(Error):
 
-    def __init__(self):
-        pass
+    def __init__(self, message):
+        self.message = message
 
     def __str__(self):
-        return "The video cannot be longer than 15 minutes"
+        return self.message

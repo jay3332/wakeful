@@ -1,4 +1,5 @@
-import discord, difflib, asyncio, traceback, aiohttp
+import discord, difflib, asyncio, traceback, aiohttp, asyncpg
+from discord.ext.commands.core import command
 from jishaku.models import copy_context_with
 from discord.ext import commands
 from utils.webhook import Webhook, AsyncWebhookAdapter
@@ -18,16 +19,21 @@ class Errors(commands.Cog):
             try:
                 res["commands"]
             except TypeError:
-                commands = []
+                commands = ""
+            commands = commands.split(",")
+            if "snipe" in commands:
+                return
+            self.bot.message_cache[msg.guild.id] = {}
+            self.bot.message_cache[msg.guild.id][msg.channel.id] = msg
+            await asyncio.sleep(10)
+            try:
+                message = self.bot.message_cache[msg.guild.id][msg.channel.id]
+            except Exception:
+                pass
             else:
-                commands = res["commands"]
-                commands = commands.split(",")
-                if not "snipe" in commands:
-                    self.bot.message_cache[msg.guild.id] = {}
-                    self.bot.message_cache[msg.guild.id][msg.channel.id] = msg
-                    await asyncio.sleep(10)
-                    if self.bot.message_cache[msg.guild.id][msg.channel.id] == msg:
-                        self.bot.message_cache[msg.guild.id].pop(msg.channel.id)
+                if message == msg:
+                    self.bot.message_cache[msg.guild.id].pop(msg.channel.id)
+                    
 
     @commands.Cog.listener()
     async def on_command_error(self, ctx, error):
@@ -174,6 +180,17 @@ class Errors(commands.Cog):
     @commands.Cog.listener()
     async def on_command_completion(self, ctx):
         self.bot.cmdsSinceRestart += 1
+        command_name = None
+        if ctx.command.parent is not None:
+            command_name = f"{ctx.command.parent.name} {ctx.command.name}"
+        else:
+            command_name = ctx.command.name
+        try:
+            command = self.bot.command_usage[command_name]
+        except KeyError:
+            self.bot.command_usage[command_name] = {"usage": 1}
+        else:
+            self.bot.command_usage[command_name] = {"usage": command["usage"]+1}
 
 
 

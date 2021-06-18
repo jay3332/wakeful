@@ -1,9 +1,10 @@
-import discord, asyncio, os, pwd
+import discord, asyncio, os, pwd, random
 from discord.ext import commands
 from utils.checks import is_mod
 from utils.functions import *
 from utils.get import *
-from jishaku.models import simulate_message
+from utils.paginator import *
+from jishaku.models import copy
 from jishaku.codeblocks import codeblock_converter
 from prettytable import PrettyTable
 
@@ -201,13 +202,84 @@ class Admin(commands.Cog):
     async def evaluate(self, ctx, *, code : codeblock_converter):
         await ctx.invoke(self.bot.get_command("jishaku python"), **{"argument": code})
 
-    @developer.command(aliases=["sim"])
+    @developer.command(aliases=["cmdus", "cmdusage", "commandus"])
     @commands.is_owner()
-    async def simulate(self, ctx, member : discord.Member, message : str):
-        msg = await simulate_message(ctx, author=member, channel=ctx.channel, content=message)
+    async def commandusage(self, ctx, *, command : str = None):
+        if command is None:
+
+            if len(list(self.bot.command_usage)) == 0 and list(self.bot.command_usage) == []:
+                em=discord.Embed(description="N/A", color=color())
+                await ctx.reply(embed=em, mention_author=False)
+            else:
+                res = WrapList(list(self.bot.command_usage), 6)
+                embeds = []
+                for txt in res:
+                    em=discord.Embed(title="Command Usage", description="\n".join(f"`{text}` - `{self.bot.command_usage[text]['usage']}`" for text in txt), color=color())
+                    embeds.append(em)
+                pag = menus.MenuPages(Paginator(embeds, per_page=1))
+                await pag.start(ctx)
+
+        else:
+            
+            command = self.bot.get_command(command)
+
+            if command is None:
+                return await ctx.reply(f"That command doesn't exist", mention_author=False)
+
+            if ctx.command.parent is not None:
+                command_name = f"{command.parent.name} {command.name}"
+            else:
+                command_name = command.name
+
+            try:
+                cmd = self.bot.command_usage[command_name]
+            except KeyError:
+                print(self.bot.command_usage)
+                return await ctx.reply(f"I could not find any stats for `{command_name}`", mention_author=False)
+            em=discord.Embed(
+                title=command_name,
+                description=f"`{command_name}` - `{cmd['usage']}`",
+                color=color()
+            )
+            await ctx.reply(embed=em, mention_author=False)
+
+
+    @commands.group(aliases=["sim"], invoke_without_command=True, description="A command to dispatch events")
+    @commands.is_owner()
+    async def simulate(self, ctx):
+        await ctx.invoke(self.bot.get_command("help"), **{"command":ctx.command.name})
+
+    @simulate.command()
+    @commands.is_owner()
+    async def message(self, ctx, member : discord.Member, *, message : str):
+        msg: discord.Message = copy.copy(ctx.message)
+        msg.author = member
+        msg.channel = ctx.channel
+        msg.content = message
         self.bot.dispatch("message", msg)
         await ctx.message.add_reaction(self.bot.icons["greentick"])
 
+    @simulate.command()
+    @commands.is_owner()
+    async def delete(self, ctx, member : discord.Member, *, message : str):
+        msg: discord.Message = copy.copy(ctx.message)
+        msg.author = member
+        msg.channel = ctx.channel
+        msg.content = message
+        self.bot.dispatch("message_delete", msg)
+        await ctx.message.add_reaction(self.bot.icons["greentick"])
+
+    @simulate.command()
+    @commands.is_owner()
+    async def join(self, ctx):
+        self.bot.dispatch("guild_join", ctx.guild)
+        await ctx.message.add_reaction(self.bot.icons["greentick"])
+
+    @simulate.command(aliases=["remove"])
+    @commands.is_owner()
+    async def leave(self, ctx):
+        self.bot.dispatch("guild_remove", ctx.guild)
+        await ctx.message.add_reaction(self.bot.icons["greentick"])
 
     @developer.command(hidden=True)
     @commands.is_owner()

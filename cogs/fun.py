@@ -1,3 +1,4 @@
+from utils.errors import TooLong
 from utils.checks import gameRunning
 import discord, io, asyncdagpi, asyncio, datetime, string, random, json, wonderwords, typing
 from discord.ext import commands
@@ -47,6 +48,8 @@ class Fun(commands.Cog):
     @commands.command()
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def tts(self, ctx, *, message):
+        if len(message) > 500:
+            raise TooLong("The text can't be over 500 characters long")
         async with ctx.typing():
             file = await do_tts(message)
         await ctx.reply(file=discord.File(file, f"{message}.wav"), mention_author=False)
@@ -54,6 +57,9 @@ class Fun(commands.Cog):
     @commands.group(aliases=["vctts"], invoke_without_command=True)
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def voicechattts(self, ctx, *, message):
+        if len(message) > 500:
+            raise TooLong("The text can't be over 500 characters long")
+            
         if not is_vc(ctx, ctx.author):
             await ctx.message.add_reaction(self.bot.icons["redtick"])
             em=discord.Embed(description=f"You are not in my voice channel", color=color())

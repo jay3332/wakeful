@@ -41,6 +41,7 @@ class wakeful(commands.AutoShardedBot):
         self.cmdsSinceRestart = 0
         self.message_cache = {}
         self.directorys = {}
+        self.command_usage = {}
         self.games = {
             "akinator": {}
         }

@@ -60,7 +60,7 @@ def download_emojis(emojis : tuple):
 def download(url):
     video = pytube.YouTube(str(url))
     if video.length > 900:
-        raise TooLong
+        raise TooLong("The video cannot be longer than 15 minutes")
     
     res = video.streams.get_highest_resolution()
     path = tempfile.TemporaryDirectory()
@@ -297,7 +297,7 @@ class Utility(commands.Cog):
                 data = self.ytdl.extract_info(url, download=False)
 
             if data["duration"] > 900:
-                raise TooLong()
+                raise TooLong("The video cannot be longer than 15 minutes")()
             else:
                 try:
                     data = data["entries"][0]
@@ -1256,7 +1256,7 @@ class Utility(commands.Cog):
             commands = commands.split(",")
             if len(commands) != 0 and commands != ['']:
                 em=discord.Embed(title="Disabled commands", description=", ".join(cmd for cmd in commands if cmd != ""), color=color())
-                
+
                 await ctx.reply(embed=em, mention_author=False)
             else:
                 em=discord.Embed(description=f"There are no disabled commands", color=color())
@@ -1566,13 +1566,19 @@ class Utility(commands.Cog):
                     else:
                         cooldown_msg = "N/A"
                     #---------------------------------------
+                    command_name = None
+                    if given_command.parent is not None:
+                        command_name = f"{given_command.parent.name} {given_command.name}"
+                    else:
+                        command_name = given_command.name
+                    #---------------------------------------
                     em=discord.Embed(
-                        title=given_command.name,
+                        title=command_name,
                         description=given_command.description,
                         color=color()
                     )
                     
-                    em.add_field(name="Usage", value=f"{prefix}{given_command.name} {command_usage}", inline=False)
+                    em.add_field(name="Usage", value=f"{prefix}{command_name} {command_usage}", inline=False)
                     em.add_field(name="Cooldown", value=cooldown_msg, inline=False)
                     if given_command.aliases:
                         em.add_field(name=f"Aliases [{len(given_command.aliases)}]", value="> " + ", ".join(f"`{alias}`" for alias in given_command.aliases), inline=False)
