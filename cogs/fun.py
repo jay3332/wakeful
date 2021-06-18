@@ -36,6 +36,7 @@ def typeracer(img, sentence):
     array = io.BytesIO()
     img.save(array, format="png")
     return discord.File(io.BytesIO(array.getvalue()), "typeracer.png")
+
 class Fun(commands.Cog):
 
     """Fun & games commands"""
@@ -176,6 +177,7 @@ class Fun(commands.Cog):
             em=discord.Embed(description=f"{name.mention}'s estimated age is {age}", color=color())
             em.set_footer(text=f"Powered by agify.io", icon_url=ctx.author.avatar_url)
             await ctx.send(embed=em)
+
     @commands.group(name="together", invoke_without_command=True)
     @commands.cooldown(1,5,commands.BucketType.user)
     async def _together(self, ctx):
@@ -325,7 +327,7 @@ class Fun(commands.Cog):
             em.set_image(url=url)
             await ctx.reply(embed=em, mention_author=False)
         else:
-            await ctx.invoke(self.bot.get_command("meme"))
+            await ctx.reinvoke()
 
     @commands.command(aliases=["typerace"], description="Makes the bot send an image with text, which someone has to type in 20 seconds")
     @commands.guild_only()
