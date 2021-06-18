@@ -226,7 +226,7 @@ class Admin(commands.Cog):
             if command is None:
                 return await ctx.reply(f"That command doesn't exist", mention_author=False)
 
-            if ctx.command.parent is not None:
+            if command.parent is not None:
                 command_name = f"{command.parent.name} {command.name}"
             else:
                 command_name = command.name
