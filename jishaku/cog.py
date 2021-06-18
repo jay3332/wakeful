@@ -19,7 +19,7 @@ from discord.ext import commands
 
 from jishaku.cog_base import JishakuBase
 from jishaku.flags import JISHAKU_HIDE
-from jishaku.meta import __version__
+from jishaku.meta import __version__, __title__
 from jishaku.metacog import GroupCogMeta
 from jishaku.modules import package_version
 from utils.get import color
@@ -53,7 +53,7 @@ async def jsk(self, ctx: commands.Context):
     """
 
     summary = [
-        f"Jishaku v{__version__}, discord.py `{package_version('discord.py')}`, "
+        f"{__title__} v{__version__}, discord.py `{package_version('discord.py')}`, "
         f"`Python {sys.version}` on `{sys.platform}`".replace("\n", ""),
         f"Module was loaded {humanize.naturaltime(self.load_time)}, "
         f"cog was loaded {humanize.naturaltime(self.start_time)}.",
@@ -64,7 +64,7 @@ async def jsk(self, ctx: commands.Context):
         # 3.6 support uses a shim now, due to being unable to compile asynchronous function bodies
         #  outside of asynchronous functions.
         summary.extend([
-            "Jishaku no longer has primary support for Python 3.6. While the cog will still work, some "
+            "{__title__} no longer has primary support for Python 3.6. While the cog will still work, some "
             "features and bugfixes may be unavailable on this version.",
             "It is recommended that you update to Python 3.7+ when possible so Jishaku can properly "
             "leverage new language features.",
