@@ -1749,12 +1749,12 @@ class Utility(commands.Cog):
                 em=discord.Embed(title=guild.name,description=f"""
     > {guild.description}
 
-    {self.bot.icons['arrow']}Created at: {guild.created_at.strftime('%d/%m/%Y at %H:%M:%S')} ({humanize.naturaltime(guild.created_at)})
-    {self.bot.icons['arrow']}Verification Level: {str(guild.verification_level).title()}""", color=color(), url=invite)
+{self.bot.icons['arrow']}Created at: {guild.created_at.strftime('%d/%m/%Y at %H:%M:%S')} ({humanize.naturaltime(guild.created_at)})
+{self.bot.icons['arrow']}Verification Level: {str(guild.verification_level).title()}""", color=color(), url=invite)
             else:
                 em=discord.Embed(title=guild.name,description=f"""
-    {self.bot.icons['arrow']}Created at: {guild.created_at.strftime('%d/%m/%Y at %H:%M:%S')} ({humanize.naturaltime(guild.created_at)})
-    {self.bot.icons['arrow']}Verification Level: {str(guild.verification_level).title()}""", color=color(), url=invite)
+{self.bot.icons['arrow']}Created at: {guild.created_at.strftime('%d/%m/%Y at %H:%M:%S')} ({humanize.naturaltime(guild.created_at)})
+{self.bot.icons['arrow']}Verification Level: {str(guild.verification_level).title()}""", color=color(), url=invite)
             em.set_thumbnail(url=guild.icon_url)
             em.set_footer(text=f"ID: {guild.id}", icon_url=ctx.author.avatar_url)
             if guild.banner_url is not None:
