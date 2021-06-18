@@ -3,6 +3,7 @@ from discord.ext import commands
 from utils.checks import is_mod
 from utils.functions import *
 from utils.get import *
+from jishaku.models import simulate_message
 from jishaku.codeblocks import codeblock_converter
 from prettytable import PrettyTable
 
@@ -199,6 +200,14 @@ class Admin(commands.Cog):
     @commands.is_owner()
     async def evaluate(self, ctx, *, code : codeblock_converter):
         await ctx.invoke(self.bot.get_command("jishaku python"), **{"argument": code})
+
+    @developer.command(aliases=["sim"])
+    @commands.is_owner()
+    async def simulate(self, ctx, member : discord.Member, message : str):
+        msg = await simulate_message(ctx, author=member, channel=ctx.channel, content=message)
+        self.bot.dispatch("message", msg)
+        await ctx.message.add_reaction(self.bot.icons["greentick"])
+
 
     @developer.command(hidden=True)
     @commands.is_owner()

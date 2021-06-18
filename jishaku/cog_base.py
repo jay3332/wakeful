@@ -34,12 +34,14 @@ from jishaku.codeblocks import Codeblock, codeblock_converter
 from jishaku.exception_handling import ReplResponseReactor
 from jishaku.flags import JISHAKU_RETAIN, SCOPE_PREFIX
 from jishaku.functools import AsyncSender
-from jishaku.models import copy_context_with
+from jishaku.models import copy_context_with, simulate_message
 from jishaku.modules import ExtensionConverter
 from jishaku.paginators import PaginatorInterface, WrappedFilePaginator, WrappedPaginator
 from jishaku.repl import AsyncCodeExecutor, Scope, all_inspections, get_var_dict_from_ctx
 from jishaku.shell import ShellReader
 from jishaku.voice import BasicYouTubeDLSource, connected_check, playing_check, vc_check, youtube_dl
+
+from __main__ import get_prefix
 
 __all__ = (
     "JishakuBase",
@@ -285,7 +287,7 @@ class JishakuBase(commands.Cog):  # pylint: disable=too-many-public-methods
 
             target = target_member or target
 
-        alt_ctx = await copy_context_with(ctx, author=target, content=ctx.prefix + command_string)
+        alt_ctx = await copy_context_with(ctx, author=target, content=await get_prefix(self.bot, await simulate_message(ctx, author=target, channel=ctx.channel, content="foo")) + command_string)
 
         if alt_ctx.command is None:
             if alt_ctx.invoked_with is None:

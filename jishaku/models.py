@@ -33,3 +33,15 @@ async def copy_context_with(ctx: commands.Context, *, author=None, channel=None,
 
     # obtain and return a context of the same type
     return await ctx.bot.get_context(alt_message, cls=type(ctx))
+
+async def simulate_message(ctx: commands.Context, *, author=None, channel=None, content=None):
+    message: discord.Message = copy.copy(ctx.message)
+
+    if author is not None:
+        message.author = author
+    if channel is not None:
+        message.channel = channel
+    if content is not None:
+        message.content = content
+
+    return message
