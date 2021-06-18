@@ -324,9 +324,9 @@ class Admin(commands.Cog):
         self.bot.dispatch("message", msg)
         await ctx.message.add_reaction(self.bot.icons["greentick"])
 
-    @simulate.command(aliases=["del"])
+    @simulate.command(name="delete", aliases=["del"])
     @commands.is_owner()
-    async def delete(self, ctx, member : discord.Member, *, message : str):
+    async def _delete(self, ctx, member : discord.Member, *, message : str):
         msg: discord.Message = copy.copy(ctx.message)
         msg.author = member
         msg.channel = ctx.channel
