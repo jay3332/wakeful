@@ -256,6 +256,8 @@ class Admin(commands.Cog):
         msg.author = member
         msg.channel = ctx.channel
         msg.content = message
+        if ctx.message.reference:
+            msg.reference = ctx.message.reference
         self.bot.dispatch("message", msg)
         await ctx.message.add_reaction(self.bot.icons["greentick"])
 
@@ -266,6 +268,8 @@ class Admin(commands.Cog):
         msg.author = member
         msg.channel = ctx.channel
         msg.content = message
+        if ctx.message.reference:
+            msg.reference = ctx.message.reference
         self.bot.dispatch("message_delete", msg)
         await ctx.message.add_reaction(self.bot.icons["greentick"])
 

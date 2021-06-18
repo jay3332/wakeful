@@ -1214,7 +1214,7 @@ class Utility(commands.Cog):
         except KeyError:
             em=discord.Embed(description=f"There's no message to snipe", color=color())
             return await ctx.reply(embed=em, mention_author=False)
-            
+
         res = WrapText(msg.content, 2048)
         embeds = []
         for word in res:
