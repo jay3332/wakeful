@@ -966,7 +966,7 @@ class Utility(commands.Cog):
             em.add_field(name="Bot", value=f"""
 {self.bot.icons['arrow']}**Guilds**: `{len(self.bot.guilds)}`
 {self.bot.icons['arrow']}**Users**: `{len(self.bot.users)}`
-{self.bot.icons['arrow']}**Commands**: `{len([cmd for cmd in list(set(self.bot.walk_commands())) if not cmd.hidden])}`
+{self.bot.icons['arrow']}**Commands**: `{len([cmd for cmd in list(self.bot.walk_commands()) if not cmd.hidden])}`
 {self.bot.icons['arrow']}**Commands executed**: `{self.bot.cmdsSinceRestart}`""", inline=True)
             em.add_field(name="File Statistics", value=f"""
 {self.bot.icons['arrow']}**Letters**: `{letters}`
@@ -1603,10 +1603,7 @@ class Utility(commands.Cog):
                 else:
                     em.add_field(name="Aliases [0]", value="N/A", inline=False)
                 try:
-                    if is_mod(self.bot, ctx.author):
-                        commands_ = [cmd for cmd in given_command.commands]
-                    else:
-                        commands_ = [cmd for cmd in given_command.commands if not cmd.hidden and not cmd.name in disabled]
+                    commands_ = [cmd for cmd in given_command.commands]
                 except Exception:
                     commands_ = "N/A"
                 try:
@@ -1625,17 +1622,64 @@ class Utility(commands.Cog):
                 disabled = disabled.split(",")
             given_cog = get_cog(self.bot, command)
             if given_cog is not None:
-                if is_mod(self.bot, ctx.author):
-                    commands_ = [cmd for cmd in given_cog.walk_commands() if cmd.parent is None]
-                else:
-                    commands_ = [cmd for cmd in given_cog.walk_commands() if not cmd.hidden and not cmd.name in disabled and cmd.parent is None]
+                commands_ = [cmd for cmd in given_cog.walk_commands() if cmd.parent is None]
                 if commands_ is not None and commands_ != []:
                     em=discord.Embed(title=f"{given_cog.qualified_name} commands [{len(commands_)}]", description=f"{given_cog.description}\n\n> "+", ".join(f"`{cmd.name}`" for cmd in commands_), color=color())
                     await ctx.reply(embed=em, mention_author=False)
                 else:
                     await ctx.reply(f"This command does not exist", mention_author=False)
             else:
-                await ctx.reply(f"There isn't a cog / command with the name `{command}`", mention_author=False)
+                await ctx.reply(f"There isn't a cog or command with the name `{command}`", mention_author=False)
+
+    @commands.group(invoke_without_command=True)
+    @commands.cooldown(1,5,commands.BucketType.user)
+    async def search(self, ctx):
+        await ctx.invoke(self.bot.get_command("help"), **{"command": ctx.command.name})
+    
+    @search.command(name="command", aliases=["cmd"])
+    @commands.cooldown(1,5,commands.BucketType.user)
+    async def _command(self, ctx, *, name : str):
+        commands = [cmd.name if cmd.parent is None else f"{cmd.parent.name} {cmd.name}" for cmd in list(self.bot.walk_commands())]
+        cmds = []
+
+        for cmd in commands:
+            if name.lower() in cmd.lower():
+                cmds.append(cmd)
+
+        res = WrapList(cmds, 6)
+        embeds = []
+        for txt in res:
+            em=discord.Embed(description="\n".join(f"{list(cmds).index(text)+1}. `{text}`" for text in txt), color=color())
+            embeds.append(em)
+        pag = self.bot.paginate(Paginator(embeds, per_page=1))
+        await pag.start(ctx)
+
+    @search.command(name="cog")
+    @commands.cooldown(1,5,commands.BucketType.user)
+    async def _cog(self, ctx, *, name : str):
+        cogs = []
+        for cog in self.bot.cogs:
+            cog = get_cog(self.bot, cog)
+            if not cog.qualified_name.lower() in ["jishaku"]:
+                if is_mod(self.bot, ctx.author):
+                    cmds = [cmd for cmd in cog.get_commands()]
+                else:
+                    cmds = [cmd for cmd in list(cog.get_commands()) if not cmd.hidden]
+                if len(cmds) != 0 and cmds != []:
+                    cogs.append(cog)
+        _cogs = []
+
+        for cog in cogs:
+            if name.lower() in cog.qualified_name.lower():
+                _cogs.append(cog)
+
+        res = WrapList(_cogs, 6)
+        embeds = []
+        for txt in res:
+            em=discord.Embed(description="\n".join(f"{list(_cogs).index(text)+1}. `{text.qualified_name}`" for text in txt), color=color())
+            embeds.append(em)
+        pag = self.bot.paginate(Paginator(embeds, per_page=1))
+        await pag.start(ctx)
 
     @help.command()
     @commands.cooldown(1,5,commands.BucketType.user)
