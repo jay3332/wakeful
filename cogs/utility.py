@@ -1,6 +1,7 @@
 import discord, datetime, async_cse, psutil, humanize, os, sys, inspect, mystbin, googletrans, asyncio, aiohttp, random, time, lyricsgenius
 import asyncdagpi, hashlib, asyncpg, io, typing, gdshortener, pathlib, textwrap, async_tio, zipfile, aiowiki
 import mathjspy, pytube, youtube_dl, re 
+import twemoji_parser as twemoji
 
 from discord.ext import commands
 from utils.webhook import Webhook, AsyncWebhookAdapter
@@ -365,7 +366,7 @@ class Utility(commands.Cog):
                     em=discord.Embed(description="The video was too large to be sent", color=color())
                     await ctx.reply(embed=em, mention_author=False)
 
-    @commands.command()
+    @commands.command(aliases=["ei"])
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def emojiinfo(self, ctx, emoji: typing.Union[discord.PartialEmoji, discord.Emoji, str]):
         if isinstance(emoji, discord.PartialEmoji):
@@ -410,7 +411,7 @@ class Utility(commands.Cog):
             await ctx.reply(embed=em, mention_author=False)
         elif isinstance(emoji, str):
             await ctx.message.add_reaction(self.bot.icons['redtick'])
-            em=discord.Embed(description=f"This command does not support default emojis, please input a custom emoji", color=color())
+            em=discord.Embed(description=f"This command does not support default emojis, please use bigemoji, emojitoimage or input a custom emoji", color=color())
             
             await ctx.reply(embed=em, mention_author=False)
 
@@ -838,7 +839,7 @@ class Utility(commands.Cog):
         if command is None:
             em=discord.Embed(description=f"Couldn't find command `{command_name}`", color=color())
             return await ctx.reply(embed=em, mention_author=False)
-            
+
         try:
             source_lines, _ = inspect.getsourcelines(command.callback)
         except (TypeError, OSError):
