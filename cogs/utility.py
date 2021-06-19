@@ -1672,7 +1672,7 @@ class Utility(commands.Cog):
         if content is None:
             if not ctx.message.reference:
                 raise commands.MissingRequiredArgument(inspect.Parameter("content", inspect.Parameter.KEYWORD_ONLY))
-            elif content is None:
+            elif ctx.message.reference.resolved.content is None:
                 raise commands.MissingRequiredArgument(inspect.Parameter("content", inspect.Parameter.KEYWORD_ONLY))
             else:
                 content = ctx.message.reference.resolved.content
