@@ -12,7 +12,8 @@ def do_polaroid(image, method : str, args : list = [], kwargs : dict = {}):
     method = getattr(img, method)
     method(*args, **kwargs)
     bytes_ = img.save_bytes()
-    return bytes_
+    file = discord.File(io.BytesIO(bytes_), filename=f"{method}.png")
+    return file
 
 class Polaroid(commands.Cog):
 
@@ -31,7 +32,7 @@ class Polaroid(commands.Cog):
         res = await do_polaroid(img, method="apply_gradient")
         em=discord.Embed(color=color())
         em.set_image(url=f"attachment://{ctx.command.name}.png")
-        await ctx.reply(embed=em, file=discord.File(io.BytesIO(res), filename=f"{ctx.command.name}.png"), mention_author=False)
+        await ctx.reply(embed=em, file=res, mention_author=False)
 
     @commands.command()
     @commands.cooldown(1,5,commands.BucketType.user)
@@ -43,7 +44,7 @@ class Polaroid(commands.Cog):
         res = await do_polaroid(img, method="fliph")
         em=discord.Embed(color=color())
         em.set_image(url=f"attachment://{ctx.command.name}.png")
-        await ctx.reply(embed=em, file=discord.File(io.BytesIO(res), filename=f"{ctx.command.name}.png"), mention_author=False)
+        await ctx.reply(embed=em, file=res, mention_author=False)
 
     @commands.command()
     @commands.cooldown(1,5,commands.BucketType.user)
@@ -55,7 +56,7 @@ class Polaroid(commands.Cog):
         res = await do_polaroid(img, method="flipv")
         em=discord.Embed(color=color())
         em.set_image(url=f"attachment://{ctx.command.name}.png")
-        await ctx.reply(embed=em, file=discord.File(io.BytesIO(res), filename=f"{ctx.command.name}.png"), mention_author=False)
+        await ctx.reply(embed=em, file=res, mention_author=False)
 
     @commands.command()
     @commands.cooldown(1,5,commands.BucketType.user)
@@ -67,7 +68,7 @@ class Polaroid(commands.Cog):
         res = await do_polaroid(img, method="box_blur")
         em=discord.Embed(color=color())
         em.set_image(url=f"attachment://{ctx.command.name}.png")
-        await ctx.reply(embed=em, file=discord.File(io.BytesIO(res), filename=f"{ctx.command.name}.png"), mention_author=False)
+        await ctx.reply(embed=em, file=res, mention_author=False)
 
     @commands.command()
     @commands.cooldown(1,5,commands.BucketType.user)
@@ -79,7 +80,7 @@ class Polaroid(commands.Cog):
         res = await do_polaroid(img, method="resize", args=(2000,900,1))
         em=discord.Embed(color=color())
         em.set_image(url=f"attachment://{ctx.command.name}.png")
-        await ctx.reply(embed=em, file=discord.File(io.BytesIO(res), filename=f"{ctx.command.name}.png"), mention_author=False)
+        await ctx.reply(embed=em, file=res, mention_author=False)
 
     @commands.command()
     @commands.cooldown(1,5,commands.BucketType.user)
@@ -91,7 +92,7 @@ class Polaroid(commands.Cog):
         res = await do_polaroid(img, method="brighten", kwargs={"treshold":50})
         em=discord.Embed(color=color())
         em.set_image(url=f"attachment://{ctx.command.name}.png")
-        await ctx.reply(embed=em, file=discord.File(io.BytesIO(res), filename=f"{ctx.command.name}.png"), mention_author=False)
+        await ctx.reply(embed=em, file=res, mention_author=False)
 
     @commands.command()
     @commands.cooldown(1,5,commands.BucketType.user)
@@ -102,7 +103,7 @@ class Polaroid(commands.Cog):
             res = await do_polaroid(img, method="solarize")
         em=discord.Embed(color=color())
         em.set_image(url=f"attachment://{ctx.command.name}.png")
-        await ctx.reply(embed=em, file=discord.File(io.BytesIO(res), filename=f"{ctx.command.name}.png"), mention_author=False)
+        await ctx.reply(embed=em, file=res, mention_author=False)
 
     @commands.command()
     @commands.cooldown(1,5,commands.BucketType.user)
@@ -113,7 +114,7 @@ class Polaroid(commands.Cog):
             res = await do_polaroid(img, method="oil", kwargs={"radius":5, "intensity":5})
         em=discord.Embed(color=color())
         em.set_image(url=f"attachment://{ctx.command.name}.png")
-        await ctx.reply(embed=em, file=discord.File(io.BytesIO(res), filename=f"{ctx.command.name}.png"), mention_author=False)
+        await ctx.reply(embed=em, file=res, mention_author=False)
 
     @commands.group(invoke_without_command=True)
     @commands.cooldown(1,5,commands.BucketType.user)
@@ -129,7 +130,7 @@ class Polaroid(commands.Cog):
             res = await do_polaroid(img, method="filter", args=[ctx.command.name])
         em=discord.Embed(color=color())
         em.set_image(url=f"attachment://{ctx.command.name}.png")
-        await ctx.reply(embed=em, file=discord.File(io.BytesIO(res), filename=f"{ctx.command.name}.png"), mention_author=False)
+        await ctx.reply(embed=em, file=res, mention_author=False)
 
     @filter.command()
     @commands.cooldown(1,5,commands.BucketType.user)
@@ -140,7 +141,7 @@ class Polaroid(commands.Cog):
             res = await do_polaroid(img, method="filter", args=[ctx.command.name])
         em=discord.Embed(color=color())
         em.set_image(url=f"attachment://{ctx.command.name}.png")
-        await ctx.reply(embed=em, file=discord.File(io.BytesIO(res), filename=f"{ctx.command.name}.png"), mention_author=False)
+        await ctx.reply(embed=em, file=res, mention_author=False)
 
     @filter.command()
     @commands.cooldown(1,5,commands.BucketType.user)
@@ -151,7 +152,7 @@ class Polaroid(commands.Cog):
             res = await do_polaroid(img, method="filter", args=[ctx.command.name])
         em=discord.Embed(color=color())
         em.set_image(url=f"attachment://{ctx.command.name}.png")
-        await ctx.reply(embed=em, file=discord.File(io.BytesIO(res), filename=f"{ctx.command.name}.png"), mention_author=False)
+        await ctx.reply(embed=em, file=res, mention_author=False)
 
     @filter.command()
     @commands.cooldown(1,5,commands.BucketType.user)
@@ -162,7 +163,7 @@ class Polaroid(commands.Cog):
             res = await do_polaroid(img, method="filter", args=[ctx.command.name])
         em=discord.Embed(color=color())
         em.set_image(url=f"attachment://{ctx.command.name}.png")
-        await ctx.reply(embed=em, file=discord.File(io.BytesIO(res), filename=f"{ctx.command.name}.png"), mention_author=False)
+        await ctx.reply(embed=em, file=res, mention_author=False)
 
     @filter.command()
     @commands.cooldown(1,5,commands.BucketType.user)
@@ -173,7 +174,7 @@ class Polaroid(commands.Cog):
             res = await do_polaroid(img, method="filter", args=[ctx.command.name])
         em=discord.Embed(color=color())
         em.set_image(url=f"attachment://{ctx.command.name}.png")
-        await ctx.reply(embed=em, file=discord.File(io.BytesIO(res), filename=f"{ctx.command.name}.png"), mention_author=False)
+        await ctx.reply(embed=em, file=res, mention_author=False)
 
     @filter.command()
     @commands.cooldown(1,5,commands.BucketType.user)
@@ -184,7 +185,7 @@ class Polaroid(commands.Cog):
             res = await do_polaroid(img, method="filter", args=[ctx.command.name])
         em=discord.Embed(color=color())
         em.set_image(url=f"attachment://{ctx.command.name}.png")
-        await ctx.reply(embed=em, file=discord.File(io.BytesIO(res), filename=f"{ctx.command.name}.png"), mention_author=False)
+        await ctx.reply(embed=em, file=res, mention_author=False)
 
     @filter.command()
     @commands.cooldown(1,5,commands.BucketType.user)
@@ -195,7 +196,7 @@ class Polaroid(commands.Cog):
             res = await do_polaroid(img, method="filter", args=[ctx.command.name])
         em=discord.Embed(color=color())
         em.set_image(url=f"attachment://{ctx.command.name}.png")
-        await ctx.reply(embed=em, file=discord.File(io.BytesIO(res), filename=f"{ctx.command.name}.png"), mention_author=False)
+        await ctx.reply(embed=em, file=res, mention_author=False)
 
     @filter.command()
     @commands.cooldown(1,5,commands.BucketType.user)
@@ -206,7 +207,7 @@ class Polaroid(commands.Cog):
             res = await do_polaroid(img, method="filter", args=[ctx.command.name])
         em=discord.Embed(color=color())
         em.set_image(url=f"attachment://{ctx.command.name}.png")
-        await ctx.reply(embed=em, file=discord.File(io.BytesIO(res), filename=f"{ctx.command.name}.png"), mention_author=False)
+        await ctx.reply(embed=em, file=res, mention_author=False)
 
     @filter.command()
     @commands.cooldown(1,5,commands.BucketType.user)
@@ -217,7 +218,7 @@ class Polaroid(commands.Cog):
             res = await do_polaroid(img, method="filter", args=["pastel_pink"])
         em=discord.Embed(color=color())
         em.set_image(url=f"attachment://{ctx.command.name}.png")
-        await ctx.reply(embed=em, file=discord.File(io.BytesIO(res), filename=f"{ctx.command.name}.png"), mention_author=False)
+        await ctx.reply(embed=em, file=res, mention_author=False)
 
     @filter.command()
     @commands.cooldown(1,5,commands.BucketType.user)
@@ -228,7 +229,7 @@ class Polaroid(commands.Cog):
             res = await do_polaroid(img, method="filter", args=[ctx.command.name])
         em=discord.Embed(color=color())
         em.set_image(url=f"attachment://{ctx.command.name}.png")
-        await ctx.reply(embed=em, file=discord.File(io.BytesIO(res), filename=f"{ctx.command.name}.png"), mention_author=False)
+        await ctx.reply(embed=em, file=res, mention_author=False)
 
     @filter.command()
     @commands.cooldown(1,5,commands.BucketType.user)
@@ -239,7 +240,7 @@ class Polaroid(commands.Cog):
             res = await do_polaroid(img, method="filter", args=[ctx.command.name])
         em=discord.Embed(color=color())
         em.set_image(url=f"attachment://{ctx.command.name}.png")
-        await ctx.reply(embed=em, file=discord.File(io.BytesIO(res), filename=f"{ctx.command.name}.png"), mention_author=False)
+        await ctx.reply(embed=em, file=res, mention_author=False)
 
     @filter.command()
     @commands.cooldown(1,5,commands.BucketType.user)
@@ -250,7 +251,7 @@ class Polaroid(commands.Cog):
             res = await do_polaroid(img, method="filter", args=[ctx.command.name])
         em=discord.Embed(color=color())
         em.set_image(url=f"attachment://{ctx.command.name}.png")
-        await ctx.reply(embed=em, file=discord.File(io.BytesIO(res), filename=f"{ctx.command.name}.png"), mention_author=False)
+        await ctx.reply(embed=em, file=res, mention_author=False)
 
     @filter.command()
     @commands.cooldown(1,5,commands.BucketType.user)
@@ -261,7 +262,7 @@ class Polaroid(commands.Cog):
             res = await do_polaroid(img, method="filter", args=[ctx.command.name])
         em=discord.Embed(color=color())
         em.set_image(url=f"attachment://{ctx.command.name}.png")
-        await ctx.reply(embed=em, file=discord.File(io.BytesIO(res), filename=f"{ctx.command.name}.png"), mention_author=False)
+        await ctx.reply(embed=em, file=res, mention_author=False)
     
     @filter.command()
     @commands.cooldown(1,5,commands.BucketType.user)
@@ -272,7 +273,7 @@ class Polaroid(commands.Cog):
             res = await do_polaroid(img, method="filter", args=[ctx.command.name])
         em=discord.Embed(color=color())
         em.set_image(url=f"attachment://{ctx.command.name}.png")
-        await ctx.reply(embed=em, file=discord.File(io.BytesIO(res), filename=f"{ctx.command.name}.png"), mention_author=False)
+        await ctx.reply(embed=em, file=res, mention_author=False)
 
     @filter.command()
     @commands.cooldown(1,5,commands.BucketType.user)
@@ -283,7 +284,7 @@ class Polaroid(commands.Cog):
             res = await do_polaroid(img, method="filter", args=[ctx.command.name])
         em=discord.Embed(color=color())
         em.set_image(url=f"attachment://{ctx.command.name}.png")
-        await ctx.reply(embed=em, file=discord.File(io.BytesIO(res), filename=f"{ctx.command.name}.png"), mention_author=False)
+        await ctx.reply(embed=em, file=res, mention_author=False)
 
     @filter.command()
     @commands.cooldown(1,5,commands.BucketType.user)
@@ -294,7 +295,7 @@ class Polaroid(commands.Cog):
             res = await do_polaroid(img, method="filter", args=[ctx.command.name])
         em=discord.Embed(color=color())
         em.set_image(url=f"attachment://{ctx.command.name}.png")
-        await ctx.reply(embed=em, file=discord.File(io.BytesIO(res), filename=f"{ctx.command.name}.png"), mention_author=False)
+        await ctx.reply(embed=em, file=res, mention_author=False)
 
     @filter.command()
     @commands.cooldown(1,5,commands.BucketType.user)
@@ -305,7 +306,7 @@ class Polaroid(commands.Cog):
             res = await do_polaroid(img, method="filter", args=[ctx.command.name])
         em=discord.Embed(color=color())
         em.set_image(url=f"attachment://{ctx.command.name}.png")
-        await ctx.reply(embed=em, file=discord.File(io.BytesIO(res), filename=f"{ctx.command.name}.png"), mention_author=False)
+        await ctx.reply(embed=em, file=res, mention_author=False)
 
     @filter.command()
     @commands.cooldown(1,5,commands.BucketType.user)
@@ -316,7 +317,7 @@ class Polaroid(commands.Cog):
             res = await do_polaroid(img, method="filter", args=[ctx.command.name])
         em=discord.Embed(color=color())
         em.set_image(url=f"attachment://{ctx.command.name}.png")
-        await ctx.reply(embed=em, file=discord.File(io.BytesIO(res), filename=f"{ctx.command.name}.png"), mention_author=False)
+        await ctx.reply(embed=em, file=res, mention_author=False)
 
     @filter.command()
     @commands.cooldown(1,5,commands.BucketType.user)
@@ -327,7 +328,7 @@ class Polaroid(commands.Cog):
             res = await do_polaroid(img, method="filter", args=[ctx.command.name])
         em=discord.Embed(color=color())
         em.set_image(url=f"attachment://{ctx.command.name}.png")
-        await ctx.reply(embed=em, file=discord.File(io.BytesIO(res), filename=f"{ctx.command.name}.png"), mention_author=False)
+        await ctx.reply(embed=em, file=res, mention_author=False)
 
     @filter.command()
     @commands.cooldown(1,5,commands.BucketType.user)
@@ -338,7 +339,7 @@ class Polaroid(commands.Cog):
             res = await do_polaroid(img, method="filter", args=[ctx.command.name])
         em=discord.Embed(color=color())
         em.set_image(url=f"attachment://{ctx.command.name}.png")
-        await ctx.reply(embed=em, file=discord.File(io.BytesIO(res), filename=f"{ctx.command.name}.png"), mention_author=False)
+        await ctx.reply(embed=em, file=res, mention_author=False)
 
     @filter.command()
     @commands.cooldown(1,5,commands.BucketType.user)
@@ -349,7 +350,7 @@ class Polaroid(commands.Cog):
             res = await do_polaroid(img, method="filter", args=[ctx.command.name])
         em=discord.Embed(color=color())
         em.set_image(url=f"attachment://{ctx.command.name}.png")
-        await ctx.reply(embed=em, file=discord.File(io.BytesIO(res), filename=f"{ctx.command.name}.png"), mention_author=False)
+        await ctx.reply(embed=em, file=res, mention_author=False)
 
     @filter.command()
     @commands.cooldown(1,5,commands.BucketType.user)
@@ -360,7 +361,7 @@ class Polaroid(commands.Cog):
             res = await do_polaroid(img, method="filter", args=[ctx.command.name])
         em=discord.Embed(color=color())
         em.set_image(url=f"attachment://{ctx.command.name}.png")
-        await ctx.reply(embed=em, file=discord.File(io.BytesIO(res), filename=f"{ctx.command.name}.png"), mention_author=False)
+        await ctx.reply(embed=em, file=res, mention_author=False)
 
     @filter.command()
     @commands.cooldown(1,5,commands.BucketType.user)
@@ -371,7 +372,7 @@ class Polaroid(commands.Cog):
             res = await do_polaroid(img, method="filter", args=[ctx.command.name])
         em=discord.Embed(color=color())
         em.set_image(url=f"attachment://{ctx.command.name}.png")
-        await ctx.reply(embed=em, file=discord.File(io.BytesIO(res), filename=f"{ctx.command.name}.png"), mention_author=False)
+        await ctx.reply(embed=em, file=res, mention_author=False)
 
 
 def setup(bot):
