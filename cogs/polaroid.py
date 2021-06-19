@@ -68,6 +68,9 @@ class Polaroid(commands.Cog):
     @commands.command()
     @commands.cooldown(1,5,commands.BucketType.user)
     async def resize(self, ctx, width : int, height : int, url : typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
+        if width > 6000 or height > 6000:
+            return await ctx.send("The dimensions can't be bigger than 6000 pixels", mention_author=False)
+            
         async with ctx.typing():
             image = str(await getImage(ctx, url))
             img = await (await self.bot.session.get(image)).read()
