@@ -190,6 +190,7 @@ class Fun(commands.Cog):
         await ctx.invoke(self.bot.get_command("help"), **{"command": ctx.command.name})
     
     @_together.command(aliases=["yt"])
+    @commands.bot_has_guild_permissions(create_instant_invite=True)
     @commands.cooldown(1,5,commands.BucketType.user)
     async def youtube(self, ctx):
         try:
@@ -203,6 +204,7 @@ class Fun(commands.Cog):
             await ctx.send(embed=em)
 
     @_together.command()
+    @commands.bot_has_guild_permissions(create_instant_invite=True)
     @commands.cooldown(1,5,commands.BucketType.user)
     async def poker(self, ctx):
         try:
@@ -216,6 +218,7 @@ class Fun(commands.Cog):
             await ctx.send(embed=em)
 
     @_together.command()
+    @commands.bot_has_guild_permissions(create_instant_invite=True)
     @commands.cooldown(1,5,commands.BucketType.user)
     async def chess(self, ctx):
         try:
@@ -229,6 +232,7 @@ class Fun(commands.Cog):
             await ctx.send(embed=em)
 
     @_together.command()
+    @commands.bot_has_guild_permissions(create_instant_invite=True)
     @commands.cooldown(1,5,commands.BucketType.user)
     async def betrayal(self, ctx):
         try:
@@ -242,6 +246,7 @@ class Fun(commands.Cog):
             await ctx.send(embed=em)
 
     @_together.command()
+    @commands.bot_has_guild_permissions(create_instant_invite=True)
     @commands.cooldown(1,5,commands.BucketType.user)
     async def fishing(self, ctx):
         try:
