@@ -16,6 +16,16 @@
     "GENIUS":"",
     "COLOR": "",
     "ICONS": {
+        "badges": {
+            "hypesquad_balance": "",
+            "hypesquad_bravery": "",
+            "hypesquad_brilliance": "",
+            "bug_hunter": "",
+            "partner": "",
+            "staff": "",
+            "verified_bot_developer": "",
+            "early_supporter": ""
+        },
         "greentick": "✅",
         "redtick": "❌",
         "arrow": "▶",

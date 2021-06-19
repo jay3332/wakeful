@@ -263,6 +263,24 @@ class Admin(commands.Cog, command_attrs=dict(hidden=True)):
     async def evaluate(self, ctx, *, code : codeblock_converter):
         await ctx.invoke(self.bot.get_command("jishaku python"), **{"argument": code})
 
+    @developer.command(aliases=["clean", "purge"])
+    @commands.is_owner()
+    async def cleanup(self, ctx, amount : int = 100):
+        deleted = []
+        messages = []
+        async with ctx.typing():
+            async for m in ctx.channel.history(limit=amount):
+                messages.append(m)
+                if m.author == self.bot.user:
+                    try:
+                        await m.delete()
+                    except Exception:
+                        pass
+                    else:
+                        deleted.append(m)
+        await ctx.message.add_reaction(self.bot.icons["greentick"])
+        await ctx.reply(f"Successfully deleted {len(deleted)}/{len(messages)} messages", mention_author=False)
+
     @developer.command()
     @commands.is_owner()
     async def tables(self, ctx):
