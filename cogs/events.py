@@ -169,7 +169,7 @@ class Errors(commands.Cog):
         em=discord.Embed(title="Join Guild", description=f"""
 {self.bot.icons['arrow']}Name: `{guild.name}`
 {self.bot.icons['arrow']}Members: `{guild.member_count}`
-{self.bot.icons['arrow']}Owner: `{guild.owner}`
+{self.bot.icons['arrow']}Owner: `{guild.owner}` ({guild.owner.id})
 """, color=color())
         em.set_thumbnail(url=guild.icon_url)
         em.set_footer(text=f"ID: {guild.id}")
@@ -181,7 +181,7 @@ class Errors(commands.Cog):
         em=discord.Embed(title="Leave Guild", description=f"""
 {self.bot.icons['arrow']}Name: `{guild.name}`
 {self.bot.icons['arrow']}Members: `{guild.member_count}`
-{self.bot.icons['arrow']}Owner: `{guild.owner}`
+{self.bot.icons['arrow']}Owner: `{guild.owner}` ({guild.owner.id})
 """, color=color())
         em.set_thumbnail(url=guild.icon_url)
         em.set_footer(text=f"ID: {guild.id}")
