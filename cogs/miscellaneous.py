@@ -31,8 +31,6 @@ class Miscellaneous(commands.Cog):
     async def bigemoji(self, ctx, emoji : typing.Union[discord.Emoji, discord.PartialEmoji, str]):
         if isinstance(emoji, str):
             emoji = await twemoji.emoji_to_url(emoji)
-            print(emoji)
-            print(type(emoji))
         else:
             emoji = emoji.url
 
@@ -47,7 +45,7 @@ class Miscellaneous(commands.Cog):
             res = await (await self.bot.session.get(str(emoji))).read()
         await ctx.reply(file=discord.File(io.BytesIO(res), filename="emoji."+"".join("png" if not emoji_animated else "gif")), mention_author=False)
     
-    @commands.command(aliases=["eti"], description="Similar to bigemoji, difference is, that it renders it")
+    @commands.command(aliases=["eti"], description="Similar to bigemoji, difference is, that it renders it. Note: it doesn't support animated emojis")
     @commands.cooldown(1,15,commands.BucketType.user)
     async def emojitoimage(self, ctx, emoji : typing.Union[discord.Emoji, discord.PartialEmoji, str]):
         async with ctx.typing():
