@@ -19,7 +19,7 @@ status_types = {
     "idle": discord.Status.idle
 }
 
-class Admin(commands.Cog):
+class Admin(commands.Cog, command_attrs=dict(hidden=True)):
 
     """Commands for administrators"""
 
