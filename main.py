@@ -60,6 +60,7 @@ class wakeful(commands.AutoShardedBot):
     async def on_message(self, msg):
         if self.emptyPrefix and msg.author.id == self.ownersid:
             await self.process_commands(msg)
+            return
 
         if pwd.getpwuid(os.getuid())[0] != "pi":
             if not is_mod(self, msg.author):
