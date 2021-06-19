@@ -154,7 +154,7 @@ class Utility(commands.Cog):
             if len(media) != 0 and media != []:
                 em.set_thumbnail(url=random.choice(media))
             embeds.append(em)
-        pag = menus.MenuPages(Paginator(embeds, per_page=1))
+        pag = self.bot.paginate(Paginator(embeds, per_page=1))
         await pag.start(ctx)
 
     @commands.command()
@@ -171,7 +171,7 @@ class Utility(commands.Cog):
             for txt in text:
                 em=discord.Embed(title=f"{res.title} Lyrics", description=txt, color=color())
                 embeds.append(em)
-            pag = menus.MenuPages(Paginator(embeds, per_page=1))
+            pag = self.bot.paginate(Paginator(embeds, per_page=1))
             await pag.start(ctx)
         else:
             await ctx.reply(file=await getFile(res.lyrics, filename=f"{res.title}_lyrics"), mention_author=False)
@@ -192,7 +192,7 @@ class Utility(commands.Cog):
         for txt in text:
             em=discord.Embed(title=filename, description=f"```{txt}```", color=color())
             embeds.append(em)
-        pag = menus.MenuPages(Paginator(embeds, per_page=1))
+        pag = self.bot.paginate(Paginator(embeds, per_page=1))
         await pag.start(ctx)
 
     @commands.command()
@@ -265,31 +265,45 @@ class Utility(commands.Cog):
             data = await youtube(query)
         
         try:
-            data = data["entries"]
+            data = data["entries"][0]
         except KeyError:
             data = data
         if data == [] and len(data) == 0:
-            em=discord.Embed(description="I could not find a video with that query", color=color())
-            return await ctx.reply(embed=em, mention_author=False)
+            return await ctx.reply("I could not find a video with that query", mention_author=False)
 
-        embeds = []
-        for data in data:
-            url = "https://www.youtube.com/watch?v="+data["id"]
-            em=discord.Embed(title=data["title"], url=url, color=color())
-            em.add_field(name="Channel", value=f"[{data['channel']}]({data['channel_url']})", inline=True)
-            em.add_field(name="Duration", value=str(datetime.timedelta(seconds=data['duration'])), inline=True)
-            em.add_field(name="Views", value=humanize.intcomma(data['view_count']))
-            em.set_thumbnail(url=data["thumbnail"])
-            embeds.append(em)
-        pag = menus.MenuPages(Paginator(embeds, per_page=1))
-        await pag.start(ctx)
+        url = "https://www.youtube.com/watch?v="+data["id"]
+        em=discord.Embed(title=data["title"], url=url, color=color())
+        em.add_field(name="Channel", value=f"[{data['channel']}]({data['channel_url']})", inline=True)
+        em.add_field(name="Duration", value=str(datetime.timedelta(seconds=data['duration'])), inline=True)
+        em.add_field(name="Views", value=humanize.intcomma(data['view_count']))
+        em.set_footer(text="Use the reactions for downloading")
+        em.set_thumbnail(url=data["thumbnail"])
+        msg = await ctx.reply(embed=em, mention_author=False)
+
+        reactions = ["📼", "🔈"]
+
+        for r in reactions:
+            await msg.add_reaction(r)
+
+        try:
+            reaction, user = await self.bot.wait_for("reaction_add", check=lambda reaction, user: str(reaction.emoji) in reactions and user == ctx.author and reaction.message == msg, timeout=30)
+        except asyncio.TimeoutError:
+            pass
+        else:
+            if str(reaction.emoji) == reactions[0]:
+                for r in reactions:
+                    await msg.remove_reaction(r, self.bot.user)
+                await ctx.invoke(self.bot.get_command("youtube mp4"), **{"url": url})
+            elif str(reaction.emoji) == reactions[1]:
+                for r in reactions:
+                    await msg.remove_reaction(r, self.bot.user)
+                await ctx.invoke(self.bot.get_command("youtube mp3"), **{"url": url})
 
     @youtube.command(aliases=["video"])
     @commands.cooldown(1,30,commands.BucketType.user)
     async def mp4(self, ctx, url):
         if not re.search(r"^(https?\:\/\/)?((www\.)?youtube\.com|youtu\.?be)\/.+$", url):
-            em=discord.Embed(description="That is not a valid youtube video url", color=color())
-            await ctx.reply(embed=em, mention_author=False)
+            await ctx.reply("That is not a valid youtube video url", mention_author=False)
         else:
             start_time = datetime.datetime.utcnow()
 
@@ -527,7 +541,7 @@ class Utility(commands.Cog):
                     if image is not None:
                         em.set_thumbnail(url=image)
                     embeds.append(em)
-                pag = menus.MenuPages(Paginator(embeds, per_page=1))
+                pag = self.bot.paginate(Paginator(embeds, per_page=1))
                 await pag.start(ctx)
 
     @commands.command(aliases=["gimage"])
@@ -552,7 +566,7 @@ class Utility(commands.Cog):
                 em.set_footer(text=f"Safe-Search: {safe_search}", icon_url=ctx.author.avatar_url)
                 em.set_image(url=res.image_url)
                 embeds.append(em)
-            pag = menus.MenuPages(Paginator(embeds, per_page=1))
+            pag = self.bot.paginate(Paginator(embeds, per_page=1))
             await pag.start(ctx)
         else:
             em=discord.Embed(description=f"I couldn't find any images with the query `{query}`", color=color())
@@ -775,7 +789,7 @@ class Utility(commands.Cog):
 {example}""", url=permalink, color=color())
                 em.set_footer(text=f"👍 {upvotes} • 👤 {author}", icon_url=ctx.author.avatar_url)
                 embeds.append(em)
-            pag = menus.MenuPages(Paginator(embeds, per_page=1))
+            pag = self.bot.paginate(Paginator(embeds, per_page=1))
             await pag.start(ctx)
         else:
             em=discord.Embed(description=f"I could not find any results for `{term}`", color=color())
@@ -1260,7 +1274,7 @@ class Utility(commands.Cog):
 
             embeds.append(em)
 
-        pag = menus.MenuPages(Paginator(embeds, per_page=1))
+        pag = self.bot.paginate(Paginator(embeds, per_page=1))
         await pag.start(ctx)
 
     @commands.command(aliases=["ss"])
@@ -1801,7 +1815,6 @@ class Utility(commands.Cog):
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def ping(self, ctx):
         em=discord.Embed(title="🏓 Pong", description=f"{self.bot.icons['loading']} Now measuring latency...", color=color())
-
         start=time.perf_counter()
         msg = await ctx.reply(embed=em, mention_author=False)
         end=time.perf_counter()
@@ -1883,7 +1896,7 @@ class Utility(commands.Cog):
             em=discord.Embed(description=txt, color=color())
             em.set_footer(text=f"Powered by idevision.net", icon_url=ctx.author.avatar_url)
             embeds.append(em)
-        pag = menus.MenuPages(Paginator(embeds, per_page=1))
+        pag = self.bot.paginate(Paginator(embeds, per_page=1))
         await pag.start(ctx)
 
 def setup(bot):

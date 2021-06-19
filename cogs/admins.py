@@ -222,10 +222,7 @@ class Admin(commands.Cog, command_attrs=dict(hidden=True)):
         reaction, user = await self.bot.wait_for("reaction_add", check=lambda reaction, user: user == ctx.author and str(reaction.emoji) in reactions and reaction.message == msg)
         if str(reaction.emoji) == self.bot.icons['greentick']:
             for reaction_ in reactions:
-                try:
-                    await msg.clear_reactions()
-                except Exception:
-                    pass
+                await msg.remove_reaction(reaction_, self.bot.user)
             em=discord.Embed(description=f"Now restarting... {self.bot.icons['loading']}", color=color())
             await msg.edit(embed=em)
             for i in list(self.bot.directorys):
@@ -280,7 +277,7 @@ class Admin(commands.Cog, command_attrs=dict(hidden=True)):
                 for txt in res:
                     em=discord.Embed(title="Command Usage", description="\n".join(f"`{text}` - `{self.bot.command_usage[text]['usage']}`" for text in txt), color=color())
                     embeds.append(em)
-                pag = menus.MenuPages(Paginator(embeds, per_page=1))
+                pag = self.bot.paginate(Paginator(embeds, per_page=1))
                 await pag.start(ctx)
 
         else:

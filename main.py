@@ -1,7 +1,7 @@
 from DiscordUtils.Music import Music
 import discord, os, datetime, json, asyncio, aiohttp, pwd, asyncpg, logging, coloredlogs, discordTogether, random, string
 from discord.ext.commands.bot import when_mentioned_or
-from discord.ext import commands, tasks
+from discord.ext import commands, tasks, menus
 from colorama import Fore
 from discord.flags import Intents
 from utils.checks import is_blacklisted, is_mod
@@ -54,6 +54,9 @@ class wakeful(commands.AutoShardedBot):
         self.status = None
         self.guild = int(conf["GUILD"])
         self.mod_role = int(conf["MODROLE"])
+
+    def paginate(self, paginator):
+        return menus.MenuPages(paginator)
 
     async def on_message(self, msg):
         if self.emptyPrefix:

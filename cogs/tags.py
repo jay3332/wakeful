@@ -249,7 +249,7 @@ class Tags(commands.Cog):
             for txt in res:
                 em=discord.Embed(description="\n".join(f"{list(records).index(text)+1}. {text['name']}" for text in txt), color=color())
                 embeds.append(em)
-            pag = menus.MenuPages(Paginator(embeds, per_page=1))
+            pag = self.bot.paginate(Paginator(embeds, per_page=1))
             await pag.start(ctx)
         else:
             em=discord.Embed(description=f"There are no tags with `{query}` in the name", color=color())
@@ -269,7 +269,7 @@ class Tags(commands.Cog):
             for txt in res:
                 em=discord.Embed(description="\n".join(f"{list(records).index(text)+1}. {text['name']}" for text in txt), color=color())
                 embeds.append(em)
-            pag = menus.MenuPages(Paginator(embeds, per_page=1))
+            pag = self.bot.paginate(Paginator(embeds, per_page=1))
             await pag.start(ctx)
         else:
             em=discord.Embed(description=f"There are no tags on this guild", color=color())
@@ -289,7 +289,7 @@ class Tags(commands.Cog):
                 em=discord.Embed(description="\n".join(f"{list(records).index(text)+1}. {text['name']}" for text in txt), color=color())
                 em.set_author(name=member, icon_url=member.avatar_url)
                 embeds.append(em)
-            pag = menus.MenuPages(Paginator(embeds, per_page=1))
+            pag = self.bot.paginate(Paginator(embeds, per_page=1))
             await pag.start(ctx)
         else:
             em=discord.Embed(description=f"{member.mention} does not have any tags on this guild", color=color())
