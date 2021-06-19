@@ -10,7 +10,6 @@ from utils.get import *
 def do_polaroid(image, method : str, args : list = [], kwargs : dict = {}):
     img = polaroid.Image(image)
     method = getattr(img, method)
-    method(*args, **kwargs)
     bytes_ = io.BytesIO(img.save_bytes())
     return bytes_
 
@@ -68,8 +67,8 @@ class Polaroid(commands.Cog):
     @commands.command()
     @commands.cooldown(1,5,commands.BucketType.user)
     async def resize(self, ctx, width : int, height : int, url : typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
-        if width > 6000 or height > 6000:
-            return await ctx.send("The dimensions can't be over 6000 pixels", mention_author=False)
+        if width > 3000 or height > 3000:
+            return await ctx.send("The dimensions can't be over 3000 pixels", mention_author=False)
 
         async with ctx.typing():
             image = str(await getImage(ctx, url))
