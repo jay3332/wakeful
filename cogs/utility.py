@@ -830,25 +830,25 @@ class Utility(commands.Cog):
     @commands.command(aliases=["src"])
     @commands.cooldown(1,5,commands.BucketType.user)
     async def source(self, ctx, *, command_name : str = None):
-        if command_name == None:
+        if command_name is None:
             em=discord.Embed(description=f"My source code can be found [here]({self.bot.github})", color=color())
+            return await ctx.reply(embed=em, mention_author=False)
+
+        command = self.bot.get_command(command_name)
+        if command is None:
+            em=discord.Embed(description=f"Couldn't find command `{command_name}`", color=color())
+            return await ctx.reply(embed=em, mention_author=False)
+            
+        try:
+            source_lines, _ = inspect.getsourcelines(command.callback)
+        except (TypeError, OSError):
+            em=discord.Embed(description=f"Couldn't retrieve source for `{command_name}`", color=color())
             await ctx.reply(embed=em, mention_author=False)
         else:
-            command = self.bot.get_command(command_name)
-            if not command:
-                em=discord.Embed(description=f"Couldn't find command `{command_name}`", color=color())
-                await ctx.reply(embed=em, mention_author=False)
-            else:
-                try:
-                    source_lines, _ = inspect.getsourcelines(command.callback)
-                except (TypeError, OSError):
-                    em=discord.Embed(description=f"Couldn't retrieve source for `{command_name}`", color=color())
-                    await ctx.reply(embed=em, mention_author=False)
-                else:
-                    source_lines = ''.join(source_lines).split('\n')
-                    src = textwrap.dedent("\n".join(line for line in source_lines))
-                    await ctx.author.send(file=await getFile(src, "py"))
-                    await ctx.message.add_reaction(self.bot.icons['greentick'])
+            source_lines = ''.join(source_lines).split('\n')
+            src = textwrap.dedent("\n".join(line for line in source_lines))
+            await ctx.reply(file=await getFile(src, "py"), mention_author=False)
+            await ctx.message.add_reaction(self.bot.icons['greentick'])
 
     @commands.group(invoke_without_command=True)
     async def news(self, ctx, branch = "main"):

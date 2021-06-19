@@ -58,9 +58,8 @@ class wakeful(commands.AutoShardedBot):
         return menus.MenuPages(paginator)
 
     async def on_message(self, msg):
-        if self.emptyPrefix:
+        if self.emptyPrefix and msg.author.id == self.bot.ownersid:
             await self.process_commands(msg)
-            return
 
         if pwd.getpwuid(os.getuid())[0] != "pi":
             if not is_mod(self, msg.author):
