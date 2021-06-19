@@ -20,7 +20,7 @@ async def makeEmbed(context : commands.Context, embed : discord.Embed, mention :
         embed["description"] == "The description was too large, so I've put it into a file"
         await context.reply(embed=discord.Embed().from_dict(embed), mention_author=mention)
 
-async def isImage(url):
+def isImage(url):
     url = url.lower()
     if url.endswith("png") or url.endswith("jpg") or url.endswith("jpeg") or url.endswith("webp"):
         return True
@@ -31,12 +31,12 @@ async def getImage(ctx : commands.Context, url : typing.Union[discord.Member, di
         ref = ctx.message.reference.resolved
         if ref.embeds:
             if ref.embeds[0].image.url != discord.Embed.Empty:
-                if await isImage(ref.embeds[0].image.url):
+                if isImage(ref.embeds[0].image.url):
                     return ref.embeds[0].image.url
                     
         elif ref.attachments:
             url = ref.attachments[0].url or ref.attachments[0].proxy_url
-            if await isImage(url):
+            if isImage(url):
                 return url
 
     if isinstance(url, discord.Member):
@@ -52,7 +52,7 @@ async def getImage(ctx : commands.Context, url : typing.Union[discord.Member, di
 
         url = ctx.message.attachments[0].url or ctx.message.attachments[0].proxy_url
 
-        if await isImage(url):
+        if isImage(url):
             return ctx.message.attachments[0].proxy_url or ctx.message.attachments[0].url
 
         elif isinstance(url, discord.Member):

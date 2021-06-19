@@ -747,6 +747,38 @@ class Utility(commands.Cog):
             else:
                 await msg.delete()
 
+    @commands.command(aliases=["firstmsg", "fmessage", "fmsg"])
+    @commands.cooldown(1,5,commands.BucketType.user)
+    async def firstmessage(self, ctx, channel : discord.TextChannel = None):
+        if channel is None:
+            channel = ctx.channel
+        
+        message = None
+        async for m in channel.history(limit=1, oldest_first=True):
+            message = m
+
+        content = message.content
+
+        em=discord.Embed(title="First Message", color=color(), url=message.jump_url, timestamp=message.created_at)
+        em.set_author(name=message.author, icon_url=message.author.avatar_url)
+        if len(content) > 25:
+            content = content[:22-3]+"..."
+
+        if content is not None and len(content) != 0:
+            em.add_field(name="Content", value=content, inline=False)
+
+        if message.reference:
+            em.add_field(name="Reply", value=f"[{message.reference.resolved.content}]({message.reference.resolved.jump_url})", inline=False)
+
+        if message.attachments:
+            em.add_field(name="Attachments", value=", ".join(f"[{message.attachment.index(a)}]({a.url})" for a in message.attachments))
+
+        if message.attachments:
+            if isImage(message.attachments[0].url):
+                em.set_thumbnail(url=message.attachments[0].url)
+
+        await ctx.reply(embed=em, mention_author=False)
+
     @commands.command(aliases=["gif"])
     @commands.cooldown(1,5,commands.BucketType.user)
     async def giphy(self, ctx, *, query : str):

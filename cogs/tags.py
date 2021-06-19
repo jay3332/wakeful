@@ -34,7 +34,7 @@ async def is_owner(ctx, name):
 class Tags(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.Limit = 200
+        self.Limit = 1250
         self.MinLimit = 25
 
     @commands.group(invoke_without_command=True)
@@ -87,11 +87,11 @@ class Tags(commands.Cog):
             tag = await get_tag(ctx, name)
             name = tag["name"]
             author_id = tag["author"]
-            content = tag["content"]
-            created = datetime.datetime.fromtimestamp(int(tag["created"]))# - datetime.timedelta(hours=2)
-            if len(content) > self.MinLimit:
-                exceeding = content[self.MinLimit:]
-                content = content.replace(exceeding, "...")
+            if len(tag["content"]) > self.MinLimit:
+                content = tag["content"][:self.MinLimit-3]+"..."
+            else:
+                content = tag["content"]
+            created = datetime.datetime.fromtimestamp(int(tag["created"]))
 
             try:
                 author = (ctx.guild.get_member(int(author_id))).mention
@@ -110,7 +110,7 @@ class Tags(commands.Cog):
     async def edit(self, ctx, name, *, content):
         if len(content) > self.Limit:
             await ctx.message.add_reaction(self.bot.icons['redtick'])
-            em=discord.Embed(description=f"The content can't be over 200 characters long", color=color())
+            em=discord.Embed(description=f"The content can't be over {self.Limit} characters long", color=color())
             await ctx.reply(embed=em, mention_author=False)
         elif not await exists(ctx, name):
             await ctx.message.add_reaction(self.bot.icons['redtick'])
@@ -191,7 +191,7 @@ class Tags(commands.Cog):
             await ctx.reply(embed=em, mention_author=False)
         elif len(content) > self.Limit:
             await ctx.message.add_reaction(self.bot.icons['redtick'])
-            em=discord.Embed(description=f"The content can't be over 200 characters long", color=color())
+            em=discord.Embed(description=f"The content can't be over {self.Limit} characters long", color=color())
             await ctx.reply(embed=em, mention_author=False)
         else:
             await self.bot.db.execute("INSERT INTO tags (guild, name, content, author, created) VALUES ($1, $2, $3, $4, $5)", ctx.guild.id, name, content, ctx.author.id, int(time.time()))

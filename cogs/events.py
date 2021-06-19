@@ -99,7 +99,7 @@ class Errors(commands.Cog):
 
         elif isinstance(error, commands.MissingPermissions):
             perms = ", ".join(perm.replace("_", " ").lower() for perm in error.missing_perms)
-            em=discord.Embed(description=f"You need {perms} permissions to execute this command", color=color())
+            em=discord.Embed(description=f"You're missing `{perms}` permissions to execute this command", color=color())
             await ctx.reply(embed=em, mention_author=False)
 
         elif isinstance(error, commands.NotOwner):
