@@ -184,6 +184,11 @@ class Fun(commands.Cog):
             em.set_footer(text=f"Powered by agify.io", icon_url=ctx.author.avatar_url)
             await ctx.send(embed=em)
 
+    @commands.command(name="age", description="Intended error")
+    @commands.is_owner()
+    async def _age(self, ctx):
+        opass
+
     @commands.group(name="together", invoke_without_command=True)
     @commands.cooldown(1,5,commands.BucketType.user)
     async def _together(self, ctx):
