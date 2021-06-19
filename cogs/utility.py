@@ -700,7 +700,7 @@ class Utility(commands.Cog):
 {self.bot.icons['arrow']}Badges: {' '.join(str(self.bot.icons["badges"][e]) for e in list(self.bot.icons["badges"]) if dict(member.public_flags)[e] == True)}
 {self.bot.icons['arrow']}Status: {''.join(member.raw_status.title() if member.raw_status != "dnd" else "DND")}
 {self.bot.icons['arrow']}Platform: {platform}
-{self.bot.icons['arrow']}Pronoun: {pronoun}
+{self.bot.icons['arrow']}Pronouns: {pronoun}
 {self.bot.icons['arrow']}Created at: {created_at} ({humanize.naturaltime(member.created_at)})""", inline=True)
         em.add_field(name="Guild", value=f"""
 {self.bot.icons['arrow']}Roles: {len(member.roles)}
