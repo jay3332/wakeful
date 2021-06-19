@@ -263,6 +263,25 @@ class Admin(commands.Cog, command_attrs=dict(hidden=True)):
     async def evaluate(self, ctx, *, code : codeblock_converter):
         await ctx.invoke(self.bot.get_command("jishaku python"), **{"argument": code})
 
+    @developer.command()
+    @commands.is_owner()
+    async def tables(self, ctx):
+        res = await self.bot.db.fetch("""
+SELECT *
+FROM pg_catalog.pg_tables
+WHERE schemaname != 'pg_catalog' AND 
+    schemaname != 'information_schema';
+""")
+        headers = list(res[0].keys())
+        table = PrettyTable()
+        table.field_names = headers
+        for rec in res:
+            lst = list(rec)
+            table.add_row(lst)
+        msg = table.get_string()
+        await ctx.send(f"```\n{msg}\n```")
+
+
     @developer.command(aliases=["cmdus", "cmdusage", "commandus"])
     @commands.is_owner()
     async def commandusage(self, ctx, *, command : str = None):

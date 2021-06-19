@@ -1,5 +1,6 @@
 import discord, difflib, asyncio, traceback, aiohttp, asyncpg
 from discord.ext.commands.core import command
+from requests.models import InvalidURL
 from jishaku.models import copy_context_with
 from discord.ext import commands
 from utils.webhook import Webhook, AsyncWebhookAdapter
@@ -122,6 +123,9 @@ class Errors(commands.Cog):
                 address = f"{error.host}:{error.port}"
                 em=discord.Embed(description=f"I couldn't connect to `{address}`", color=color())
                 await ctx.reply(embed=em, mention_author=False)
+
+            elif isinstance(error, aiohttp.InvalidURL):
+                await ctx.reply("Invalid URL", mention_author=False)
 
             elif isinstance(error, commands.BotMissingPermissions):
                 perms = ", ".join(perm.replace("_", " ").lower() for perm in error.missing_perms)

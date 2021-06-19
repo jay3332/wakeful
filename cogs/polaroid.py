@@ -67,11 +67,33 @@ class Polaroid(commands.Cog):
 
     @commands.command()
     @commands.cooldown(1,5,commands.BucketType.user)
+    async def resize(self, ctx, width : int, height : int, url : typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
+        async with ctx.typing():
+            image = str(await getImage(ctx, url))
+            img = await (await self.bot.session.get(image)).read()
+            res = await do_polaroid(img, method="resize", args=(width,height,1))
+        em=discord.Embed(color=color())
+        em.set_image(url=f"attachment://{ctx.command.name}.png")
+        await ctx.reply(embed=em, file=discord.File(res, filename=f"{ctx.command.name}.png"), mention_author=False)
+
+    @commands.command()
+    @commands.cooldown(1,5,commands.BucketType.user)
     async def wide(self, ctx, url : typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
         async with ctx.typing():
             image = str(await getImage(ctx, url))
             img = await (await self.bot.session.get(image)).read()
             res = await do_polaroid(img, method="resize", args=(2000,900,1))
+        em=discord.Embed(color=color())
+        em.set_image(url=f"attachment://{ctx.command.name}.png")
+        await ctx.reply(embed=em, file=discord.File(res, filename=f"{ctx.command.name}.png"), mention_author=False)
+
+    @commands.command()
+    @commands.cooldown(1,5,commands.BucketType.user)
+    async def ultrawide(self, ctx, url : typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
+        async with ctx.typing():
+            image = str(await getImage(ctx, url))
+            img = await (await self.bot.session.get(image)).read()
+            res = await do_polaroid(img, method="resize", args=(4000,900,1))
         em=discord.Embed(color=color())
         em.set_image(url=f"attachment://{ctx.command.name}.png")
         await ctx.reply(embed=em, file=discord.File(res, filename=f"{ctx.command.name}.png"), mention_author=False)

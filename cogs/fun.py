@@ -1,3 +1,4 @@
+from discord.mentions import AllowedMentions
 from utils.errors import TooLong
 from utils.checks import gameRunning
 import discord, io, asyncdagpi, asyncio, datetime, string, random, json, wonderwords, typing
@@ -81,7 +82,12 @@ class Fun(commands.Cog):
             await ctx.guild.change_voice_state(channel=ctx.author.voice.channel, self_deaf=True)
 
         source = discord.PCMVolumeTransformer(discord.FFmpegPCMAudio(f"{path.name}/file.wav"), volume=100)
-        ctx.voice_client.play(source, after=lambda e: '')
+        
+        try:
+            ctx.voice_client.play(source, after=lambda e: '')
+        except discord.ClientException as exc:
+            await ctx.message.add_reaction(self.bot.icons["redtick"])
+            return await ctx.reply(str(exc), mention_author=False, AllowedMentions=discord.AllowedMentions.none())
 
         await ctx.message.add_reaction(self.bot.icons["greentick"])
 

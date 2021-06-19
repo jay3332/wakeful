@@ -42,8 +42,9 @@ async def getImage(ctx : commands.Context, url : typing.Union[discord.Member, di
     if isinstance(url, discord.Member):
         return str(url.avatar_url_as(format="png", size=1024))
     elif isinstance(url, str):
-        if re.search(r"http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*(),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+", url) and isImage(url):
-            return url
+        if re.search(r"http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*(),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+", url):
+            if isImage(url):
+                return url
 
     if isinstance(url, discord.Emoji) or isinstance(url, discord.PartialEmoji):
         return url.url
@@ -60,5 +61,5 @@ async def getImage(ctx : commands.Context, url : typing.Union[discord.Member, di
         else:
             return str(ctx.author.avatar_url_as(format="png", size=1024))
 
-    elif url is None:
+    if url is None:
         return str(ctx.author.avatar_url_as(format="png", size=1024))
