@@ -57,6 +57,17 @@ class wakeful(commands.AutoShardedBot):
     def paginate(self, paginator):
         return menus.MenuPages(paginator)
 
+    class roo:
+
+        async def bulli():
+            return "<:rooBulli:744346131324076072>"
+
+        async def think():
+            return "<:rooThink:596576798351949847>"
+
+        async def bless():
+            return "<:rooBless:597589960270544916>"
+
     async def on_message(self, msg):
         if self.emptyPrefix and msg.author.id == self.ownersid:
             await self.process_commands(msg)
