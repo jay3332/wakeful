@@ -550,7 +550,7 @@ class JishakuBase(commands.Cog):  # pylint: disable=too-many-public-methods
                                     for x in range(random.randrange(5,10)):
                                         result = result.replace(random.choice(list(string.ascii_letters)), random.choice(list(string.ascii_letters)))
 
-                                result = "".join(l.upper() if random.randrange(1,2) == 2 else l.lower() for l in result)
+                                    result = "".join(l.upper() if random.randint(0,1) == 0 else l.lower() for l in result)
 
                                 send(await ctx.send(result.replace(self.bot.http.token, "[when the baka is sus]")))
         finally:
