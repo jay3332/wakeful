@@ -937,23 +937,13 @@ class Utility(commands.Cog):
     @commands.command(aliases=["botinfo", "about", "bi"])
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def info(self, ctx):
-        operating_system=None
-        if os.name == "nt":
-            operating_system = "Windows"
-        elif os.name == "posix":
-            operating_system = "Linux"
         async with ctx.typing():
             process = psutil.Process()
             p = pathlib.Path('./')
             version = sys.version_info
             em = discord.Embed(color=color())
-            # Uptime
-            delta_uptime = datetime.datetime.utcnow() - self.bot.uptime
-            hours, remainder = divmod(int(delta_uptime.total_seconds()), 3600)
-            minutes, seconds = divmod(remainder, 60)
-            days, hours = divmod(hours, 24)
             # File Stats
-            files = classes = funcs = coroutines = comments = lines = letters = 0
+            files = classes = funcs = comments = lines = letters = 0
             for f in p.rglob("*.py"):
                 files += 1
                 with f.open() as of:
@@ -965,70 +955,28 @@ class Utility(commands.Cog):
                         if line.startswith("def"):
                             funcs += 1
                         if line.startswith("async def"):
-                            coroutines += 1
+                            funcs += 1
                         if "#" in line:
                             comments += 1
                         lines += 1
-            # Channels
-            channels = 0
-            for guild in self.bot.guilds:
-                for channel in guild.channels:
-                    channels += 1
-            cogs = []
-            # Disabled commands
-            if ctx.guild is not None:
-                disabled = await self.bot.db.fetchrow("SELECT commands FROM commands WHERE guild = $1", ctx.guild.id)
-                try:
-                    disabled = disabled["commands"]
-                except Exception:
-                    disabled = []
-                else:
-                    disabled = disabled.split(",")
-            else:
-                disabled = []
-            # Cogs
-            for cog in self.bot.cogs:
-                cog = get_cog(self.bot, cog)
-                if not cog.qualified_name.lower() in ["jishaku"]:
-                    if is_mod(self.bot, ctx.author):
-                        cmds = [cmd for cmd in cog.get_commands()]
-                    else:
-                        cmds = [cmd for cmd in cog.get_commands() if not cmd.hidden and not cmd.name in disabled]
-                    if len(cmds) != 0 and cmds != []:
-                        cogs.append(cog)
             # Embed
             owner = self.bot.get_user(self.bot.ownersid)
-            em.add_field(name="System", value=f"""
-{self.bot.icons['arrow']}**OS**: `{operating_system}`
-{self.bot.icons['arrow']}**CPU**: `{process.cpu_percent()}`%
-{self.bot.icons['arrow']}**Memory**: `{humanize.naturalsize(process.memory_full_info().rss)}`
-{self.bot.icons['arrow']}**Process**: `{process.pid}`
-{self.bot.icons['arrow']}**Threads**: `{process.num_threads()}`
-{self.bot.icons['arrow']}**Language**: `Python`
-{self.bot.icons['arrow']}**Python version**: `{version[0]}.{version[1]}.{version[2]}`
-{self.bot.icons['arrow']}**discord.py version**: `{discord.__version__}`""", inline=False)
             em.add_field(name="Bot", value=f"""
 {self.bot.icons['arrow']}**Guilds**: `{len(self.bot.guilds)}`
 {self.bot.icons['arrow']}**Users**: `{len(self.bot.users)}`
-{self.bot.icons['arrow']}**Channels**: `{channels}`
-{self.bot.icons['arrow']}**Shards**: `{len(list(self.bot.shards))}`
 {self.bot.icons['arrow']}**Commands**: `{len([cmd for cmd in list(set(self.bot.walk_commands())) if not cmd.hidden])}`
-{self.bot.icons['arrow']}**Commands executed**: `{self.bot.cmdsSinceRestart}`
-{self.bot.icons['arrow']}**Cogs**: `{len(cogs)}`
-{self.bot.icons['arrow']}**Uptime**: `{days}d {hours}h {minutes}m {seconds}s`""", inline=False)
+{self.bot.icons['arrow']}**Commands executed**: `{self.bot.cmdsSinceRestart}`""", inline=True)
             em.add_field(name="File Statistics", value=f"""
 {self.bot.icons['arrow']}**Letters**: `{letters}`
 {self.bot.icons['arrow']}**Files**: `{files}`
 {self.bot.icons['arrow']}**Lines**: `{lines}`
-{self.bot.icons['arrow']}**Functions**: `{funcs}`
-{self.bot.icons['arrow']}**Coroutines**: `{coroutines}`
-{self.bot.icons['arrow']}**Comments**: `{comments}`""", inline=False)
+{self.bot.icons['arrow']}**Functions**: `{funcs}`""", inline=True)
             em.add_field(name="Links", value=f"""
-{self.bot.icons['arrow']}[Developer](https://discord.com/users/{owner.id})
+{self.bot.icons['arrow']}[Developer](https://discord.com/users/{owner.id}) ({owner})
 {self.bot.icons['arrow']}[Source]({self.bot.github})
-{self.bot.icons['arrow']}[Invite](https://discord.com/api/oauth2/authorize?client_id={self.bot.user.id}&permissions=8&scope=bot)""", inline=False)
+{self.bot.icons['arrow']}[Invite](https://discord.com/api/oauth2/authorize?client_id={self.bot.user.id}&permissions=8&scope=bot)""", inline=True)
             em.set_thumbnail(url=self.bot.user.avatar_url)
-        em.set_footer(text=f"Made by {owner}", icon_url=owner.avatar_url)
+        em.set_footer(text=f"Python {version[0]}.{version[1]}.{version[2]} • discord.py {discord.__version__}")
         await ctx.reply(embed=em, mention_author=False)
 
     @commands.command()

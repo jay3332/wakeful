@@ -123,8 +123,14 @@ class Music(commands.Cog):
             await ctx.reply(embed=em, mention_author=False)
         else:
             player = self.music.get_player(guild_id=ctx.guild.id)
-            await player.stop()
-            await ctx.message.add_reaction(self.bot.icons["greentick"])
+            try:
+                await player.stop()
+            except:
+                await ctx.message.add_reaction(self.bot.icons["redtick"])
+                em=discord.Embed(description="There currently isn't a song playing", color=color())
+                await ctx.reply(embed=em, mention_author=False)
+            else:
+                await ctx.message.add_reaction(self.bot.icons["greentick"])
 
     @commands.command()
     async def loop(self, ctx):
