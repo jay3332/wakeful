@@ -443,7 +443,7 @@ class Fun(commands.Cog):
     @commands.command(usage="[file]")
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def caption(self, ctx, member : typing.Union[discord.Member, str] = None):
-        url = getImage(ctx, member)
+        url = await getImage(ctx, member)
         print(type(url))
         async with ctx.typing():
             res = await self.bot.session.post("https://captionbot.azurewebsites.net/api/messages", json={"Content": url, "Type": "CaptionRequest"}, headers={"Content-Type": "application/json; charset=utf-8"})

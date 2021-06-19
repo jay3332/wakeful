@@ -20,23 +20,23 @@ async def makeEmbed(context : commands.Context, embed : discord.Embed, mention :
         embed["description"] == "The description was too large, so I've put it into a file"
         await context.reply(embed=discord.Embed().from_dict(embed), mention_author=mention)
 
-def isImage(url):
+async def isImage(url):
     url = url.lower()
     if url.endswith("png") or url.endswith("jpg") or url.endswith("jpeg") or url.endswith("webp"):
         return True
     return False
 
-def getImage(ctx : commands.Context, url : typing.Union[discord.Member, discord.Emoji, discord.PartialEmoji, None, str] = None):
+async def getImage(ctx : commands.Context, url : typing.Union[discord.Member, discord.Emoji, discord.PartialEmoji, None, str] = None):
     if ctx.message.reference:
         ref = ctx.message.reference.resolved
         if ref.embeds:
             if ref.embeds[0].image.url != discord.Embed.Empty:
-                if isImage(ref.embeds[0].image.url):
+                if await isImage(ref.embeds[0].image.url):
                     return ref.embeds[0].image.url
                     
         elif ref.attachments:
             url = ref.attachments[0].url or ref.attachments[0].proxy_url
-            if isImage(url):
+            if await isImage(url):
                 return url
 
     if isinstance(url, discord.Member):
@@ -52,7 +52,7 @@ def getImage(ctx : commands.Context, url : typing.Union[discord.Member, discord.
 
         url = ctx.message.attachments[0].url or ctx.message.attachments[0].proxy_url
 
-        if isImage(url):
+        if await isImage(url):
             return ctx.message.attachments[0].proxy_url or ctx.message.attachments[0].url
 
         elif isinstance(url, discord.Member):
