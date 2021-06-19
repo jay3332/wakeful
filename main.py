@@ -1,9 +1,8 @@
-from DiscordUtils.Music import Music
 import discord, os, datetime, json, asyncio, aiohttp, pwd, asyncpg, logging, coloredlogs, discordTogether, random, string
 from discord.ext.commands.bot import when_mentioned_or
-from discord.ext import commands, tasks, menus
+from discord.ext import commands, tasks
 from colorama import Fore
-from discord.flags import Intents
+from utils import menus
 from utils.checks import is_blacklisted, is_mod
 from utils.get import *
 
