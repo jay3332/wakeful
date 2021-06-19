@@ -16,7 +16,7 @@ class Miscellaneous(commands.Cog):
     async def bigemoji(self, ctx, emoji : typing.Union[discord.Emoji, discord.PartialEmoji]):
         async with ctx.typing():
             res = await (await self.bot.session.get(str(emoji.url))).read()
-        await ctx.reply(file=discord.File(io.BytesIO(res), filename="emoji.png"), mention_author=False)
+        await ctx.reply(file=discord.File(io.BytesIO(res), filename="emoji."+"".join("png" if not emoji.animated else "gif")), mention_author=False)
 
     @commands.command(description=f'''
 Example: `poll "Am I cool?" Yes=✅,No=❌`
