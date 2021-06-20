@@ -1,7 +1,6 @@
 import discord, datetime, async_cse, psutil, humanize, os, sys, inspect, mystbin, googletrans, asyncio, aiohttp, random, time, lyricsgenius
 import asyncdagpi, hashlib, asyncpg, io, typing, gdshortener, pathlib, textwrap, async_tio, zipfile, aiowiki
-import mathjspy, pytube, youtube_dl, re 
-import twemoji_parser as twemoji
+import mathjspy, pytube, youtube_dl, re, tempfile
 
 from discord.ext import commands
 from utils.webhook import Webhook, AsyncWebhookAdapter

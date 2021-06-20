@@ -1,6 +1,7 @@
-import os, tempfile, discord, io, typing, re
+import discord, io, typing, re
 from discord.ext import commands
 from jishaku.functools import executor_function
+import twemoji_parser as twemoji
 
 @executor_function
 def getFile(text, end = "txt", filename="message"):
@@ -27,6 +28,10 @@ def isImage(url):
     return False
 
 async def getImage(ctx : commands.Context, url : typing.Union[discord.Member, discord.Emoji, discord.PartialEmoji, None, str] = None):
+
+    if isinstance(url, str):
+        url = await twemoji.emoji_to_url(url)
+
     if ctx.message.reference:
         ref = ctx.message.reference.resolved
         if ref.embeds:
