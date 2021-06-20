@@ -366,6 +366,32 @@ class Image(commands.Cog):
             em.set_footer(text=f"Powered by nekobot.xyz", icon_url=ctx.author.avatar_url)
         await ctx.reply(embed=em, mention_author=False)
 
+    @commands.command()
+    @commands.cooldown(1,5,commands.BucketType.user)
+    async def jpeg(self, ctx, member : typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
+        url = await getImage(ctx, member)
+        async with ctx.typing():
+            res = await self.bot.session.get(f"https://nekobot.xyz/api/imagegen?type=jpeg&url={url}")
+            res = await res.json()
+            image = res["message"]
+            em=discord.Embed(color=color())
+            em.set_image(url=image)
+            em.set_footer(text=f"Powered by nekobot.xyz", icon_url=ctx.author.avatar_url)
+        await ctx.reply(embed=em, mention_author=False)
+
+    @commands.command()
+    @commands.cooldown(1,5,commands.BucketType.user)
+    async def deepfry(self, ctx, member : typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
+        url = await getImage(ctx, member)
+        async with ctx.typing():
+            res = await self.bot.session.get(f"https://nekobot.xyz/api/imagegen?type=deepfry&image={url}")
+            res = await res.json()
+            image = res["message"]
+            em=discord.Embed(color=color())
+            em.set_image(url=image)
+            em.set_footer(text=f"Powered by nekobot.xyz", icon_url=ctx.author.avatar_url)
+        await ctx.reply(embed=em, mention_author=False)
+
 
 def setup(bot):
     bot.add_cog(Image(bot))

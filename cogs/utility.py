@@ -696,7 +696,7 @@ class Utility(commands.Cog):
         em=discord.Embed(title=str(member), color=color())
         em.add_field(name="Info", value=f"""
 {self.bot.icons['arrow']}Name: {member.name}
-{self.bot.icons['arrow']}Nickname: {member.nick}
+{self.bot.icons['arrow']}Nickname: {''.join("N/A" if member.nick is None else member.nick)}
 {self.bot.icons['arrow']}Badges: {' '.join(str(self.bot.icons["badges"][e]) for e in list(self.bot.icons["badges"]) if dict(member.public_flags)[e] == True)}
 {self.bot.icons['arrow']}Status: {''.join(member.raw_status.title() if member.raw_status != "dnd" else "DND")}
 {self.bot.icons['arrow']}Platform: {platform}
@@ -1329,8 +1329,8 @@ class Utility(commands.Cog):
 
     @rtfm.command(aliases=["cs"])
     @commands.cooldown(1,5,commands.BucketType.user)
-    async def custom(self, ctx, suffix, query):
-        url = f"https://{suffix}.readthedocs.io/en/latest/"
+    async def custom(self, ctx, prefix, query):
+        url = f"https://{prefix}.readthedocs.io/en/latest/"
         async with ctx.typing():
             res = await self.bot.session.get(f"https://idevision.net/api/public/rtfm?query={query}&location={url}&show-labels=false&label-labels=false")
         if res.status == 200:
@@ -1550,68 +1550,69 @@ class Utility(commands.Cog):
                 disabled = []
             else:
                 disabled = disabled.split(",")
-            if not given_command.hidden == True and not given_command.name in disabled or is_mod(self.bot, ctx.author):
-                #-------------------------------------
-                try:
-                    command_subcommands = "> " + ", ".join(f"`{command.name}`" for command in given_command.commands if not command.hidden or not command.name in disabled)
-                except Exception:
-                    command_subcommands = "N/A"
-                #-------------------------------------
-                if given_command.usage is not None:
-                    command_usage = given_command.usage
+            if given_command.hidden == True or given_command.name in disabled and not is_mod(self.bot, ctx.author):
+                return await ctx.reply(f"There isn't a cog or command with the name `{command}`", mention_author=False)
+            #-------------------------------------
+            try:
+                command_subcommands = "> " + ", ".join(f"`{command.name}`" for command in given_command.commands if not command.hidden or not command.name in disabled)
+            except Exception:
+                command_subcommands = "N/A"
+            #-------------------------------------
+            if given_command.usage is not None:
+                command_usage = given_command.usage
+            else:
+                parameters = {}
+                for param in list(given_command.params):
+                    if not param in ["self", "ctx"]:
+                        parameter = dict(given_command.params)[str(param)]
+                        if parameter.kind.name.lower() == "positional_or_keyword":
+                            parameters[str(param)] = "required"
+                        else:
+                            parameters[str(param)] = "optional"
+                command_usage = " ".join(f"<{param}>" if dict(parameters)[param] == "required" else f"[{param}]" for param in list(parameters))
+            #---------------------------------------
+            command_bucket = given_command._buckets
+            command_cooldown = command_bucket._cooldown
+            if command_cooldown is not None:
+                cooldown_type = list(command_cooldown.type)[0]
+                cooldown_per = round(command_cooldown.per)
+                if cooldown_per > 59:
+                    cooldown_per = f"{round(cooldown_per / 60)} minutes"
                 else:
-                    parameters = {}
-                    for param in list(given_command.params):
-                        if not param in ["self", "ctx"]:
-                            parameter = dict(given_command.params)[str(param)]
-                            if parameter.kind.name.lower() == "positional_or_keyword":
-                                parameters[str(param)] = "required"
-                            else:
-                                parameters[str(param)] = "optional"
-                    command_usage = " ".join(f"<{param}>" if dict(parameters)[param] == "required" else f"[{param}]" for param in list(parameters))
-                #---------------------------------------
-                command_bucket = given_command._buckets
-                command_cooldown = command_bucket._cooldown
-                if command_cooldown is not None:
-                    cooldown_type = list(command_cooldown.type)[0]
-                    cooldown_per = round(command_cooldown.per)
-                    if cooldown_per > 59:
-                        cooldown_per = f"{round(cooldown_per / 60)} minutes"
-                    else:
-                        cooldown_per = f"{cooldown_per} seconds"
-                    cooldown_rate = command_cooldown.rate
-                    cooldown_msg = f"{''.join(f'{cooldown_rate} time' if str(cooldown_rate) == '1' else f'{cooldown_rate} times')} every {cooldown_per} per {cooldown_type}"
-                else:
-                    cooldown_msg = "N/A"
-                #---------------------------------------
-                command_name = None
-                if given_command.parent is not None:
-                    command_name = f"{given_command.parent.name} {given_command.name}"
-                else:
-                    command_name = given_command.name
-                #---------------------------------------
-                em=discord.Embed(
-                    title=command_name,
-                    description=given_command.description,
-                    color=color()
-                )
-                
-                em.add_field(name="Usage", value=f"{prefix}{command_name} {command_usage}", inline=False)
-                em.add_field(name="Cooldown", value=cooldown_msg, inline=False)
-                if given_command.aliases:
-                    em.add_field(name=f"Aliases [{len(given_command.aliases)}]", value="> " + ", ".join(f"`{alias}`" for alias in given_command.aliases), inline=False)
-                else:
-                    em.add_field(name="Aliases [0]", value="N/A", inline=False)
-                try:
-                    commands_ = [cmd for cmd in given_command.commands]
-                except Exception:
-                    commands_ = "N/A"
-                try:
-                    em.add_field(name=f"Subcommands [{''.join(str(len(commands_)) if str(commands_) != 'N/A' else '0')}]", value=command_subcommands, inline=False)
-                except AttributeError:
-                    em.add_field(name=f"Subcommands [0]", value="N/A", inline=False)
-                em.add_field(name="Category", value=given_command.cog_name, inline=False)
-                await ctx.reply(embed=em, mention_author=False)
+                    cooldown_per = f"{cooldown_per} seconds"
+                cooldown_rate = command_cooldown.rate
+                cooldown_msg = f"{''.join(f'{cooldown_rate} time' if str(cooldown_rate) == '1' else f'{cooldown_rate} times')} every {cooldown_per} per {cooldown_type}"
+            else:
+                cooldown_msg = "N/A"
+            #---------------------------------------
+            command_name = None
+            if given_command.parent is not None:
+                command_name = f"{given_command.parent.name} {given_command.name}"
+            else:
+                command_name = given_command.name
+            #---------------------------------------
+            em=discord.Embed(
+                title=command_name,
+                description=given_command.description,
+                color=color()
+            )
+            
+            em.add_field(name="Usage", value=f"{prefix}{command_name} {command_usage}", inline=False)
+            em.add_field(name="Cooldown", value=cooldown_msg, inline=False)
+            if given_command.aliases:
+                em.add_field(name=f"Aliases [{len(given_command.aliases)}]", value="> " + ", ".join(f"`{alias}`" for alias in given_command.aliases), inline=False)
+            else:
+                em.add_field(name="Aliases [0]", value="N/A", inline=False)
+            try:
+                commands_ = [cmd for cmd in given_command.commands]
+            except Exception:
+                commands_ = "N/A"
+            try:
+                em.add_field(name=f"Subcommands [{''.join(str(len(commands_)) if str(commands_) != 'N/A' else '0')}]", value=command_subcommands, inline=False)
+            except AttributeError:
+                em.add_field(name=f"Subcommands [0]", value="N/A", inline=False)
+            em.add_field(name="Category", value=given_command.cog_name, inline=False)
+            await ctx.reply(embed=em, mention_author=False)
         else:
             disabled = await self.bot.db.fetchrow("SELECT commands FROM commands WHERE guild = $1", ctx.guild.id)
             try:
@@ -1627,11 +1628,11 @@ class Utility(commands.Cog):
                     em=discord.Embed(title=f"{given_cog.qualified_name} commands [{len(commands_)}]", description=f"{given_cog.description}\n\n> "+", ".join(f"`{cmd.name}`" for cmd in commands_), color=color())
                     await ctx.reply(embed=em, mention_author=False)
                 else:
-                    await ctx.reply(f"This command does not exist", mention_author=False)
+                    await ctx.reply(f"There isn't a cog or command with the name `{command}`", mention_author=False)
             else:
                 await ctx.reply(f"There isn't a cog or command with the name `{command}`", mention_author=False)
 
-    @commands.group(invoke_without_command=True)
+    @commands.group(invoke_without_command=True, aliases=["sc"])
     @commands.cooldown(1,5,commands.BucketType.user)
     async def search(self, ctx):
         await ctx.invoke(self.bot.get_command("help"), **{"command": ctx.command.name})
@@ -1639,12 +1640,26 @@ class Utility(commands.Cog):
     @search.command(name="command", aliases=["cmd"])
     @commands.cooldown(1,5,commands.BucketType.user)
     async def _command(self, ctx, *, name : str):
-        commands = [cmd.name if cmd.parent is None else f"{cmd.parent.name} {cmd.name}" for cmd in list(self.bot.walk_commands())]
+        commands = []
+        for cmd in list(self.bot.walk_commands()):
+            if cmd.hidden:
+                if is_mod(self.bot, ctx.author):
+                    pass
+
+        if cmd.parent is None:
+            commands.append(cmd.name)
+        else:
+            commands.append(f"{cmd.parent.name} {cmd.name}")
+        for alias in cmd.aliases:
+            commands.append(alias)
         cmds = []
 
         for cmd in commands:
             if name.lower() in cmd.lower():
                 cmds.append(cmd)
+
+        if cmds == [] and len(cmds) == 0:
+            return await ctx.reply(f"I could not find any results for `{name}`", mention_author=False, allowed_mentions=discord.AllowedMentions.none())
 
         res = WrapList(cmds, 6)
         embeds = []
@@ -1672,6 +1687,9 @@ class Utility(commands.Cog):
         for cog in cogs:
             if name.lower() in cog.qualified_name.lower():
                 _cogs.append(cog)
+
+        if _cogs == [] and len(_cogs) == 0:
+            return await ctx.reply(f"I could not find any results for `{name}`", mention_author=False, allowed_mentions=discord.AllowedMentions.none())
 
         res = WrapList(_cogs, 6)
         embeds = []

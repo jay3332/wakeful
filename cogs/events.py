@@ -14,6 +14,10 @@ class Errors(commands.Cog):
         self.bot = bot
 
     @commands.Cog.listener()
+    async def on_message_edit(self, before, after):
+        await self.bot.process_commands(after)
+
+    @commands.Cog.listener()
     async def on_message_delete(self, msg):
         if not msg.author.bot and msg.guild is not None:
             res = await self.bot.db.fetchrow("SELECT commands FROM commands WHERE guild = $1", msg.guild.id)

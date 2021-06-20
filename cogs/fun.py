@@ -91,6 +91,11 @@ class Fun(commands.Cog):
 
         await ctx.message.add_reaction(self.bot.icons["greentick"])
 
+    @commands.command(aliases=["pick"])
+    @commands.cooldown(1,5,commands.BucketType.user)
+    async def choose(self, ctx, *options):
+        await ctx.reply(random.choice(options), mention_author=False, allowed_mentions=discord.AllowedMentions.none())
+
     @voicechattts.command(name="stop")
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def _stop(self, ctx):
