@@ -62,8 +62,8 @@ def download(url, method = "mp4"):
     except Exception as exc:
         raise NotFound(exc)
 
-    if video.length > 900:
-        raise TooLong("The video cannot be longer than 15 minutes.")
+    if video.length > 600:
+        raise TooLong("The video cannot be longer than 10 minutes.")
     buffer = io.BytesIO()
 
     print(method)

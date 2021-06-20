@@ -71,6 +71,40 @@ class Image(commands.Cog):
 
     @commands.command()
     @commands.cooldown(1,10,commands.BucketType.user)
+    async def retromeme(self, ctx, top: str, bottom : str, url : str = None):
+        url = await getImage(ctx, url)
+        async with ctx.typing():
+            img = await dagpi.image_process(
+                asyncdagpi.ImageFeatures.retro_meme(),
+                url=url,
+                top_text=top,
+                bottom_text=bottom
+            )
+            file=discord.File(img.image, f"{ctx.command.name}.png")
+            em=discord.Embed(color=color())
+            em.set_image(url=f"attachment://{ctx.command.name}.png")
+            em.set_footer(text=f"Powered by dagpi.xyz", icon_url=ctx.author.avatar_url)
+        await ctx.send(file=file, embed=em)
+
+    @commands.command()
+    @commands.cooldown(1,10,commands.BucketType.user)
+    async def modernmeme(self, ctx, top: str, bottom : str, url : str = None):
+        url = await getImage(ctx, url)
+        async with ctx.typing():
+            img = await dagpi.image_process(
+                asyncdagpi.ImageFeatures.retro_meme(),
+                url=url,
+                top_text=top,
+                bottom_text=bottom
+            )
+            file=discord.File(img.image, f"{ctx.command.name}.png")
+            em=discord.Embed(color=color())
+            em.set_image(url=f"attachment://{ctx.command.name}.png")
+            em.set_footer(text=f"Powered by dagpi.xyz", icon_url=ctx.author.avatar_url)
+        await ctx.send(file=file, embed=em)
+
+    @commands.command()
+    @commands.cooldown(1,10,commands.BucketType.user)
     async def america(self, ctx, member : typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
         url = await getImage(ctx, member)
         async with ctx.typing():
