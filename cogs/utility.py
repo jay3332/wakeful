@@ -55,18 +55,30 @@ def download_emojis(emojis : tuple):
     return discord.File(file_, "emojis.zip")
 
 @executor_function
-def download(url):
+def download(url, method = "mp4"):
+
     try:
         video = pytube.YouTube(str(url))
     except Exception as exc:
         raise NotFound(exc)
+
     if video.length > 900:
         raise TooLong("The video cannot be longer than 15 minutes.")
-    res = video.streams.get_highest_resolution()
     buffer = io.BytesIO()
-    download = res.stream_to_buffer(buffer)
-    download.seek(0)
-    file_ = discord.File(str(download))
+
+    print(method)
+    
+    if method == "mp4":
+        print("a")
+        res = video.streams.filter(progressive=True, file_extension="mp4").order_by("resolution").desc().first().stream_to_buffer(buffer)
+    elif method == "mp3":
+        print("c")
+        res = video.streams.filter(mime_type="audio/mp4").order_by("abr").desc().first().stream_to_buffer(buffer)
+
+    buffer.seek(0)
+
+    file_ = discord.File(buffer, filename="".join("video.mp4" if method == "mp4" else "audio.mp3"))
+
     return file_
 
 class Utility(commands.Cog):
@@ -305,13 +317,15 @@ class Utility(commands.Cog):
         if not re.search(r"^(https?\:\/\/)?((www\.)?youtube\.com|youtu\.?be)\/.+$", url):
             await ctx.reply("That is not a valid youtube video url", mention_author=False)
         else:
-            start_time = datetime.datetime.utcnow()
-
             em=discord.Embed(description=f"{self.bot.icons['loading']} Now downloading video", color=color())
             msg = await ctx.reply(embed=em, mention_author=False)
 
+            start_time = datetime.datetime.utcnow()
+
+            print(ctx.command.name)
+
             async with ctx.typing():
-                res = await download(url)
+                res = await download(url, "mp4")
 
             em=discord.Embed(description=f"{self.bot.icons['loading']} Now uploading video", color=color())
             await msg.edit(embed=em)
@@ -332,38 +346,27 @@ class Utility(commands.Cog):
             em=discord.Embed(description="That is not a valid youtube video url", color=color())
             await ctx.reply(embed=em, mention_author=False)
         else:
+
+            em=discord.Embed(description=f"{self.bot.icons['loading']} Now downloading audio", color=color())
+            msg = await ctx.reply(embed=em, mention_author=False)
+
             start_time = datetime.datetime.utcnow()
+
             async with ctx.typing():
-                data = self.ytdl.extract_info(url, download=False)
+                res = await download(url, "mp3")
 
-            if data["duration"] > 900:
-                raise TooLong("The video cannot be longer than 15 minutes.")
-            else:
-                try:
-                    data = data["entries"][0]
-                except IndexError:
-                    em=discord.Embed(description="I could not find a video with that query", color=color())
-                    return await ctx.reply(embed=em, mention_author=False)
-                except KeyError:
-                    data = data
+            em=discord.Embed(description=f"{self.bot.icons['loading']} Now uploading audio", color=color())
+            await msg.edit(embed=em)
+            
+            delta = datetime.datetime.utcnow() - start_time
+            hours, remainder = divmod(int(delta.total_seconds()), 3600)
+            minutes, seconds = divmod(remainder, 60)
 
-                em=discord.Embed(description=f"{self.bot.icons['loading']} Now downloading audio", color=color())
-                msg = await ctx.reply(embed=em, mention_author=False)
-
-                async with ctx.typing():
-                    res = await (await self.bot.session.get(data["url"])).read()
-
-                em=discord.Embed(description=f"{self.bot.icons['loading']} Now uploading audio", color=color())
-                await msg.edit(embed=em)
-                
-                delta = datetime.datetime.utcnow() - start_time
-                hours, remainder = divmod(int(delta.total_seconds()), 3600)
-                minutes, seconds = divmod(remainder, 60)
-                try:
-                    await ctx.reply(content=f"Download took: {minutes}m, {seconds}s", file=discord.File(io.BytesIO(res), filename=f"{data['title']}.mp3"), mention_author=False)
-                except discord.HTTPException:
-                    em=discord.Embed(description="The video was too large to be sent", color=color())
-                    await ctx.reply(embed=em, mention_author=False)
+            try:
+                await ctx.reply(content=f"Download took: {minutes}m, {seconds}s", file=res, mention_author=False)
+            except discord.HTTPException:
+                em=discord.Embed(description="The video was too large to be sent", color=color())
+                await ctx.reply(embed=em, mention_author=False)
 
     @commands.command(aliases=["ei"])
     @commands.cooldown(1, 5, commands.BucketType.user)

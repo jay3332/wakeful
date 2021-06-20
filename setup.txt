@@ -1,4 +1,4 @@
 1. Rename the example-config.json to config.json and set it up
-2. Install all needed modules (note: you need imagemagick installed for svgtopng and all other commands using wand to work)
+2. Install all needed modules (note: you need imagemagick installed for svgtopng and all other commands using wand to work and pytube has to be installed like this: "pip install -U git+https://github.com/pytube/pytube")
 4. Setup a postgresql database
 5. Execute all queries from the query.sql file in your postgresql database

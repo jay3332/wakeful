@@ -55,6 +55,22 @@ class Image(commands.Cog):
 
     @commands.command()
     @commands.cooldown(1,10,commands.BucketType.user)
+    async def allmyhomiesuse(self, ctx, bad : str, good : str):
+        async with ctx.typing():
+            img = await dagpi.image_process(
+                asyncdagpi.ImageFeatures.retro_meme(),
+                url="https://media.discordapp.net/attachments/698057848449400832/855803039649366036/dee.png",
+                top_text=f"Fuck {bad}",
+                bottom_text=f"All My Homies use {good}"
+            )
+            file=discord.File(img.image, f"{ctx.command.name}.png")
+            em=discord.Embed(color=color())
+            em.set_image(url=f"attachment://{ctx.command.name}.png")
+            em.set_footer(text=f"Powered by dagpi.xyz", icon_url=ctx.author.avatar_url)
+        await ctx.send(file=file, embed=em)
+
+    @commands.command()
+    @commands.cooldown(1,10,commands.BucketType.user)
     async def america(self, ctx, member : typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
         url = await getImage(ctx, member)
         async with ctx.typing():
