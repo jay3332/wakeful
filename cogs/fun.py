@@ -383,15 +383,13 @@ class Fun(commands.Cog):
             brand = logo.brand
             hint = logo.hint
             question = logo.question
-            em = discord.Embed(description=f"Try guessing this logo in under 20 seconds - Hhint: ||`{hint}`||", color=color())
+            em = discord.Embed(description=f"Try guessing this logo in under 20 seconds - Hint: ||`{hint}`||", color=color())
             em.set_image(url=question)
         emsg = await ctx.send(embed=em)
         try:
             brand = logo.brand
             msg = await self.bot.wait_for('message', check=lambda message: message.content.lower() == str(brand).lower() and message.channel == ctx.channel, timeout=20)
-            em=discord.Embed(description=f"Correct! The logo was `{brand}`", color=color())
-            em.set_thumbnail(url=logo.answer)
-            await emsg.edit(embed=em)
+            await msg.reply(f"Correct! The logo was `{brand}`", mention_author=False, allowed_mentions=discord.AllowedMentions.mnone())
         except asyncio.TimeoutError:
             em=discord.Embed(description=f"You took too long to answer, it was `{logo.brand}`", color=color())
             em.set_thumbnail(url=logo.answer)
