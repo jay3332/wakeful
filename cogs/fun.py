@@ -383,24 +383,21 @@ class Fun(commands.Cog):
             brand = logo.brand
             hint = logo.hint
             question = logo.question
-            em = discord.Embed(description=f"try guessing this logo in under 20 seconds - hint: ||`{hint}`||", color=color())
+            em = discord.Embed(description=f"Try guessing this logo in under 20 seconds - Hhint: ||`{hint}`||", color=color())
             em.set_image(url=question)
-            em.set_footer(text=f"Powered by dagpi.xyz", icon_url=ctx.author.avatar_url)
         emsg = await ctx.send(embed=em)
         try:
             brand = logo.brand
-            msg = await self.bot.wait_for('message', check=lambda message: message.content.lower() == str(brand).lower() and message.channel == ctx.channel and message.author == ctx.author, timeout=20)
-            em=discord.Embed(description=f"correct! the logo was `{brand}`", color=color())
+            msg = await self.bot.wait_for('message', check=lambda message: message.content.lower() == str(brand).lower() and message.channel == ctx.channel, timeout=20)
+            em=discord.Embed(description=f"Correct! The logo was `{brand}`", color=color())
             em.set_thumbnail(url=logo.answer)
-            em.set_footer(text=f"Powered by dagpi.xyz", icon_url=ctx.author.avatar_url)
             await emsg.edit(embed=em)
         except asyncio.TimeoutError:
-            em=discord.Embed(description=f"you took too long to answer, it was `{logo.brand}`", color=color())
+            em=discord.Embed(description=f"You took too long to answer, it was `{logo.brand}`", color=color())
             em.set_thumbnail(url=logo.answer)
-            em.set_footer(text=f"Powered by dagpi.xyz", icon_url=ctx.author.avatar_url)
             await emsg.edit(embed=em)
         
-    @commands.command(description="Gets the http cat image of the given number", usage="[http code]")
+    @commands.command()
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def httpcat(self, ctx, code : int):
         res = await self.bot.session.get(f"https://http.cat/{code}")
@@ -456,7 +453,7 @@ class Fun(commands.Cog):
         em=discord.Embed(title=f"{member.name}'s gayrate", description=f"{member.name} is `{random.randrange(0,100)}`% gay", color=color())
         await ctx.reply(embed=em, mention_author=False)
 
-    @commands.command(usage="[file]")
+    @commands.command()
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def caption(self, ctx, member : typing.Union[discord.Member, str] = None):
         url = await getImage(ctx, member)

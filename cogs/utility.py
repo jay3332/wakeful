@@ -746,7 +746,7 @@ class Utility(commands.Cog):
                     em.set_image(url=attachment)
                 await webhook.send(embed=em)
                 await suggestion.add_reaction(self.bot.icons['greentick'])
-                em=discord.Embed(description="Your suggestion has been sent to the admins\nNote: abuse may get you blacklisted", color=color())
+                em=discord.Embed(description="Your suggestion has been sent to the admins\nNote: Abuse may get you blacklisted", color=color())
                 await msg.edit(embed=em)
             else:
                 await msg.delete()
@@ -1117,7 +1117,6 @@ class Utility(commands.Cog):
             res = await (await self.bot.session.get(f"https://api.qrserver.com/v1/create-qr-code/?data={text}&size=200x200")).read()
         em=discord.Embed(color=color())
         f = discord.File(io.BytesIO(res), filename="qr.png")
-        em.set_footer(text=f"Powered by qrserver.com", icon_url=ctx.author.avatar_url)
         em.set_image(url=f"attachment://qr.png")
         await ctx.reply(embed=em, file=f, mention_author=False)
 
@@ -1195,7 +1194,7 @@ class Utility(commands.Cog):
                 name = res["epicUserHandle"]
                 recentMatches = res["recentMatches"]
                 em=discord.Embed(title=name, color=color())
-                em.set_footer(text=f"ID: {accid} • Powered by fortnitetracker.com", icon_url=ctx.author.avatar_url)
+                em.set_footer(text=f"ID: {accid}", icon_url=ctx.author.avatar_url)
                 em.set_thumbnail(url=avatar)
                 amount = len(recentMatches)
                 if amount > 1:
@@ -1308,7 +1307,6 @@ class Utility(commands.Cog):
             nodes = res["nodes"]
         if nodes != {}:
             em=discord.Embed(description="\n".join(f"[`{e}`]({nodes[e]})" for e in nodes), color=color())
-            em.set_footer(text=f"Powered by idevision.net", icon_url=ctx.author.avatar_url)
             await ctx.reply(embed=em, mention_author=False)
         else:
             em=discord.Embed(description=f"No results found for `{query}`", color=color())
@@ -1323,7 +1321,6 @@ class Utility(commands.Cog):
             nodes = res["nodes"]
         if nodes != {}:
             em=discord.Embed(description="\n".join(f"[`{e}`]({nodes[e]})" for e in nodes), color=color())
-            em.set_footer(text=f"Powered by idevision.net", icon_url=ctx.author.avatar_url)
             await ctx.reply(embed=em, mention_author=False)
         else:
             em=discord.Embed(description=f"No results found for `{query}`", color=color())
@@ -1340,7 +1337,6 @@ class Utility(commands.Cog):
             nodes = res["nodes"]
             if nodes != {}:
                 em=discord.Embed(description="\n".join(f"[`{e}`]({nodes[e]})" for e in nodes), color=color())
-                em.set_footer(text=f"Powered by idevision.net", icon_url=ctx.author.avatar_url)
                 await ctx.reply(embed=em, mention_author=False)
             else:
                 em=discord.Embed(description=f"No results found for `{query}`", color=color())
@@ -1447,7 +1443,6 @@ class Utility(commands.Cog):
 {self.bot.icons['arrow']}Deaths Today: {stats['todayDeaths']}
 {self.bot.icons['arrow']}Recovered Today: {stats['todayRecovered']}
 """, color=color())
-            em.set_footer(text="Powered by dinosaur.ml", icon_url=ctx.author.avatar_url)
             em.set_thumbnail(url=stats["countryInfo"]["flag"])
             await ctx.reply(embed=em, mention_author=False)
         else:

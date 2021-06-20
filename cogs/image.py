@@ -50,7 +50,6 @@ class Image(commands.Cog):
             file=discord.File(img.image, f"{ctx.command.name}.png")
             em=discord.Embed(color=color())
             em.set_image(url=f"attachment://{ctx.command.name}.png")
-            em.set_footer(text=f"Powered by dagpi.xyz", icon_url=ctx.author.avatar_url)
         await ctx.send(file=file, embed=em)
 
     @commands.command()
@@ -66,7 +65,6 @@ class Image(commands.Cog):
             file=discord.File(img.image, f"{ctx.command.name}.png")
             em=discord.Embed(color=color())
             em.set_image(url=f"attachment://{ctx.command.name}.png")
-            em.set_footer(text=f"Powered by dagpi.xyz", icon_url=ctx.author.avatar_url)
         await ctx.send(file=file, embed=em)
 
     @commands.command()
@@ -83,7 +81,6 @@ class Image(commands.Cog):
             file=discord.File(img.image, f"{ctx.command.name}.png")
             em=discord.Embed(color=color())
             em.set_image(url=f"attachment://{ctx.command.name}.png")
-            em.set_footer(text=f"Powered by dagpi.xyz", icon_url=ctx.author.avatar_url)
         await ctx.send(file=file, embed=em)
 
     @commands.command()
@@ -100,7 +97,6 @@ class Image(commands.Cog):
             file=discord.File(img.image, f"{ctx.command.name}.png")
             em=discord.Embed(color=color())
             em.set_image(url=f"attachment://{ctx.command.name}.png")
-            em.set_footer(text=f"Powered by dagpi.xyz", icon_url=ctx.author.avatar_url)
         await ctx.send(file=file, embed=em)
 
     @commands.command()
@@ -112,7 +108,6 @@ class Image(commands.Cog):
             file=discord.File(img.image, f"{ctx.command.name}.png")
             em=discord.Embed(color=color())
             em.set_image(url=f"attachment://{ctx.command.name}.png")
-            em.set_footer(text=f"Powered by dagpi.xyz", icon_url=ctx.author.avatar_url)
         await ctx.send(file=file, embed=em)
 
     @commands.command()
@@ -124,7 +119,6 @@ class Image(commands.Cog):
             file=discord.File(img.image, f"{ctx.command.name}.gif")
             em=discord.Embed(color=color())
             em.set_image(url=f"attachment://{ctx.command.name}.gif")
-            em.set_footer(text=f"Powered by dagpi.xyz", icon_url=ctx.author.avatar_url)
         await ctx.send(file=file, embed=em)
 
     @commands.command()
@@ -136,7 +130,6 @@ class Image(commands.Cog):
             file=discord.File(img.image, f"{ctx.command.name}.png")
             em=discord.Embed(color=color())
             em.set_image(url=f"attachment://{ctx.command.name}.png")
-            em.set_footer(text=f"Powered by dagpi.xyz", icon_url=ctx.author.avatar_url)
         await ctx.send(file=file, embed=em)
 
     @commands.command()
@@ -148,7 +141,6 @@ class Image(commands.Cog):
             file=discord.File(img.image, f"{ctx.command.name}.png")
             em=discord.Embed(color=color())
             em.set_image(url=f"attachment://{ctx.command.name}.png")
-            em.set_footer(text=f"Powered by dagpi.xyz", icon_url=ctx.author.avatar_url)
         await ctx.send(file=file, embed=em)
 
     @commands.command()
@@ -160,7 +152,6 @@ class Image(commands.Cog):
             file=discord.File(img.image, f"{ctx.command.name}.png")
             em=discord.Embed(color=color())
             em.set_image(url=f"attachment://{ctx.command.name}.png")
-            em.set_footer(text=f"Powered by dagpi.xyz", icon_url=ctx.author.avatar_url)
         await ctx.send(file=file, embed=em)
 
     @commands.command()
@@ -172,7 +163,6 @@ class Image(commands.Cog):
             file=discord.File(img.image, f"{ctx.command.name}.png")
             em=discord.Embed(color=color())
             em.set_image(url=f"attachment://{ctx.command.name}.png")
-            em.set_footer(text=f"Powered by dagpi.xyz", icon_url=ctx.author.avatar_url)
         await ctx.send(file=file, embed=em)
 
     @commands.command()
@@ -184,7 +174,6 @@ class Image(commands.Cog):
             file=discord.File(img.image, f"{ctx.command.name}.png")
             em=discord.Embed(color=color())
             em.set_image(url=f"attachment://{ctx.command.name}.png")
-            em.set_footer(text=f"Powered by dagpi.xyz", icon_url=ctx.author.avatar_url)
         await ctx.send(file=file, embed=em)
 
     @commands.command(aliases=["s8n"])
@@ -196,7 +185,6 @@ class Image(commands.Cog):
             file=discord.File(img.image, f"{ctx.command.name}.png")
             em=discord.Embed(color=color())
             em.set_image(url=f"attachment://{ctx.command.name}.png")
-            em.set_footer(text=f"Powered by dagpi.xyz", icon_url=ctx.author.avatar_url)
         await ctx.send(file=file, embed=em)
 
     @commands.command()
@@ -208,7 +196,6 @@ class Image(commands.Cog):
             file=discord.File(img.image, f"{ctx.command.name}.png")
             em=discord.Embed(color=color())
             em.set_image(url=f"attachment://{ctx.command.name}.png")
-            em.set_footer(text=f"Powered by dagpi.xyz", icon_url=ctx.author.avatar_url)
         await ctx.send(file=file, embed=em)
 
     @commands.command()
@@ -220,7 +207,6 @@ class Image(commands.Cog):
             file=discord.File(img.image, f"{ctx.command.name}.png")
             em=discord.Embed(color=color())
             em.set_image(url=f"attachment://{ctx.command.name}.png")
-            em.set_footer(text=f"Powered by dagpi.xyz", icon_url=ctx.author.avatar_url)
         await ctx.send(file=file, embed=em)
 
     @commands.command(aliases=["hitler", "wth"])
@@ -232,7 +218,6 @@ class Image(commands.Cog):
             file=discord.File(img.image, f"{ctx.command.name}.png")
             em=discord.Embed(color=color())
             em.set_image(url=f"attachment://{ctx.command.name}.png")
-            em.set_footer(text=f"Powered by dagpi.xyz", icon_url=ctx.author.avatar_url)
         await ctx.send(file=file, embed=em)
 
     @commands.command()
@@ -244,7 +229,6 @@ class Image(commands.Cog):
             file=discord.File(img.image, f"{ctx.command.name}.png")
             em=discord.Embed(color=color())
             em.set_image(url=f"attachment://{ctx.command.name}.png")
-            em.set_footer(text=f"Powered by dagpi.xyz", icon_url=ctx.author.avatar_url)
         await ctx.send(file=file, embed=em)
 
     @commands.command(aliases=["ytcomment"])
@@ -255,7 +239,6 @@ class Image(commands.Cog):
             file=discord.File(img.image, f"{ctx.command.name}.png")
             em=discord.Embed(color=color())
             em.set_image(url=f"attachment://{ctx.command.name}.png")
-            em.set_footer(text=f"Powered by dagpi.xyz", icon_url=ctx.author.avatar_url)
         await ctx.send(file=file, embed=em)
 
     @commands.command(name="discord")
@@ -266,7 +249,6 @@ class Image(commands.Cog):
             file=discord.File(img.image, f"{ctx.command.name}.png")
             em=discord.Embed(color=color())
             em.set_image(url=f"attachment://{ctx.command.name}.png")
-            em.set_footer(text=f"Powered by dagpi.xyz", icon_url=ctx.author.avatar_url)
         await ctx.send(file=file, embed=em)
 
     @commands.command()
@@ -287,7 +269,6 @@ class Image(commands.Cog):
             file=discord.File(img.image, f"{ctx.command.name}.png")
             em=discord.Embed(color=color())
             em.set_image(url=f"attachment://{ctx.command.name}.png")
-            em.set_footer(text=f"Powered by dagpi.xyz", icon_url=ctx.author.avatar_url)
         await ctx.send(file=file, embed=em)
 
     @commands.command()
@@ -299,7 +280,6 @@ class Image(commands.Cog):
             file=discord.File(img.image, f"{ctx.command.name}.png")
             em=discord.Embed(color=color())
             em.set_image(url=f"attachment://{ctx.command.name}.png")
-            em.set_footer(text=f"Powered by dagpi.xyz", icon_url=ctx.author.avatar_url)
         await ctx.send(file=file, embed=em)
 
     @commands.command()
@@ -311,7 +291,6 @@ class Image(commands.Cog):
             file=discord.File(img.image, f"{ctx.command.name}.png")
             em=discord.Embed(color=color())
             em.set_image(url=f"attachment://{ctx.command.name}.png")
-            em.set_footer(text=f"Powered by dagpi.xyz", icon_url=ctx.author.avatar_url)
         await ctx.send(file=file, embed=em)
 
     @commands.command()
@@ -323,7 +302,6 @@ class Image(commands.Cog):
             file=discord.File(img.image, f"{ctx.command.name}.png")
             em=discord.Embed(color=color())
             em.set_image(url=f"attachment://{ctx.command.name}.png")
-            em.set_footer(text=f"Powered by dagpi.xyz", icon_url=ctx.author.avatar_url)
         await ctx.send(file=file, embed=em)
 
     @commands.command()
@@ -335,7 +313,6 @@ class Image(commands.Cog):
             file=discord.File(img.image, f"{ctx.command.name}.png")
             em=discord.Embed(color=color())
             em.set_image(url=f"attachment://{ctx.command.name}.png")
-            em.set_footer(text=f"Powered by dagpi.xyz", icon_url=ctx.author.avatar_url)
         await ctx.send(file=file, embed=em)
 
     @commands.command()
@@ -347,7 +324,6 @@ class Image(commands.Cog):
             file=discord.File(img.image, f"{ctx.command.name}.png")
             em=discord.Embed(color=color())
             em.set_image(url=f"attachment://{ctx.command.name}.png")
-            em.set_footer(text=f"Powered by dagpi.xyz", icon_url=ctx.author.avatar_url)
         await ctx.send(file=file, embed=em)
 
     @commands.command()
@@ -360,7 +336,6 @@ class Image(commands.Cog):
             res = res["message"]
             em=discord.Embed(color=color())
             em.set_image(url=res)
-            em.set_footer(text=f"Powered by nekobot.xyz", icon_url=ctx.author.avatar_url)
         await ctx.reply(embed=em, mention_author=False)
 
     @commands.command()
@@ -373,9 +348,7 @@ class Image(commands.Cog):
             res = res["message"]
             img = await self.bot.session.get(res)
             img = await img.read()
-            em=discord.Embed(color=color())
-            em.set_footer(text=f"Powered by nekobot.xyz", icon_url=ctx.author.avatar_url)
-        await ctx.reply(embed=em, file=discord.File(io.BytesIO(img), filename="stickbug.mp4"), mention_author=False)
+        await ctx.reply(file=discord.File(io.BytesIO(img), filename="stickbug.mp4"), mention_author=False)
 
     @commands.command(aliases=["cmm"])
     @commands.cooldown(1,5,commands.BucketType.user)
@@ -387,7 +360,6 @@ class Image(commands.Cog):
             res = res["message"]
             em=discord.Embed(color=color())
             em.set_image(url=res)
-            em.set_footer(text=f"Powered by nekobot.xyz", icon_url=ctx.author.avatar_url)
         await ctx.reply(embed=em, mention_author=False)
 
     @commands.command(aliases=["phc", "pornhubcomment"])
@@ -400,7 +372,6 @@ class Image(commands.Cog):
             res = res["message"]
             em=discord.Embed(color=color())
             em.set_image(url=res)
-            em.set_footer(text=f"Powered by nekobot.xyz", icon_url=ctx.author.avatar_url)
         await ctx.reply(embed=em, mention_author=False)
 
     @commands.command(aliases=["iphonex"])
@@ -413,7 +384,6 @@ class Image(commands.Cog):
             image = res["message"]
             em=discord.Embed(color=color())
             em.set_image(url=image)
-            em.set_footer(text=f"Powered by nekobot.xyz", icon_url=ctx.author.avatar_url)
         await ctx.reply(embed=em, mention_author=False)
 
     @commands.command()
@@ -426,7 +396,6 @@ class Image(commands.Cog):
             image = res["message"]
             em=discord.Embed(color=color())
             em.set_image(url=image)
-            em.set_footer(text=f"Powered by nekobot.xyz", icon_url=ctx.author.avatar_url)
         await ctx.reply(embed=em, mention_author=False)
 
     @commands.command()
@@ -439,7 +408,6 @@ class Image(commands.Cog):
             image = res["message"]
             em=discord.Embed(color=color())
             em.set_image(url=image)
-            em.set_footer(text=f"Powered by nekobot.xyz", icon_url=ctx.author.avatar_url)
         await ctx.reply(embed=em, mention_author=False)
 
 
