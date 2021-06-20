@@ -512,7 +512,7 @@ class Utility(commands.Cog):
             em=discord.Embed(description=f"This package wasn't found", color=color())
             await ctx.reply(embed=em, mention_author=False)
 
-    @commands.command(aliases=["g"])
+    @commands.group(aliases=["g"], invoke_without_command=True)
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def google(self, ctx, *, query):
         async with ctx.typing():
@@ -545,9 +545,9 @@ class Utility(commands.Cog):
                 pag = self.bot.paginate(Paginator(embeds, per_page=1))
                 await pag.start(ctx)
 
-    @commands.command(aliases=["gimage"])
+    @google.command(aliases=["i"])
     @commands.cooldown(1, 5, commands.BucketType.user)
-    async def googleimage(self, ctx, *, query):
+    async def image(self, ctx, *, query):
         if ctx.channel.is_nsfw():
             safe_search_setting=False
             safe_search="Disabled"
