@@ -1,5 +1,6 @@
-import discord, typing, io
+import discord, typing, io, inspect
 import twemoji_parser as twemoji
+from wand import image, color
 
 from pilmoji import Pilmoji
 from PIL import Image, ImageFont
@@ -16,6 +17,12 @@ class Miscellaneous(commands.Cog):
         self.bot = bot
 
     @executor_function
+    def svg2png(self, bytes_):
+        with image.Image(blob=bytes_, format="svg", width=400, height=400, background="none") as svg:
+            data = svg.make_blob("png")
+        return io.BytesIO(data)
+
+    @executor_function
     def emojitoimg(self, emoji):
         with Image.new('RGBA', (400, 400), 0) as image:
             font = ImageFont.truetype('data/font.ttf', 24)
@@ -25,6 +32,27 @@ class Miscellaneous(commands.Cog):
         image.save(buffer, "png")
         buffer.seek(0)
         return buffer
+
+    @commands.command(aliases=["svg2png"])
+    @commands.cooldown(1,5,commands.BucketType.user)
+    async def svgtopng(self, ctx, attachment : str = None):
+        if attachment is None:
+            if not ctx.message.attachments:
+                raise commands.MissingRequiredArgument(inspect.Parameter("attachment", inspect.Parameter.KEYWORD_ONLY))
+        
+        if attachment is None:
+            url = ctx.message.attachments[0].url or ctx.message.attachments[0].proxy_url
+        else:
+            url = attachment
+
+        if not url.endswith(".svg"):
+            return await ctx.reply("Please give me a valid svg file")
+
+        res = await (await self.bot.session.get(url)).read()
+
+        image = await self.svg2png(res)
+
+        await ctx.reply(file=discord.File(image, filename=ctx.command.name+".png"), mention_author=False)
 
     @commands.command(aliases=["be"])
     @commands.cooldown(1,5,commands.BucketType.user)
