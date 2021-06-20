@@ -148,7 +148,7 @@ class Utility(commands.Cog):
             return await ctx.reply(f"I couldn't find a wikipedia page with the query `{query}`", mention_author=False, allowed_mentions=discord.AllowedMentions.none())
         url = (await page.urls()).view
         media = await page.media()
-        text = WrapText(summary, 2048)
+        text = WrapText(summary, 1024)
         embeds = []
         for txt in text:
             em=discord.Embed(title=title, description=str(txt), url=url, color=color())
@@ -1243,7 +1243,7 @@ class Utility(commands.Cog):
         if content is None or len(content) == 0:
             content = "*Message did not contain any content*"
 
-        res = WrapText(content, 2048)
+        res = WrapText(content, 1024)
         embeds = []
         for word in res:
             em = discord.Embed(description=word, color=color(), timestamp=msg.created_at)
@@ -1932,7 +1932,7 @@ class Utility(commands.Cog):
         async with ctx.typing():
             res = (await (await self.bot.session.get("https://idevision.net/api/public/ocr", headers={"Authorization":get_config("IDEVISION")}, params={"filetype":filetype}, data=image)).json())["data"]
 
-        text = WrapText(res, 2048)
+        text = WrapText(res, 1024)
         if len(text) == 0:
             return await ctx.reply("I couldn't read what your image says", mention_author=False)
         embeds = []
