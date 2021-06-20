@@ -33,6 +33,10 @@ async def getImage(ctx : commands.Context, url : typing.Union[discord.Member, di
             if ref.embeds[0].image.url != discord.Embed.Empty:
                 if isImage(ref.embeds[0].image.url):
                     return ref.embeds[0].image.url
+
+            if ref.embeds[0].thumbnail.url != discord.Embed.Empty:
+                if isImage(ref.embeds[0].thumbnail.url):
+                    return ref.embeds[0].thumbnail.url
                     
         elif ref.attachments:
             url = ref.attachments[0].url or ref.attachments[0].proxy_url
