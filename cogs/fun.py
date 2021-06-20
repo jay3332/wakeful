@@ -389,7 +389,7 @@ class Fun(commands.Cog):
         try:
             brand = logo.brand
             msg = await self.bot.wait_for('message', check=lambda message: message.content.lower() == str(brand).lower() and message.channel == ctx.channel, timeout=20)
-            await msg.reply(f"Correct! The logo was `{brand}`", mention_author=False, allowed_mentions=discord.AllowedMentions.mnone())
+            await msg.reply(f"Correct! The logo was `{brand}`", mention_author=False, allowed_mentions=discord.AllowedMentions.none())
         except asyncio.TimeoutError:
             em=discord.Embed(description=f"You took too long to answer, it was `{logo.brand}`", color=color())
             em.set_thumbnail(url=logo.answer)
