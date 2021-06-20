@@ -42,6 +42,7 @@ class wakeful(commands.AutoShardedBot):
         self.message_cache = {}
         self.directorys = {}
         self.command_usage = {}
+        self.roos = []
         self.games = {
             "akinator": {}
         }
@@ -56,17 +57,26 @@ class wakeful(commands.AutoShardedBot):
 
     def paginate(self, paginator):
         return menus.MenuPages(paginator)
+    class roo():
 
-    class roo:
+        def __init__(self, bot):
+            self.bot = bot
 
-        async def bulli():
-            return "<:rooBulli:744346131324076072>"
+        def getEmoji(self, name : str):
+            try:
+                return self.bot.roos[name.lower()]
+            except KeyError:
+                return "didnt found find :anguished::anguished::anguished::anguished::anguished:"
 
-        async def think():
-            return "<:rooThink:596576798351949847>"
+        def __getattr__(self, attr):
+            async def predicate():
+                return self.getEmoji(attr)
+            return predicate
+        
+    async def on_ready(self):
+        logger.info(f"Logged in as: {bot.user} ({bot.user.id})")
 
-        async def bless():
-            return "<:rooBless:597589960270544916>"
+        bot.roos = {em.name.lower().strip("roo"): str(em) for em in bot.emojis if em.name.lower().startswith("roo")}
 
     async def on_message(self, msg):
         if self.emptyPrefix and msg.author.id == self.ownersid:
@@ -134,10 +144,6 @@ class wakeful(commands.AutoShardedBot):
                 else:
                     em=discord.Embed(description=f"The prefix for dms is `{prefix[2]}`", color=color())
                     return await msg.channel.send(embed=em)
-
-
-    async def on_ready(self):
-        logger.info(f"Logged in as: {bot.user.name}#{bot.user.discriminator} ({bot.user.id})")
 
 bot = wakeful(command_prefix=get_prefix, case_insensitive=True, ShardCount=10, intents=discord.Intents.all())
 bot.remove_command("help")

@@ -41,7 +41,7 @@ def get_var_dict_from_ctx(ctx: commands.Context, prefix: str = '_'):
         'guild': ctx.guild,
         'message': ctx.message,
         'msg': ctx.message,
-        'roo': ctx.bot.roo
+        'roo': ctx.bot.roo(ctx.bot)
     }
 
     return {f'{prefix}{k}': v for k, v in raw_var_dict.items()}
