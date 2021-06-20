@@ -133,7 +133,11 @@ async def jsk(self, ctx: commands.Context):
     # Show websocket latency in milliseconds
     summary.append(f"Average websocket latency: {round(self.bot.latency * 1000, 2)}ms")
 
-    await ctx.send(embed=discord.Embed(description="\n".join(summary), color=color()))
+    em = discord.Embed(description="\n".join(summary), color=color())
+    em.set_author(name="Jishaku", icon_url=ctx.bot.user.avatar_url)
+    em.set_footer(text=ctx.author, icon_url=ctx.author.avatar_url)
+
+    await ctx.reply(embed=em, mention_author=False)
 
 
 class Jishaku(JishakuBase, metaclass=GroupCogMeta, command_parent=jsk):

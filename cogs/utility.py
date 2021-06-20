@@ -1452,22 +1452,6 @@ class Utility(commands.Cog):
             em=discord.Embed(description=f"I couldn't find any covid stats for `{country}`", color=color())
             await ctx.reply(embed=em, mention_author=False)
 
-    @commands.command(aliases=["shard", "shards"])
-    @commands.cooldown(1,15,commands.BucketType.user)
-    async def shardinfo(self, ctx, shard : int = None):
-        if shard is None:
-            em=discord.Embed(title="Shards", color=color())
-            for shard in list(self.bot.shards):
-                shard = dict(self.bot.shards)[shard]
-                em.add_field(
-                    name=f"Shard {shard.id+1}",
-                    value=f"""
-{self.bot.icons['arrow']}Latency: `{round(shard.latency, 1)}`ms
-{self.bot.icons['arrow']}Count: `{shard.shard_count}`
-""", inline=True
-                )
-            await ctx.reply(embed=em, mention_author=False)
-
     @commands.command(aliases=["calculator", "calculater", "calc"])
     @commands.cooldown(1,5,commands.BucketType.user)
     async def calculate(self, ctx, *, args : str):
@@ -1552,6 +1536,8 @@ class Utility(commands.Cog):
                 disabled = disabled.split(",")
             if given_command.hidden == True or given_command.name in disabled and not is_mod(self.bot, ctx.author):
                 return await ctx.reply(f"There isn't a cog or command with the name `{command}`", mention_author=False)
+            else:
+                pass
             #-------------------------------------
             try:
                 command_subcommands = "> " + ", ".join(f"`{command.name}`" for command in given_command.commands if not command.hidden or not command.name in disabled)
@@ -1644,14 +1630,21 @@ class Utility(commands.Cog):
         for cmd in list(self.bot.walk_commands()):
             if cmd.hidden:
                 if is_mod(self.bot, ctx.author):
+                    if cmd.parent is None:
+                        commands.append(cmd.name)
+                    else:
+                        commands.append(f"{cmd.parent.name} {cmd.name}")
+                    for alias in cmd.aliases:
+                        commands.append(alias)
+                else:
                     pass
-
-        if cmd.parent is None:
-            commands.append(cmd.name)
-        else:
-            commands.append(f"{cmd.parent.name} {cmd.name}")
-        for alias in cmd.aliases:
-            commands.append(alias)
+            else:
+                if cmd.parent is None:
+                    commands.append(cmd.name)
+                else:
+                    commands.append(f"{cmd.parent.name} {cmd.name}")
+                for alias in cmd.aliases:
+                    commands.append(alias)
         cmds = []
 
         for cmd in commands:
