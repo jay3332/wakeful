@@ -370,13 +370,18 @@ class Utility(commands.Cog):
 
         for channel in channels:
             url = "https://www.youtube.com/channel/"+channel["id"]
+            if not channel['thumbnails'][0]['url'].startswith("https:"):
+                thumbnail = f"https:{channel['thumbnails'][0]['url']}"
+            else:
+                thumbnail = channel['thumbnails'][0]['url']
+            print(thumbnail)
             if channel["descriptionSnippet"] is not None:
                 em=discord.Embed(title=channel["title"], descritpion=" ".join(text["text"] for text in channel["descriptionSnippet"]), url=url, color=color())
             else:
                 em=discord.Embed(title=channel["title"], url=url, color=color())
             em.add_field(name="Videos", value=channel['videoCount'], inline=True)
             em.add_field(name="Subscribers", value="".join(channel['subscribers'] if channel['subscribers'] is not None else "0"), inline=True)
-            em.set_thumbnail(url=f"https:{channel['thumbnails'][0]['url']}")
+            em.set_thumbnail(url=thumbnail)
             embeds.append(em)
 
         pag = self.bot.paginate(Paginator(embeds, per_page=1))
