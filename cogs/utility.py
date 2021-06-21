@@ -1,7 +1,7 @@
 import discord, datetime, async_cse, psutil, humanize, os, sys, inspect, mystbin, googletrans, asyncio, aiohttp, random, time, lyricsgenius
 import asyncdagpi, hashlib, asyncpg, io, typing, gdshortener, pathlib, textwrap, async_tio, zipfile, aiowiki
 import mathjspy, pytube, youtube_dl, re, tempfile
-from youtubesearchpython.__future__ import VideosSearch
+from youtubesearchpython.__future__ import VideosSearch, ChannelsSearch
 
 from discord.ext import commands
 from utils.webhook import Webhook, AsyncWebhookAdapter
@@ -296,7 +296,7 @@ class Utility(commands.Cog):
 
         for video in videos:
             url = "https://www.youtube.com/watch?v="+video["id"]
-            channel_url = "https://www.youtube.com/channel"+video["channel"]["id"]
+            channel_url = "https://www.youtube.com/channel/"+video["channel"]["id"]
             em=discord.Embed(title=video["title"], url=url, color=color())
             em.add_field(name="Channel", value=f"[{video['channel']['name']}]({channel_url})", inline=True)
             em.add_field(name="Duration", value=video['duration'], inline=True)
@@ -354,8 +354,33 @@ class Utility(commands.Cog):
                         await msg.edit(embed=embeds[page])
 
                 elif str(reaction.emoji) == reactions[6]:
-                    break
                     await msg.delete()
+                    break
+            
+    @youtube.command(aliases=["c"])
+    @commands.cooldown(1,5,commands.BucketType.user)
+    async def channel(self, ctx, *, query):
+        async with ctx.typing():
+            channels = (await (ChannelsSearch(query, limit=15, region="US")).next())["result"]
+
+        if len(channels) == 0:
+            return await ctx.reply("I could not find a channel with that query", mention_author=False)
+
+        embeds = []
+
+        for channel in channels:
+            url = "https://www.youtube.com/channel/"+channel["id"]
+            if channel["descriptionSnippet"] is not None:
+                em=discord.Embed(title=channel["title"], descritpion=" ".join(text["text"] for text in channel["descriptionSnippet"]), url=url, color=color())
+            else:
+                em=discord.Embed(title=channel["title"], url=url, color=color())
+            em.add_field(name="Videos", value=channel['videoCount'], inline=True)
+            em.add_field(name="Subscribers", value="".join(channel['subscribers'] if channel['subscribers'] is not None else "0"), inline=True)
+            em.set_thumbnail(url=f"https:{channel['thumbnails'][0]['url']}")
+            embeds.append(em)
+
+        pag = self.bot.paginate(Paginator(embeds, per_page=1))
+        await pag.start(ctx)
 
     @youtube.command(aliases=["video"])
     @commands.cooldown(1,30,commands.BucketType.user)
