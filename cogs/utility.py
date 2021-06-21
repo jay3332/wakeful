@@ -522,7 +522,8 @@ class Utility(commands.Cog):
 
     @commands.command()
     @commands.cooldown(1, 5, commands.BucketType.user)
-    async def pypi(self, ctx, package):
+    async def pypi(self, ctx, *, package):
+        package = package.replace(" ", "-")
         try:
             res = await self.bot.session.get(f"https://pypi.org/pypi/{package}/json")
             json = await res.json()
