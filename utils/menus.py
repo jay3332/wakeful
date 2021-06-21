@@ -965,7 +965,7 @@ class MenuPages(Menu):
         """
         page = await self._source.get_page(0)
         kwargs = await self._get_kwargs_from_page(page)
-        return await channel.send(**kwargs)
+        return await ctx.reply(**kwargs, mention_author=False)
 
     async def start(self, ctx, *, channel=None, wait=False):
         await self._source._prepare_once()

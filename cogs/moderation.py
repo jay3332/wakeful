@@ -1,7 +1,7 @@
-from datetime import datetime
-import discord, string, random, asyncio, asyncpg
+import discord, string, random, asyncpg
 from discord.ext import commands
 from utils.get import *
+from utils.paginator import *
 from __main__ import get_prefix
 
 class Moderation(commands.Cog):
@@ -190,6 +190,92 @@ class Moderation(commands.Cog):
             await ctx.message.add_reaction(self.bot.icons["redtick"])
             em=discord.Embed(description=f"You can't moderate people that have a higher role position than you", color=color())
             await ctx.reply(embed=em, mention_author=False)
+
+    @commands.group(invoke_without_command=True)
+    @commands.guild_only()
+    @commands.has_guild_permissions(manage_guild=True)
+    async def members(self, ctx):
+        members = [str(m) for m in ctx.guild.members]
+
+        wrapped = WrapList(members, length=10)
+
+        embeds=[]
+
+        for m in wrapped:
+            em=discord.Embed(description="\n".join(m), color=color())
+            embeds.append(em)
+
+        pag = self.bot.paginate(Paginator(embeds, per_page=1))
+        await pag.start(ctx)
+
+    @members.command()
+    @commands.guild_only()
+    @commands.has_guild_permissions(manage_guild=True)
+    async def name(self, ctx, *, name):
+        members = [str(m) for m in ctx.guild.members if name.lower() in m.name.lower()]
+
+        if len(members) == 0:
+            return await ctx.reply(f"I could not find any members with `{name}` in their name", mention_author=False)
+
+        wrapped = WrapList(members, length=10)
+
+        embeds=[]
+
+        for m in wrapped:
+            em=discord.Embed(description="\n".join(m), color=color())
+            embeds.append(em)
+
+        pag = self.bot.paginate(Paginator(embeds, per_page=1))
+        await pag.start(ctx)
+
+    @members.command(aliases=["tag"])
+    @commands.guild_only()
+    @commands.has_guild_permissions(manage_guild=True)
+    async def discriminator(self, ctx, discriminator : str):
+        if len(discriminator) != 4:
+            return await ctx.reply("Please give me a valid discriminator", mention_author=False)
+
+        members = [str(m) for m in ctx.guild.members if str(m.discriminator) == discriminator]
+
+        if len(members) == 0:
+            return await ctx.reply(f"I could not find any members with `{discriminator}` in their discriminator", mention_author=False)
+
+        wrapped = WrapList(members, length=10)
+
+        embeds=[]
+
+        for m in wrapped:
+            em=discord.Embed(description="\n".join(m), color=color())
+            embeds.append(em)
+
+        pag = self.bot.paginate(Paginator(embeds, per_page=1))
+        await pag.start(ctx)
+
+    @members.command(aliases=["presence", "game"])
+    @commands.guild_only()
+    @commands.has_guild_permissions(manage_guild=True)
+    async def status(self, ctx, *, name):
+        members = []
+        for member in ctx.guild.members:
+            for presence in member.activities:
+                if member.activity.name is not None:
+                    if name.lower() in member.activity.name.lower():
+                        if not member in members:
+                            members.append(member)
+
+        if len(members) == 0:
+            return await ctx.reply(f"I could not find any members with `{name}` in their status", mention_author=False)
+
+        wrapped = WrapList(members, length=10)
+
+        embeds=[]
+
+        for m in wrapped:
+            em=discord.Embed(description="\n".join(str(m) for m in m), color=color())
+            embeds.append(em)
+
+        pag = self.bot.paginate(Paginator(embeds, per_page=1))
+        await pag.start(ctx)
 
     @commands.command(aliases=["prefix"])
     @commands.guild_only()
