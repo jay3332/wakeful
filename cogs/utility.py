@@ -222,21 +222,36 @@ class Utility(commands.Cog):
             attachment = ctx.message.attachments[0]
 
         if attachment is not None:
-            if not attachment.url.endswith(".mp4"):
-                em=discord.Embed(description="Please attach a video file", color=color())
+            if not attachment.url.endswith(".mp4") and not attachment.url.endswith(".mp3"):
+                em=discord.Embed(description="Please attach a mp4 or mp3 file", color=color())
                 return await ctx.reply(embed=em, mention_author=False)
         else:
-            em=discord.Embed(description="Please attach a video file", color=color())
+            em=discord.Embed(description="Please attach a mp4 or mp3 file", color=color())
             return await ctx.reply(embed=em, mention_author=False)
         
         start_time = datetime.datetime.utcnow()
-        em=discord.Embed(description=f"{self.bot.icons['loading']} Now downloading video...", color=color())
+
+        if attachment.url.endswith(".mp4"):
+            em=discord.Embed(description=f"{self.bot.icons['loading']} Now downloading video...", color=color())
+        elif attachment.url.endswith(".mp3"):
+            em=discord.Embed(description=f"{self.bot.icons['loading']} Now downloading audio...", color=color())
+
         msg = await ctx.reply(embed=em, mention_author=False)
         path = tempfile.TemporaryDirectory()
-        await attachment.save(f"{path.name}/file.mp4")
+
+        if attachment.url.endswith(".mp4"):
+            await attachment.save(f"{path.name}/file.mp4")
+        elif attachment.url.endswith(".mp3"):
+            await attachment.save(f"{path.name}/file.mp3")
+
         em=discord.Embed(description=f"{self.bot.icons['loading']} Now recognizing song...", color=color())
         await msg.edit(embed=em)
-        res = await client.recognize_song(path.name+"/file.mp4")
+
+        if attachment.url.endswith(".mp4"):
+            res = await client.recognize_song(path.name+"/file.mp4")
+        elif attachment.url.endswith(".mp3"):
+            res = await client.recognize_song(path.name+"/file.mp3")
+
         try:
             track = res["track"]
         except KeyError:
@@ -329,7 +344,7 @@ class Utility(commands.Cog):
                 elif str(reaction.emoji) == reactions[4]:
                     page +=1
                     await msg.edit(embed=embeds[page])
-                    
+
                 elif str(reaction.emoji) == reactions[5]:
                     if page != len(videos):
                         page = len(videos)-1
