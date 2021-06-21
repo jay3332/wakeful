@@ -332,12 +332,14 @@ class Utility(commands.Cog):
                 elif str(reaction.emoji) == reactions[2]:
                     for r in reactions:
                         await msg.remove_reaction(r, self.bot.user)
+                    url = embeds[page].url
                     await ctx.invoke(self.bot.get_command("youtube mp4"), **{"url": url})
                     break
 
                 elif str(reaction.emoji) == reactions[3]:
                     for r in reactions:
                         await msg.remove_reaction(r, self.bot.user)
+                    url = embeds[page].url
                     await ctx.invoke(self.bot.get_command("youtube mp3"), **{"url": url})
                     break
 
@@ -349,6 +351,9 @@ class Utility(commands.Cog):
                     if page != len(videos):
                         page = len(videos)-1
                         await msg.edit(embed=embeds[page])
+
+                elif str(reaction.emoji) == reactions[6]:
+                    await msg.delete()
 
     @youtube.command(aliases=["video"])
     @commands.cooldown(1,30,commands.BucketType.user)
