@@ -1,4 +1,5 @@
-import discord, datetime
+import discord, datetime, io
+from jishaku.codeblocks import codeblock_converter
 from discord.ext import commands
 from utils.get import *
 
@@ -19,6 +20,63 @@ class API(commands.Cog):
         em=discord.Embed(color=color(), timestamp=datetime.datetime.utcnow())
         em.set_image(url=image)
         em.set_footer(text=f"Powered by thecatapi.com", icon_url=ctx.author.avatar_url)
+        await ctx.reply(embed=em, mention_author=False)
+
+    @commands.command()
+    @commands.cooldown(1,5,commands.BucketType.user)
+    async def window(self, ctx, name : str, *, text : codeblock_converter):
+        url = get_config("SECRET_API")
+        data = {
+            "paddingVertical": "56px",
+            "paddingHorizontal": "56px",
+            "backgroundImage": None,
+            "backgroundImageSelection": None,
+            "backgroundMode": "color",
+            "backgroundColor": "rgba(26,127,220,0.62)",
+            "dropShadow": True,
+            "dropShadowOffsetY": "20px",
+            "dropShadowBlurRadius": "68px",
+            "theme": "vscode",
+            "windowTheme": "none",
+            "language": "auto",
+            "fontFamily": "Hack",
+            "fontSize": "14px",
+            "lineHeight": "133%",
+            "windowControls": True,
+            "widthAdjustment": True,
+            "lineNumbers": False,
+            "firstLineNumber": 1,
+            "exportSize": "2x",
+            "watermark": False,
+            "squaredImage": False,
+            "hiddenCharacters": False,
+            "name": name,
+            "width": 680,
+            "code": text.content,
+        }
+        async with ctx.typing():
+            img = io.BytesIO(await (await self.bot.session.post(url, json=data)).read())
+        em=discord.Embed(color=color())
+        em.set_image(url=f"attachment://{name}.png")
+        await ctx.reply(embed=em, file=discord.File(img, filename=f"{name}.png"), mention_author=False)
+
+    @commands.command()
+    @commands.cooldown(1,5,commands.BucketType.user)
+    async def xkcd(self, ctx, number : int = None):
+        async with ctx.typing():
+            latest = await (await self.bot.session.get("https://xkcd.com/info.0.json")).json()
+        res = None
+        if number is None:
+            res = latest
+        elif latest["num"] < number:
+            return await ctx.reply(f"This number is not available, the current maximum is {latest['num']}", mention_author=False)
+        
+        if res is None:
+            async with ctx.typing():
+                res = await (await self.bot.session.get(f"https://xkcd.com/{number}/info.0.json")).json()
+
+        em=discord.Embed(title=res["title"], description=res["alt"], color=color())
+        em.set_image(url=res["img"])
         await ctx.reply(embed=em, mention_author=False)
 
     @commands.command()

@@ -154,9 +154,9 @@ class Tags(commands.Cog):
             await ctx.message.add_reaction(self.bot.icons['redtick'])
             em=discord.Embed(description=f"There is already a tag with the name `{name}`", color=color())
             await ctx.reply(embed=em, mention_author=False)
-        elif len(new_name) < 3:
+        elif len(new_name) < 1:
             await ctx.message.add_reaction(self.bot.icons['redtick'])
-            em=discord.Embed(description=f"The new name has to be at least 3 characters long", color=color())
+            em=discord.Embed(description=f"The new name has to be at least 1 characters long", color=color())
             await ctx.reply(embed=em, mention_author=False)
         elif not await exists(ctx, name):
             await ctx.message.add_reaction(self.bot.icons['redtick'])
@@ -185,9 +185,9 @@ class Tags(commands.Cog):
             await ctx.message.add_reaction(self.bot.icons['redtick'])
             em=discord.Embed(description=f"There is already a tag with the name `{name}`", color=color())
             await ctx.reply(embed=em, mention_author=False)
-        elif len(name) < 3:
+        elif len(name) < 1:
             await ctx.message.add_reaction(self.bot.icons['redtick'])
-            em=discord.Embed(description=f"The new name has to be at least 3 characters long", color=color())
+            em=discord.Embed(description=f"The name has to be at least 1 characters long", color=color())
             await ctx.reply(embed=em, mention_author=False)
         elif len(content) > self.Limit:
             await ctx.message.add_reaction(self.bot.icons['redtick'])

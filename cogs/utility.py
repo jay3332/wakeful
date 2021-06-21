@@ -1,6 +1,7 @@
 import discord, datetime, async_cse, psutil, humanize, os, sys, inspect, mystbin, googletrans, asyncio, aiohttp, random, time, lyricsgenius
 import asyncdagpi, hashlib, asyncpg, io, typing, gdshortener, pathlib, textwrap, async_tio, zipfile, aiowiki
 import mathjspy, pytube, youtube_dl, re, tempfile
+from youtubesearchpython.__future__ import VideosSearch
 
 from discord.ext import commands
 from utils.webhook import Webhook, AsyncWebhookAdapter
@@ -65,14 +66,10 @@ def download(url, method = "mp4"):
     if video.length > 600:
         raise TooLong("The video cannot be longer than 10 minutes.")
     buffer = io.BytesIO()
-
-    print(method)
     
     if method == "mp4":
-        print("a")
         res = video.streams.filter(progressive=True, file_extension="mp4").order_by("resolution").desc().first().stream_to_buffer(buffer)
     elif method == "mp3":
-        print("c")
         res = video.streams.filter(mime_type="audio/mp4").order_by("abr").desc().first().stream_to_buffer(buffer)
 
     buffer.seek(0)
@@ -274,42 +271,69 @@ class Utility(commands.Cog):
     @commands.cooldown(1,5,commands.BucketType.user)
     async def youtube(self, ctx, *, query):
         async with ctx.typing():
-            data = await youtube(query)
-        
-        try:
-            data = data["entries"][0]
-        except KeyError:
-            data = data
-        if data == [] and len(data) == 0:
+            videos = (await (VideosSearch(query, limit=15)).next())["result"]
+
+        if len(videos) == 0:
             return await ctx.reply("I could not find a video with that query", mention_author=False)
 
-        url = "https://www.youtube.com/watch?v="+data["id"]
-        em=discord.Embed(title=data["title"], url=url, color=color())
-        em.add_field(name="Channel", value=f"[{data['channel']}]({data['channel_url']})", inline=True)
-        em.add_field(name="Duration", value=str(datetime.timedelta(seconds=data['duration'])), inline=True)
-        em.add_field(name="Views", value=humanize.intcomma(data['view_count']))
-        em.set_footer(text="Use the reactions for downloading")
-        em.set_thumbnail(url=data["thumbnail"])
-        msg = await ctx.reply(embed=em, mention_author=False)
+        embeds = []
 
-        reactions = ["📼", "🔈"]
+        for video in videos:
+            url = "https://www.youtube.com/watch?v="+video["id"]
+            channel_url = "https://www.youtube.com/channel"+video["channel"]["id"]
+            em=discord.Embed(title=video["title"], url=url, color=color())
+            em.add_field(name="Channel", value=f"[{video['channel']['name']}]({channel_url})", inline=True)
+            em.add_field(name="Duration", value=video['duration'], inline=True)
+            em.add_field(name="Views", value=video['viewCount']["text"])
+            em.set_footer(text=f"Use the reactions for downloading • Page: {int(videos.index(video))+1}/{len(videos)}")
+            em.set_thumbnail(url=video["thumbnails"][0]["url"])
+            embeds.append(em)
+
+        msg = await ctx.reply(embed=embeds[0], mention_author=False)
+
+        page = 0
+
+        reactions = [self.bot.icons["fullleft"], self.bot.icons["left"], "📼", "🔈", self.bot.icons["right"], self.bot.icons["fullright"], self.bot.icons["stop"]]
 
         for r in reactions:
             await msg.add_reaction(r)
 
-        try:
-            reaction, user = await self.bot.wait_for("reaction_add", check=lambda reaction, user: str(reaction.emoji) in reactions and user == ctx.author and reaction.message == msg, timeout=30)
-        except asyncio.TimeoutError:
-            pass
-        else:
-            if str(reaction.emoji) == reactions[0]:
-                for r in reactions:
-                    await msg.remove_reaction(r, self.bot.user)
-                await ctx.invoke(self.bot.get_command("youtube mp4"), **{"url": url})
-            elif str(reaction.emoji) == reactions[1]:
-                for r in reactions:
-                    await msg.remove_reaction(r, self.bot.user)
-                await ctx.invoke(self.bot.get_command("youtube mp3"), **{"url": url})
+        while True:
+            try:
+                reaction, user = await self.bot.wait_for("reaction_add", check=lambda reaction, user: str(reaction.emoji) in reactions and user == ctx.author and reaction.message == msg, timeout=30)
+            except asyncio.TimeoutError:
+                pass
+            else:
+
+                if str(reaction.emoji) == reactions[0]:
+                    page = 0
+                    await msg.edit(embed=embeds[page])
+
+                elif str(reaction.emoji) == reactions[1]:
+                    if page != 0:
+                        page -=1
+                        await msg.edit(embed=embeds[page])
+
+                elif str(reaction.emoji) == reactions[2]:
+                    for r in reactions:
+                        await msg.remove_reaction(r, self.bot.user)
+                    await ctx.invoke(self.bot.get_command("youtube mp4"), **{"url": url})
+                    break
+
+                elif str(reaction.emoji) == reactions[3]:
+                    for r in reactions:
+                        await msg.remove_reaction(r, self.bot.user)
+                    await ctx.invoke(self.bot.get_command("youtube mp3"), **{"url": url})
+                    break
+
+                elif str(reaction.emoji) == reactions[4]:
+                    page +=1
+                    await msg.edit(embed=embeds[page])
+                    
+                elif str(reaction.emoji) == reactions[5]:
+                    if page != len(videos):
+                        page = len(videos)-1
+                        await msg.edit(embed=embeds[page])
 
     @youtube.command(aliases=["video"])
     @commands.cooldown(1,30,commands.BucketType.user)
@@ -322,10 +346,11 @@ class Utility(commands.Cog):
 
             start_time = datetime.datetime.utcnow()
 
-            print(ctx.command.name)
-
-            async with ctx.typing():
-                res = await download(url, "mp4")
+            try:
+                async with ctx.typing():
+                    res = await asyncio.wait_for(download(url, "mp4"), timeout=300)
+            except asyncio.TimeoutError:
+                return await ctx.reply("The download has been cancelled, as it took over 5 minutes", mention_author=False)
 
             em=discord.Embed(description=f"{self.bot.icons['loading']} Now uploading video", color=color())
             await msg.edit(embed=em)
@@ -352,8 +377,11 @@ class Utility(commands.Cog):
 
             start_time = datetime.datetime.utcnow()
 
-            async with ctx.typing():
-                res = await download(url, "mp3")
+            try:
+                async with ctx.typing():
+                    res = await asyncio.wait_for(download(url, "mp3"), timeout=300)
+            except asyncio.TimeoutError:
+                return await ctx.reply("The download has been cancelled, as it took over 5 minutes", mention_author=False)
 
             em=discord.Embed(description=f"{self.bot.icons['loading']} Now uploading audio", color=color())
             await msg.edit(embed=em)
@@ -644,6 +672,7 @@ class Utility(commands.Cog):
         except AttributeError:
             booster_role = "N/A"
         created_at = ctx.guild.created_at.strftime("%d/%m/%Y at %H:%M:%S")
+
         em=discord.Embed(title=ctx.guild.name, description=f"{description}", color=color())
         em.set_image(url=ctx.guild.banner_url)
         em.set_thumbnail(url=ctx.guild.icon_url)
@@ -665,6 +694,7 @@ class Utility(commands.Cog):
 {self.bot.icons['arrow']}Roles: `{len(ctx.guild.roles)}`
 {self.bot.icons['arrow']}Region: `{ctx.guild.region}`
 {self.bot.icons['arrow']}Created at: `{created_at}` ({humanize.naturaltime(ctx.guild.created_at)})""", inline=True)
+
         await ctx.reply(embed=em, mention_author=False)
 
     @commands.command(aliases=["ui", "whois"], description="A command to get information about the given member", usage="[@member]")
@@ -695,15 +725,18 @@ class Utility(commands.Cog):
 
         join_position = sum(member.joined_at > m.joined_at if m.joined_at is not None else "1" for m in ctx.guild.members)
 
+        badges = [str(self.bot.icons["badges"][e]) for e in list(self.bot.icons["badges"]) if dict(member.public_flags)[e] == True]
+
         em=discord.Embed(title=str(member), color=color())
         em.add_field(name="Info", value=f"""
 {self.bot.icons['arrow']}Name: {member.name}
 {self.bot.icons['arrow']}Nickname: {''.join("N/A" if member.nick is None else member.nick)}
-{self.bot.icons['arrow']}Badges: {' '.join(str(self.bot.icons["badges"][e]) for e in list(self.bot.icons["badges"]) if dict(member.public_flags)[e] == True)}
+{self.bot.icons['arrow']}Badges [{len(badges)}]: {''.join(badges if len(badges) != 0 else "N/A")}
 {self.bot.icons['arrow']}Status: {''.join(member.raw_status.title() if member.raw_status != "dnd" else "DND")}
 {self.bot.icons['arrow']}Platform: {platform}
 {self.bot.icons['arrow']}Pronouns: {pronoun}
 {self.bot.icons['arrow']}Created at: {created_at} ({humanize.naturaltime(member.created_at)})""", inline=True)
+
         em.add_field(name="Guild", value=f"""
 {self.bot.icons['arrow']}Roles: {len(member.roles)}
 {self.bot.icons['arrow']}Top Role: {top_role}
@@ -711,7 +744,19 @@ class Utility(commands.Cog):
 {self.bot.icons['arrow']}Joined at: {joined_at} ({humanize.naturaltime(member.joined_at)})""", inline=True)
         em.set_footer(text=f"ID: {member.id}", icon_url=ctx.author.avatar_url)
         em.set_thumbnail(url=member.avatar_url)
-        await ctx.reply(embed=em, mention_author=False)
+
+
+        roles = [r.mention for r in [r for r in member.roles if not r.name == "@everyone"]]
+        rolestxt = ", ".join(roles)
+        if len(rolestxt) > 2048:
+            rolesem=discord.Embed(title=f"Roles [{len(roles)}]", description=WrapText(rolestxt, length=2045)[0]+"...", color=color())
+        else:
+            rolesem=discord.Embed(title=f"Roles [{len(roles)}]", description=rolestxt, color=color())
+        rolesem.set_footer(text=f"ID: {member.id}", icon_url=ctx.author.avatar_url)
+        rolesem.set_thumbnail(url=member.avatar_url)
+
+        pag = self.bot.paginate(Paginator([em, rolesem], per_page=1))
+        await pag.start(ctx)
 
     @commands.command(aliases=["pronouns"])
     @commands.cooldown(1,5,commands.BucketType.user)
