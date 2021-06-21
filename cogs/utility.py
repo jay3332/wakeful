@@ -211,12 +211,15 @@ class Utility(commands.Cog):
     async def someone(self, ctx):
         await ctx.reply(random.choice([m for m in ctx.guild.members if not m.bot and m != ctx.author]).mention, mention_author=False)
 
+
     @commands.command()
     @commands.cooldown(1,30,commands.BucketType.user)
     async def shazam(self, ctx):
         """
         Use https://github.com/jottew/ShazamIO/ for byte support
         """
+
+        return await ctx.reply("This command has been temporarily disabled", mention_author=False)
 
         attachment = None
         if ctx.message.reference:
