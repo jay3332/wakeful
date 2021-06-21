@@ -226,7 +226,7 @@ class Admin(commands.Cog, command_attrs=dict(hidden=True)):
             em=discord.Embed(description=f"Now restarting... {self.bot.icons['loading']}", color=color())
             await msg.edit(embed=em)
             for i in list(self.bot.directorys):
-                self.bot.directorys[i].cleanup()
+                i.cleanup()
             await self.bot.db.close()
             await self.bot.session.close()
             await self.bot.close()
