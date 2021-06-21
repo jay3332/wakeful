@@ -1603,10 +1603,9 @@ class Utility(commands.Cog):
                 disabled = []
             else:
                 disabled = disabled.split(",")
-            if given_command.hidden == True or given_command.name in disabled and not is_mod(self.bot, ctx.author):
-                return await ctx.reply(f"There isn't a cog or command with the name `{command}`", mention_author=False)
-            else:
-                pass
+            if given_command.hidden == True or given_command.name in disabled :
+                if not is_mod(self.bot, ctx.author):
+                    return await ctx.reply(f"There isn't a cog or command with the name `{command}`", mention_author=False)
             #-------------------------------------
             try:
                 command_subcommands = "> " + ", ".join(f"`{command.name}`" for command in given_command.commands if not command.hidden or not command.name in disabled)
