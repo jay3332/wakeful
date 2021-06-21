@@ -195,8 +195,8 @@ class Errors(commands.Cog):
     @commands.Cog.listener()
     async def on_command(self, ctx):
         msg = await self.bot.wait_for("message", check=lambda msg: msg.author == self.bot.user and msg.reference.resolved == ctx.message)
-        await self.bot.wait_for("message_delete", check=lambda msg: msg == msg) 
-        await ctx.message.delete()
+        await self.bot.wait_for("message_delete", check=lambda msg: msg == ctx.message) 
+        await msg.delete()
 
     @commands.Cog.listener()
     async def on_command_completion(self, ctx):
