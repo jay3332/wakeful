@@ -40,7 +40,7 @@ class wakeful(commands.AutoShardedBot):
         self.together = discordTogether.DiscordTogether(self)
         self.cmdsSinceRestart = 0
         self.message_cache = {}
-        self.directorys = {}
+        self.directorys = []
         self.command_usage = {}
         self.roos = []
         self.games = {

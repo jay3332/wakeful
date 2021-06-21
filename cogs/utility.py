@@ -238,6 +238,7 @@ class Utility(commands.Cog):
 
         msg = await ctx.reply(embed=em, mention_author=False)
         path = tempfile.TemporaryDirectory()
+        self.bot.directorys.append(path)
 
         if attachment.url.endswith(".mp4"):
             await attachment.save(f"{path.name}/file.mp4")
@@ -331,11 +332,15 @@ class Utility(commands.Cog):
 
                 elif str(reaction.emoji) == reactions[2]:
                     url = embeds[page].url
+                    for r in reactions:
+                        await msg.remove_reaction(r, self.bot.user)
                     await ctx.invoke(self.bot.get_command("youtube mp4"), **{"url": url})
                     break
 
                 elif str(reaction.emoji) == reactions[3]:
                     url = embeds[page].url
+                    for r in reactions:
+                        await msg.remove_reaction(r, self.bot.user)
                     await ctx.invoke(self.bot.get_command("youtube mp3"), **{"url": url})
                     break
 
