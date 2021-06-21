@@ -330,17 +330,17 @@ class Utility(commands.Cog):
                         await msg.edit(embed=embeds[page])
 
                 elif str(reaction.emoji) == reactions[2]:
-                    for r in reactions:
-                        await msg.remove_reaction(r, self.bot.user)
                     url = embeds[page].url
                     await ctx.invoke(self.bot.get_command("youtube mp4"), **{"url": url})
+                    for r in reactions:
+                        await msg.remove_reaction(r, self.bot.user)
                     break
 
                 elif str(reaction.emoji) == reactions[3]:
-                    for r in reactions:
-                        await msg.remove_reaction(r, self.bot.user)
                     url = embeds[page].url
                     await ctx.invoke(self.bot.get_command("youtube mp3"), **{"url": url})
+                    for r in reactions:
+                        await msg.remove_reaction(r, self.bot.user)
                     break
 
                 elif str(reaction.emoji) == reactions[4]:
