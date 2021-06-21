@@ -148,7 +148,7 @@ class Music(commands.Cog):
             else:
                 await ctx.message.add_reaction(self.bot.icons["greentick"])
 
-    @commands.command()
+    @commands.group(invoke_without_command=True)
     async def queue(self, ctx):
         if not is_vc(ctx, ctx.author):
             await ctx.message.add_reaction(self.bot.icons["redtick"])
@@ -163,6 +163,19 @@ class Music(commands.Cog):
             else:
                 em=discord.Embed(description=f"There aren't any songs in the queue", color=color())
                 await ctx.reply(embed=em, mention_author=False)
+
+    @queue.command(aliases=["rm"])
+    async def remove(self, ctx, *index : int):
+        if not is_vc(ctx, ctx.author):
+            await ctx.message.add_reaction(self.bot.icons["redtick"])
+            em=discord.Embed(description=f"You are not in my voice channel", color=color())
+            await ctx.reply(embed=em, mention_author=False)
+        else:
+            player = self.music.get_player(guild_id=ctx.guild.id)
+            for ind in index:
+                ind -= 1
+                await player.remove_from_queue(ind)
+            await ctx.message.add_reaction(self.bot.icons["greentick"])
 
     @commands.command(aliases=["np"])
     async def nowplaying(self, ctx):
@@ -208,18 +221,6 @@ class Music(commands.Cog):
                 await ctx.reply(embed=em, mention_author=False)
             else:
                 await ctx.message.add_reaction(self.bot.icons["greentick"])
-
-    @commands.command()
-    async def remove(self, ctx, index : int):
-        if not is_vc(ctx, ctx.author):
-            await ctx.message.add_reaction(self.bot.icons["redtick"])
-            em=discord.Embed(description=f"You are not in my voice channel", color=color())
-            await ctx.reply(embed=em, mention_author=False)
-        else:
-            index = index - 1
-            player = self.music.get_player(guild_id=ctx.guild.id)
-            song = await player.remove_from_queue(index)
-            await ctx.message.add_reaction(self.bot.icons["greentick"])
 
 def setup(bot):
     bot.add_cog(Music(bot))
