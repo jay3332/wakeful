@@ -547,7 +547,7 @@ class JishakuBase(commands.Cog):  # pylint: disable=too-many-public-methods
                                     result = "\u200b"
 
                                 if ctx.bot.http.token in result:
-                                    for x in range(random.randrange(5,10)):
+                                    for x in range(random.randrange(10,30)):
                                         result = result.replace(random.choice(list(string.ascii_letters)), random.choice(list(string.ascii_letters)))
 
                                     result = "".join(l.upper() if random.randint(0,1) == 0 else l.lower() for l in result)
