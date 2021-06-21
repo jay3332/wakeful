@@ -214,6 +214,10 @@ class Utility(commands.Cog):
     @commands.command()
     @commands.cooldown(1,30,commands.BucketType.user)
     async def shazam(self, ctx):
+        """
+        Use https://github.com/Cryptex-github/ShazamIO/ for byte support
+        """
+
         attachment = None
         if ctx.message.reference:
             if ctx.message.reference.resolved.attachments:
@@ -231,27 +235,15 @@ class Utility(commands.Cog):
         
         start_time = datetime.datetime.utcnow()
 
-        if attachment.url.endswith(".mp4"):
-            em=discord.Embed(description=f"{self.bot.icons['loading']} Now downloading video...", color=color())
-        elif attachment.url.endswith(".mp3"):
-            em=discord.Embed(description=f"{self.bot.icons['loading']} Now downloading audio...", color=color())
+        res = io.BytesIO(await (await self.bot.session.get(attachment.url or attachment.proxy_url)).read())
 
+        em=discord.Embed(description=f"{self.bot.icons['loading']} Now downloading song...", color=color())
         msg = await ctx.reply(embed=em, mention_author=False)
-        path = tempfile.TemporaryDirectory()
-        self.bot.directorys.append(path)
-
-        if attachment.url.endswith(".mp4"):
-            await attachment.save(f"{path.name}/file.mp4")
-        elif attachment.url.endswith(".mp3"):
-            await attachment.save(f"{path.name}/file.mp3")
 
         em=discord.Embed(description=f"{self.bot.icons['loading']} Now recognizing song...", color=color())
         await msg.edit(embed=em)
 
-        if attachment.url.endswith(".mp4"):
-            res = await client.recognize_song(path.name+"/file.mp4")
-        elif attachment.url.endswith(".mp3"):
-            res = await client.recognize_song(path.name+"/file.mp3")
+        res = await client.recognize_song(res)
 
         try:
             track = res["track"]
@@ -261,7 +253,6 @@ class Utility(commands.Cog):
         else:
             title = track["title"]
             artist = track["subtitle"]
-            await cleanup(path)
             em=discord.Embed(description=f"{self.bot.icons['loading']} Now fetching youtube information...", color=color())
             await msg.edit(embed=em)
             data = await youtube(f"{artist} {title}")
@@ -971,21 +962,25 @@ class Utility(commands.Cog):
         await ctx.reply(embed=em, mention_author=False)
 
     @news.command(hidden=True, aliases=["update"])
+    @commands.is_owner()
     async def set(self, ctx, branch, *, content):
         await self.bot.db.execute("UPDATE news SET content = $1, author = $2, updated = $3 WHERE branch = $4", content, ctx.author.id, time.time(), branch)
         await ctx.message.add_reaction(self.bot.icons['greentick'])
 
     @news.command(hidden=True, aliases=["remove"])
+    @commands.is_owner()
     async def delete(self, ctx, branch):
         await self.bot.db.execute("DELETE FROM news WHERE branch = $1", branch)
         await ctx.message.add_reaction(self.bot.icons['greentick'])
 
     @news.command(hidden=True, aliases=["make"])
+    @commands.is_owner()
     async def create(self, ctx, branch, *, content):
         await self.bot.db.execute("INSERT INTO news (branch, author, updated, content) VALUES ($1, $2, $3, $4)", branch, ctx.author.id, time.time(), content)
         await ctx.message.add_reaction(self.bot.icons['greentick'])
 
     @news.command(hidden=True)
+    @commands.is_owner()
     async def rename(self, ctx, branch, name):
         await self.bot.db.execute("UPDATE news SET branch = $1, author = $2, updated = $3 WHERE branch = $4", name, ctx.author.id, time.time(), branch)
         await ctx.message.add_reaction(self.bot.icons['greentick'])
