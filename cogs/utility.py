@@ -1826,7 +1826,7 @@ class Utility(commands.Cog):
         f = await getFile(content)
         await ctx.reply(file=f, mention_author=False)
 
-    @commands.group(invoke_without_command=True)
+    @commands.group(invoke_without_command=True, aliases=["mc"])
     @commands.cooldown(1,10,commands.BucketType.user)
     async def minecraft(self, ctx, username):
         uid = await self.bot.session.get(f"https://api.mojang.com/users/profiles/minecraft/{username}")
