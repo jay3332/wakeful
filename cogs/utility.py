@@ -373,7 +373,7 @@ class Utility(commands.Cog):
                 em=discord.Embed(title=channel["title"], descritpion=" ".join(text["text"] for text in channel["descriptionSnippet"]), url=url, color=color())
             else:
                 em=discord.Embed(title=channel["title"], url=url, color=color())
-            em.add_field(name="Videos", value="".join(channel['viewCount'] if channel['viewCount'] is not None else "0"), inline=True)
+            em.add_field(name="Videos", value="".join(channel['videoCount'] if channel['videoCount'] is not None else "0"), inline=True)
             em.add_field(name="Subscribers", value="".join(channel['subscribers'] if channel['subscribers'] is not None else "0"), inline=True)
             em.set_thumbnail(url=thumbnail)
             embeds.append(em)
