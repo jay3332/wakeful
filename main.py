@@ -102,9 +102,11 @@ class wakeful(commands.AutoShardedBot):
 
         for i in prefix:
             if msg.content.startswith(i):
-                if self.maintainance:
+                if self.maintainance == True:
                     if not is_mod(self, msg.author):
-                        return await msg.channel.reply("This bot is currently under maintainance, please wait", mention_author=False)
+                        return await msg.reply("This bot is currently under maintainance, please wait", mention_author=False)
+                    else:
+                        pass
                 if msg.guild is not None:
                     try:
                         command = msg.content.split(i)
