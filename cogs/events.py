@@ -15,7 +15,7 @@ class Errors(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message_edit(self, before, after):
-        if after != before:
+        if after.content != before.content:
             await self.bot.process_commands(after)
 
     @commands.Cog.listener()
@@ -191,6 +191,12 @@ class Errors(commands.Cog):
         em.set_thumbnail(url=guild.icon_url)
         em.set_footer(text=f"ID: {guild.id}")
         await webhook.send(embed=em)
+ 
+    @commands.Cog.listener()
+    async def on_command(self, ctx):
+        msg = await self.bot.wait_for("message", check=lambda msg: msg.author == self.bot.user and msg.reference.resolved == ctx.message)
+        await self.bot.wait_for("message_delete", check=lambda msg: msg == msg) 
+        await ctx.message.delete()
 
     @commands.Cog.listener()
     async def on_command_completion(self, ctx):
