@@ -56,7 +56,7 @@ def download_emojis(emojis : tuple):
     return discord.File(file_, "emojis.zip")
 
 @executor_function
-def download(url, method = "mp4"):
+def download(title, url, method = "mp4"):
 
     try:
         video = pytube.YouTube(str(url))
@@ -74,7 +74,7 @@ def download(url, method = "mp4"):
 
     buffer.seek(0)
 
-    file_ = discord.File(buffer, filename="".join("video.mp4" if method == "mp4" else "audio.mp3"))
+    file_ = discord.File(buffer, filename="".join(f"{title}.mp4" if method == "mp4" else f"{title}.mp3"))
 
     return file_
 
@@ -353,6 +353,7 @@ class Utility(commands.Cog):
                         await msg.edit(embed=embeds[page])
 
                 elif str(reaction.emoji) == reactions[6]:
+                    break
                     await msg.delete()
 
     @youtube.command(aliases=["video"])
@@ -366,9 +367,11 @@ class Utility(commands.Cog):
 
             start_time = datetime.datetime.utcnow()
 
+            title = (await youtube(url))["title"]
+
             try:
                 async with ctx.typing():
-                    res = await asyncio.wait_for(download(url, "mp4"), timeout=300)
+                    res = await asyncio.wait_for(download(title, url, "mp4"), timeout=300)
             except asyncio.TimeoutError:
                 return await ctx.reply("The download has been cancelled, as it took over 5 minutes", mention_author=False)
 
@@ -397,9 +400,11 @@ class Utility(commands.Cog):
 
             start_time = datetime.datetime.utcnow()
 
+            title = (await youtube(url))["title"]
+
             try:
                 async with ctx.typing():
-                    res = await asyncio.wait_for(download(url, "mp3"), timeout=300)
+                    res = await asyncio.wait_for(download(title, url, "mp3"), timeout=300)
             except asyncio.TimeoutError:
                 return await ctx.reply("The download has been cancelled, as it took over 5 minutes", mention_author=False)
 
