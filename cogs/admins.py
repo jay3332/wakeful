@@ -211,6 +211,16 @@ class Admin(commands.Cog, command_attrs=dict(hidden=True)):
             em=discord.Embed(description="I've disabled empty prefix", color=color())
         await ctx.reply(embed=em, mention_author=False)
 
+    @developer.command(hidden=True)
+    @commands.is_owner()
+    async def maintainance(self, ctx):
+        self.bot.emptyPrefix = not self.bot.emptyPrefix
+        if self.bot.emptyPrefix == True:
+            em=discord.Embed(description="I've enabled maintainance mode", color=color())
+        else:
+            em=discord.Embed(description="I've disabled maintainance mode", color=color())
+        await ctx.reply(embed=em, mention_author=False)
+
     @developer.command(hidden=True, aliases=["rs"])
     @commands.is_owner()
     async def restart(self, ctx):
