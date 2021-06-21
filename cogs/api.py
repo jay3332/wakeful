@@ -24,7 +24,7 @@ class API(commands.Cog):
 
     @commands.command()
     @commands.cooldown(1,5,commands.BucketType.user)
-    async def window(self, ctx, name : str, *, text : codeblock_converter):
+    async def window(self, ctx, *, text : codeblock_converter):
         url = get_config("SECRET_API")
         data = {
             "paddingVertical": "56px",
@@ -38,7 +38,7 @@ class API(commands.Cog):
             "dropShadowBlurRadius": "68px",
             "theme": "vscode",
             "windowTheme": "none",
-            "language": "auto",
+            "language": "".join(text.language if text.language is not None else "auto"),
             "fontFamily": "Hack",
             "fontSize": "14px",
             "lineHeight": "133%",
@@ -50,15 +50,15 @@ class API(commands.Cog):
             "watermark": False,
             "squaredImage": False,
             "hiddenCharacters": False,
-            "name": name,
+            "name": "",
             "width": 680,
             "code": text.content,
         }
         async with ctx.typing():
             img = io.BytesIO(await (await self.bot.session.post(url, json=data)).read())
         em=discord.Embed(color=color())
-        em.set_image(url=f"attachment://{name}.png")
-        await ctx.reply(embed=em, file=discord.File(img, filename=f"{name}.png"), mention_author=False)
+        em.set_image(url=f"attachment://window.png")
+        await ctx.reply(embed=em, file=discord.File(img, filename=f"window.png"), mention_author=False)
 
     @commands.command()
     @commands.cooldown(1,5,commands.BucketType.user)
