@@ -215,7 +215,7 @@ class Utility(commands.Cog):
     @commands.cooldown(1,30,commands.BucketType.user)
     async def shazam(self, ctx):
         """
-        Use https://github.com/Cryptex-github/ShazamIO/ for byte support
+        Use https://github.com/jottew/ShazamIO/ for byte support
         """
 
         attachment = None
@@ -235,10 +235,10 @@ class Utility(commands.Cog):
         
         start_time = datetime.datetime.utcnow()
 
-        res = io.BytesIO(await (await self.bot.session.get(attachment.url or attachment.proxy_url)).read())
-
         em=discord.Embed(description=f"{self.bot.icons['loading']} Now downloading song...", color=color())
         msg = await ctx.reply(embed=em, mention_author=False)
+
+        res = io.BytesIO(await (await self.bot.session.get(attachment.url or attachment.proxy_url)).read())
 
         em=discord.Embed(description=f"{self.bot.icons['loading']} Now recognizing song...", color=color())
         await msg.edit(embed=em)
