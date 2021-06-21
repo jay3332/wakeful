@@ -204,8 +204,8 @@ class Admin(commands.Cog, command_attrs=dict(hidden=True)):
     @developer.command(hidden=True)
     @commands.is_owner()
     async def prefix(self, ctx):
-        self.bot.emptyPrefix = not self.bot.emptyPrefix
-        if self.bot.emptyPrefix == True:
+        self.bot.emptyPrefix = not self.bot.maintainance
+        if self.bot.maintainance == True:
             em=discord.Embed(description="I've enabled empty prefix", color=color())
         else:
             em=discord.Embed(description="I've disabled empty prefix", color=color())
