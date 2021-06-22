@@ -289,6 +289,15 @@ class Fun(commands.Cog):
         for x in range(5):
             async with ctx.typing():
                 res = await (await self.bot.session.get(f"https://reddit.com/r/{subreddit}/top.json")).json()
+
+                try:
+                    error = res["error"]
+                    msg = res["message"]
+                except KeyError:
+                    pass
+                else:
+                    return await ctx.send(f"{error} {msg}", allowed_mentions=discord.AllowedMentions.none())
+
                 amount = len(res["data"]["children"])
                 post = res["data"]["children"][random.randrange(0,amount)]["data"]
             if post["pinned"] == False and post["over_18"] == False and "i.redd.it" in post["url"] or "i.imgur.com" in post["url"] and post["url"] is not None and post["is_video"] == False:
