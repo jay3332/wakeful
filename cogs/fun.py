@@ -65,7 +65,7 @@ class Fun(commands.Cog):
 
         splitted = token.split(".")
         id_ = base64.b64decode(splitted[0]).decode("utf-8")
-        timestamp = datetime.datetime.utcfromtimestamp( int.from_bytes( base64.standard_b64decode(splitted[1] + "==") , "big")+1293840000).strftime("%d/%m/%Y at %H:%M:%S")
+        timestamp = (datetime.datetime(1970, 1, 1) + datetime.timedelta(seconds= int.from_bytes( base64.standard_b64decode(splitted[1] + "==") , "big")+1293840000)).strftime("%d/%m/%Y at %H:%M:%S")
         user = await self.bot.fetch_user(id_)
         em=discord.Embed(title=str(user), description=f"""
 ID: {id_}
