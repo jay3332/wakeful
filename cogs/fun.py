@@ -277,9 +277,7 @@ class Fun(commands.Cog):
                             "youngpeopleyoutube",
                             "comedyheaven",
                             "ksi",
-                            "suddenlygay",
                             "oddlysatisfying",
-                            "unexpected",
                             "softwaregore",
                             "earthporn",
                             "nextfuckinglevel"
@@ -310,7 +308,7 @@ class Fun(commands.Cog):
                 em.set_footer(text=f"👍 {upvotes}• 💬 {comments}", icon_url=ctx.author.avatar_url)
                 em.set_image(url=url)
                 return await ctx.reply(embed=em, mention_author=False)
-        return await ctx.send("I couldn't find a valid post after 5 times of iterating")
+        return await ctx.send(f"I couldn't find a valid post after 5 times of iterating r/{subreddit}", allowed_mentions=discord.AllowedMentions.none())
 
     @commands.command(aliases=["typerace"])
     @commands.guild_only()
