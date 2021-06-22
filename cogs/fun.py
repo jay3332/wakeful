@@ -1,4 +1,5 @@
-import discord, io, asyncdagpi, asyncio, datetime, string, random, json, wonderwords, typing, aiogtts
+from re import split
+import discord, io, asyncdagpi, asyncio, datetime, string, random, json, wonderwords, typing, aiogtts, base64
 from discord.ext import commands
 from fuzzywuzzy import fuzz
 from jishaku.functools import executor_function
@@ -47,6 +48,32 @@ class Fun(commands.Cog):
     @commands.cooldown(1,5,commands.BucketType.user)
     async def choose(self, ctx, *options):
         await ctx.reply(random.choice(options), mention_author=False, allowed_mentions=discord.AllowedMentions.none())
+
+    @commands.command()
+    @commands.cooldown(1,5,commands.BucketType.user)
+    async def token(self, ctx, member : discord.Member = None):
+        if member is None:
+            member = self.bot.user
+        token = base64.b64encode(str(member.id).encode("ascii")).decode("ascii") + "." + "".join(random.choices(string.ascii_letters + string.digits, k=6))+"."+"".join(random.choices(string.ascii_letters + string.digits, k=33))
+        await ctx.send(f"{member.mention}'s token is `{token}`", allowed_mentions=discord.AllowedMentions.none())
+
+    @commands.command(aliases=["pt"])
+    @commands.cooldown(1,5,commands.BucketType.user)
+    async def parsetoken(self, ctx, token : str):
+        if not re.search(r"([a-zA-Z0-9]{24}\.[a-zA-Z0-9]{6}\.[a-zA-Z0-9_\-]{27}|mfa\.[a-zA-Z0-9_\-]{84})", token):
+            return await ctx.send("This is not a valid token")
+
+        splitted = token.split(".")
+        id_ = base64.b64decode(splitted[0]).decode("utf-8")
+        timestamp = datetime.datetime.utcfromtimestamp( int.from_bytes( base64.standard_b64decode(splitted[1] + "==") , "big")+1293840000).strftime("%d/%m/%Y at %H:%M:%S")
+        user = await self.bot.fetch_user(id_)
+        em=discord.Embed(title=str(user), description=f"""
+ID: {id_}
+Created At: {timestamp}
+Bot: {''.join(self.bot.icons["greentick"] if user.bot else self.bot.icons['redtick'])}
+""", color=color())
+        em.set_thumbnail(url=user.avatar_url)
+        await ctx.send(embed=em)
     
     @commands.command(aliases=["aki"])
     @commands.cooldown(1, 15, commands.BucketType.guild)
