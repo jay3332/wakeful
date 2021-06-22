@@ -285,7 +285,7 @@ class Fun(commands.Cog):
                             "nextfuckinglevel"
                             ])
         if subreddit.startswith("r/"):
-            subreddit = subreddit.strip("r/")
+            subreddit = subreddit[2:]
         for x in range(5):
             async with ctx.typing():
                 res = await (await self.bot.session.get(f"https://reddit.com/r/{subreddit}/top.json")).json()
