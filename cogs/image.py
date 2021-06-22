@@ -52,7 +52,7 @@ class Image(commands.Cog):
             em.set_image(url=f"attachment://{ctx.command.name}.png")
         await ctx.send(file=file, embed=em)
 
-    @commands.command(aliases=["amhu")
+    @commands.command(aliases=["amhu"])
     @commands.cooldown(1,10,commands.BucketType.user)
     async def allmyhomiesuse(self, ctx, bad : str, good : str):
         async with ctx.typing():
