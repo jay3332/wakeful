@@ -81,7 +81,7 @@ class Fun(commands.Cog):
 {self.bot.icons['arrow']}Token Created At: {timestamp}
 {self.bot.icons['arrow']}Account Created At: {user.created_at.strftime("%d/%m/%Y at %H:%M:%S")}
 {self.bot.icons['arrow']}Pronouns: {pronoun}
-{self.bot.icons['arrow']}Badges: {' '.join(badges)}
+{self.bot.icons['arrow']}Badges: {' '.join(badges if len(badges) != 0 else "N/A")}
 {self.bot.icons['arrow']}Bot: {''.join(self.bot.icons["greentick"] if user.bot else self.bot.icons['redtick'])}
 """, color=color())
         em.set_thumbnail(url=user.avatar_url)
