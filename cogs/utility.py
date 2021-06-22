@@ -394,7 +394,12 @@ class Utility(commands.Cog):
 
             start_time = datetime.datetime.utcnow()
 
-            title = (await youtube(url))["title"]
+            res = await youtube(url)
+
+            if res is None:
+                return await ctx.send("I could not find any results for this video, for some reason")
+
+            title = res["title"]
 
             try:
                 async with ctx.typing():
@@ -427,7 +432,12 @@ class Utility(commands.Cog):
 
             start_time = datetime.datetime.utcnow()
 
-            title = (await youtube(url))["title"]
+            res = await youtube(url)
+
+            if res is None:
+                return await ctx.send("I could not find any results for this video, for some reason")
+
+            title = res["title"]
 
             try:
                 async with ctx.typing():
