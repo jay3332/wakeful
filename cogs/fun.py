@@ -278,7 +278,7 @@ class Fun(commands.Cog):
                             "comedyheaven",
                             "ksi",
                             "suddenlygay",
-                            "oddlysatifying",
+                            "oddlysatisfying",
                             "unexpected",
                             "softwaregore",
                             "earthporn",
