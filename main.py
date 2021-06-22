@@ -1,8 +1,8 @@
-import discord, os, datetime, json, asyncio, aiohttp, pwd, asyncpg, logging, coloredlogs, discordTogether, random, string
-from discord.ext.commands.bot import when_mentioned_or
+import discord, os, datetime, json, aiohttp, pwd, asyncpg, logging, coloredlogs, discordTogether
 from discord.ext import commands, tasks
 from colorama import Fore
 from utils import menus
+from utils.context import SusContext
 from utils.checks import is_blacklisted, is_mod
 from utils.get import *
 
@@ -58,6 +58,9 @@ class wakeful(commands.AutoShardedBot):
 
     def paginate(self, paginator):
         return menus.MenuPages(paginator)
+
+    async def get_context(self, message, *, cls=SusContext):
+        return await super().get_context(message, cls=cls)
     class roo():
 
         def __init__(self, bot):
@@ -107,6 +110,7 @@ class wakeful(commands.AutoShardedBot):
                         return await msg.reply("This bot is currently under maintainance, please wait", mention_author=False)
                     else:
                         pass
+                    
                 if msg.guild is not None:
                     try:
                         command = msg.content.split(i)

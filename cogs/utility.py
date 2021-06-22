@@ -63,8 +63,8 @@ def download(title, url, method = "mp4"):
     except Exception as exc:
         raise NotFound(exc)
 
-    if video.length > 600:
-        raise TooLong("The video cannot be longer than 10 minutes.")
+    if video.length > 1200:
+        raise TooLong("The video cannot be longer than 20 minutes.")
     buffer = io.BytesIO()
     
     if method == "mp4":
@@ -316,8 +316,9 @@ class Utility(commands.Cog):
             else:
 
                 if str(reaction.emoji) == reactions[0]:
-                    page = 0
-                    await msg.edit(embed=embeds[page])
+                    if len(videos) != 1:
+                        page = 0
+                        await msg.edit(embed=embeds[page])
 
                 elif str(reaction.emoji) == reactions[1]:
                     if page != 0:
@@ -339,8 +340,9 @@ class Utility(commands.Cog):
                     break
 
                 elif str(reaction.emoji) == reactions[4]:
-                    page +=1
-                    await msg.edit(embed=embeds[page])
+                    if len(videos) != 1:
+                        page +=1
+                        await msg.edit(embed=embeds[page])
 
                 elif str(reaction.emoji) == reactions[5]:
                     if page != len(videos):
@@ -796,7 +798,6 @@ class Utility(commands.Cog):
         em.set_footer(text=f"ID: {member.id}", icon_url=ctx.author.avatar_url)
         em.set_thumbnail(url=member.avatar_url)
 
-
         roles = [r.mention for r in [r for r in member.roles if not r.name == "@everyone"]]
         rolestxt = ", ".join(roles)
         if len(rolestxt) > 2048:
@@ -806,7 +807,20 @@ class Utility(commands.Cog):
         rolesem.set_footer(text=f"ID: {member.id}", icon_url=ctx.author.avatar_url)
         rolesem.set_thumbnail(url=member.avatar_url)
 
-        pag = self.bot.paginate(Paginator([em, rolesem], per_page=1))
+        avatar_png = member.avatar_url_as(format="png")
+        avatar_jpg = member.avatar_url_as(format="jpg")
+        avatar_jpeg = member.avatar_url_as(format="jpeg")
+        avatar_webp = member.avatar_url_as(format="webp")
+        if member.is_avatar_animated():
+            avatar_gif = member.avatar_url_as(format="gif")
+        if member.is_avatar_animated():
+            avatarem=discord.Embed(description=f"[png]({avatar_png}) | [jpg]({avatar_jpg}) | [jpeg]({avatar_jpeg}) | [webp]({avatar_webp}) | [gif]({avatar_gif})", color=color())
+        else:
+            avatarem=discord.Embed(description=f"[png]({avatar_png}) | [jpg]({avatar_jpg}) | [jpeg]({avatar_jpeg}) | [webp]({avatar_webp})", color=color())
+        avatarem.set_image(url=member.avatar_url)
+        avatarem.set_author(name=f"{member}", icon_url=member.avatar_url)
+
+        pag = self.bot.paginate(Paginator([em, rolesem, avatarem], per_page=1))
         await pag.start(ctx)
 
     @commands.command(aliases=["pronouns"])
@@ -1134,7 +1148,7 @@ class Utility(commands.Cog):
     async def presence(self, ctx, member : discord.Member = None):
         if member is None:
             member = ctx.author
-        em=discord.Embed(title=f"{member.name}'s activities", color=color())
+        embeds = []
         for activity in member.activities:
             if isinstance(activity, discord.activity.Spotify):
                 artists = ", ".join(artist for artist in activity.artists)
@@ -1143,66 +1157,51 @@ class Utility(commands.Cog):
                 hours = days * 24 + seconds // 3600
                 minutes = (seconds % 3600) // 60
                 seconds = seconds % 60
-                em.add_field(
-                    name=f"Spotify",
-                    value=f"""
+                em=discord.Embed(title="Spotify", description=f"""
 {self.bot.icons['arrow']}Title: `{activity.title}`
-{self.bot.icons['arrow']}URL: [Click here](https://open.spotify.com/track/{activity.track_id})
 {self.bot.icons['arrow']}Artists: `{artists}`
 {self.bot.icons['arrow']}Album: `{activity.album}`
 {self.bot.icons['arrow']}Duration: `{minutes}`m `{seconds}`s
-""",
-                    inline=True
-                )
+""", url=f"https://open.spotify.com/track/{activity.track_id}", color=color())
                 em.set_thumbnail(url=activity.album_cover_url)
+                embeds.append(em)
             elif isinstance(activity, discord.activity.CustomActivity):
-                if activity.emoji != None:
-                    emoji = f"[url]({activity.emoji.url})"
+                if activity.emoji is not None:
                     emojiName = f"`{activity.emoji.name}`"
                 else:
-                    emoji = "`None`"
-                    emojiName = "`None`"
-                em.add_field(
-                    name="Custom",
-                    value=f"""
+                    emojiName = "`N/A`"
+                em=discord.Embed(title="Custom", description=f"""
 {self.bot.icons['arrow']}Text: `{activity.name}`
 {self.bot.icons['arrow']}Emoji Name: {emojiName}
-{self.bot.icons['arrow']}Emoji: {emoji}
-""",
-                    inline=True
-                )
+""", color=color())
+                if activity.emoji is not None:
+                    em.set_thumbnail(url=activity.emoji.url)
+                embeds.append(em)
             elif isinstance(activity, discord.activity.Game):
-                em.add_field(
-                    name="Game",
-                    value=f"{self.bot.icons['arrow']}Name: `{activity.name}`",
-                    inline=True
-                )
+                em=discord.Embed(title="Game", description=f"{self.bot.icons['arrow']}Name: `{activity.name}`", color=color())
+                embeds.append(em)
             elif isinstance(activity, discord.activity.Streaming):
-                em.add_field(
-                    name="Stream",
-                    value=f"""
+                em=discord.Embed(title="Stream", description=f"""
 {self.bot.icons['arrow']}Title: `{activity.name}`
 {self.bot.icons['arrow']}Platform: `{activity.platform}`
 {self.bot.icons['arrow']}URL: [{activity.url.split("/")[3]}]({activity.url})
-""", inline=True
-                )
+""", color=color())
+                embeds.append(em)
             else:
                 try:
                     type = str(activity.type).lower().split("activitytype.")[1].title()
                 except Exception:
                     type = "N/A"
-                em.add_field(
-                    name="Unknown",
-                    value=f"""
+                em=discord.Embed(title="Unknown", description=f"""
 {self.bot.icons['arrow']}Name: `{activity.name}`
 {self.bot.icons['arrow']}Details: `{activity.details}`
 {self.bot.icons['arrow']}Emoji: `{activity.emoji}`
 {self.bot.icons['arrow']}Type: `{type}`
-""",
-                    inline=True
-                )
+""", color=color())
+                embeds.append(em)
         
-        await ctx.reply(embed=em, mention_author=False)
+        pag = self.bot.paginate(Paginator(embeds, per_page=1))
+        await pag.start(ctx)
 
     @commands.group(name="qr", invoke_without_command=True)
     @commands.cooldown(1,5,commands.BucketType.user)

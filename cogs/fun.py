@@ -1,12 +1,10 @@
-from discord.mentions import AllowedMentions
-from utils.errors import TooLong
-from utils.checks import gameRunning
-import discord, io, asyncdagpi, asyncio, datetime, string, random, json, wonderwords, typing
+import discord, io, asyncdagpi, asyncio, datetime, string, random, json, wonderwords, typing, aiogtts
 from discord.ext import commands
 from fuzzywuzzy import fuzz
-from gtts import gTTS
 from jishaku.functools import executor_function
 from utils.get import *
+from utils.checks import *
+from utils.errors import *
 from utils.functions import *
 from akinator.async_aki import Akinator
 from cogs.music import is_vc
@@ -14,19 +12,6 @@ from cogs.utility import cleanup, make
 
 dagpi = asyncdagpi.Client(get_config("DAGPI"))
 akin = Akinator()
-
-@executor_function
-def do_tts(message):
-    array = io.BytesIO()
-    tts = gTTS(text=message, lang="en")
-    tts.write_to_fp(array)
-    array.seek(0)
-    return array
-
-@executor_function
-def vctts(message, path):
-    res = gTTS(text=message, lang="en")
-    res.save(f"{path.name}/file.wav")
 
 @executor_function
 def typeracer(img, sentence):
@@ -51,66 +36,17 @@ class Fun(commands.Cog):
     async def tts(self, ctx, *, message):
         if len(message) > 500:
             raise TooLong("The text can't be over 500 characters long")
+
+        buffer = io.BytesIO()
         async with ctx.typing():
-            file = await do_tts(message)
-        await ctx.reply(file=discord.File(file, f"{message}.wav"), mention_author=False)
-
-    @commands.group(aliases=["vctts"], invoke_without_command=True)
-    @commands.cooldown(1, 5, commands.BucketType.user)
-    async def voicechattts(self, ctx, *, message):
-        if len(message) > 500:
-            raise TooLong("The text can't be over 500 characters long")
-            
-        if not is_vc(ctx, ctx.author):
-            await ctx.message.add_reaction(self.bot.icons["redtick"])
-            em=discord.Embed(description=f"You are not in my voice channel", color=color())
-            return await ctx.reply(embed=em, mention_author=False)
-
-        path = await make()
-
-        async with ctx.typing():
-            await vctts(message, path)
-
-        try:
-            await ctx.author.voice.channel.connect()
-        except AttributeError:
-            em=discord.Embed(description="You have to join a voice channel to use this command", color=color())
-            return await ctx.reply(embed=em, mention_author=False)
-        except discord.ClientException:
-            pass
-        else:
-            await ctx.guild.change_voice_state(channel=ctx.author.voice.channel, self_deaf=True)
-
-        source = discord.PCMVolumeTransformer(discord.FFmpegPCMAudio(f"{path.name}/file.wav"), volume=100)
-        
-        try:
-            ctx.voice_client.play(source, after=lambda e: '')
-        except discord.ClientException as exc:
-            await ctx.message.add_reaction(self.bot.icons["redtick"])
-            return await ctx.reply(str(exc), mention_author=False, AllowedMentions=discord.AllowedMentions.none())
-
-        await ctx.message.add_reaction(self.bot.icons["greentick"])
+            await aiogtts.aiogTTS().write_to_fp(message, buffer, slow=True, lang="en")
+        buffer.seek(0)
+        await ctx.reply(file=discord.File(buffer, f"{message}.mp3"), mention_author=False)
 
     @commands.command(aliases=["pick"])
     @commands.cooldown(1,5,commands.BucketType.user)
     async def choose(self, ctx, *options):
         await ctx.reply(random.choice(options), mention_author=False, allowed_mentions=discord.AllowedMentions.none())
-
-    @voicechattts.command(name="stop")
-    @commands.cooldown(1, 5, commands.BucketType.user)
-    async def _stop(self, ctx):
-        if not is_vc(ctx, ctx.author) and ctx.voice_client is not None:
-            await ctx.message.add_reaction(self.bot.icons["redtick"])
-            em=discord.Embed(description=f"You are not in my voice channel", color=color())
-            return await ctx.reply(embed=em, mention_author=False)
-
-        if not ctx.voice_client.is_playing():
-            await ctx.message.add_reaction(self.bot.icons["redtick"])
-            em=discord.Embed(description=f"I am currently not playing anything", color=color())
-            return await ctx.reply(embed=em, mention_author=False)
-
-        ctx.voice_client.stop()
-        await ctx.message.add_reaction(self.bot.icons["greentick"])
     
     @commands.command(aliases=["aki"])
     @commands.cooldown(1, 15, commands.BucketType.guild)
@@ -350,6 +286,43 @@ class Fun(commands.Cog):
             await ctx.reply(embed=em, mention_author=False)
         else:
             await ctx.reinvoke()
+
+    @commands.command(aliases=["r"])
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    async def reddit(self, ctx, subreddit : str = None):
+        if subreddit is None:
+            subreddit = random.choice([
+                            "memes",
+                            "art",
+                            "unixporn",
+                            "youngpeopleyoutube",
+                            "comedyheaven",
+                            "ksi",
+                            "suddenlygay",
+                            "oddlysatifying",
+                            "unexpected",
+                            "softwaregore",
+                            "earthporn",
+                            "nextfuckinglevel"
+                            ])
+        if subreddit.startswith("r/"):
+            subreddit = subreddit.strip("r/")
+        for x in range(5):
+            async with ctx.typing():
+                res = await (await self.bot.session.get(f"https://reddit.com/r/{subreddit}/top.json")).json()
+                amount = len(res["data"]["children"])
+                post = res["data"]["children"][random.randrange(0,amount)]["data"]
+            if post["pinned"] == False and post["over_18"] == False and not "youtu" in post["url"] and post["is_video"] == False:
+                title = post["title"]
+                url = post["url"]
+                permalink = post["permalink"]
+                upvotes = post["ups"]
+                comments = post["num_comments"]
+                em = discord.Embed(title=f"r/{subreddit}", description=title, url=f"https://reddit.com{permalink}", color=color())
+                em.set_footer(text=f"👍 {upvotes}• 💬 {comments}", icon_url=ctx.author.avatar_url)
+                em.set_image(url=url)
+                return await ctx.reply(embed=em, mention_author=False)
+        return await ctx.send("I couldn't find a valid post after 5 times of iterating")
 
     @commands.command(aliases=["typerace"])
     @commands.guild_only()

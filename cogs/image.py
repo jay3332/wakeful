@@ -317,7 +317,7 @@ class Image(commands.Cog):
 
     @commands.command()
     @commands.cooldown(1,10,commands.BucketType.user)
-    async def captcha(self, ctx, member : typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None, *, text : str, ):
+    async def captcha(self, ctx, text : str, member : typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
         url = await getImage(ctx, member)
         async with ctx.typing():
             img = await dagpi.image_process(asyncdagpi.ImageFeatures.captcha(), url=str(url), text=text)

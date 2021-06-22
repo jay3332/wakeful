@@ -22,17 +22,6 @@ class Miscellaneous(commands.Cog):
             data = svg.make_blob("png")
         return io.BytesIO(data)
 
-    @executor_function
-    def emojitoimg(self, emoji):
-        with Image.new('RGBA', (400, 400), 0) as image:
-            font = ImageFont.truetype('data/font.ttf', 24)
-            with Pilmoji(image) as pilmoji:
-                pilmoji.text((0,0), str(emoji), (0, 0, 0), font, emoji_position_offset=(0, 5), emoji_size_factor=16.7)
-        buffer = io.BytesIO()
-        image.save(buffer, "png")
-        buffer.seek(0)
-        return buffer
-
     @commands.command(aliases=["svg2png"])
     @commands.cooldown(1,5,commands.BucketType.user)
     async def svgtopng(self, ctx, attachment : str = None):
@@ -75,13 +64,6 @@ class Miscellaneous(commands.Cog):
             res = await (await self.bot.session.get(str(emoji))).read()
 
         await ctx.reply(file=discord.File(io.BytesIO(res), filename="".join(f"emoji.gif" if emoji_animated else f"emoji.png")), mention_author=False)
-    
-    @commands.command(aliases=["eti"], description="Similar to bigemoji, difference is, that it renders it. Note: it doesn't support animated emojis")
-    @commands.cooldown(1,15,commands.BucketType.user)
-    async def emojitoimage(self, ctx, emoji : typing.Union[discord.Emoji, discord.PartialEmoji, str]):
-        async with ctx.typing():
-            res = await self.emojitoimg(emoji)
-        await ctx.reply(file=discord.File(res, filename="".join(f"{emoji}.png" if isinstance(emoji, str) else f"{emoji.name}.png")), mention_author=False)
 
     @commands.command(description=f'''
 Example: `poll "Am I cool?" Yes=✅,No=❌`

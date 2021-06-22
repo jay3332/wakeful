@@ -289,7 +289,7 @@ class Admin(commands.Cog, command_attrs=dict(hidden=True)):
                     else:
                         deleted.append(m)
         await ctx.message.add_reaction(self.bot.icons["greentick"])
-        await ctx.reply(f"Successfully deleted {len(deleted)}/{len(messages)} messages", mention_author=False)
+        await ctx.reply(f"Successfully deleted {len(deleted)}/{len(messages)} messages", mention_author=False, delete_after=5)
 
     @developer.command()
     @commands.is_owner()
