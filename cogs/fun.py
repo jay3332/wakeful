@@ -51,10 +51,14 @@ class Fun(commands.Cog):
 
     @commands.command()
     @commands.cooldown(1,5,commands.BucketType.user)
-    async def token(self, ctx, member : discord.Member = None):
+    async def token(self, ctx, member : typing.Union[discord.Member, discord.User, int] = None):
         if member is None:
-            member = self.bot.user
-        token = base64.b64encode(str(member.id).encode("ascii")).decode("ascii") + "." + "".join(random.choices(string.ascii_letters + string.digits, k=6))+"."+"".join(random.choices(string.ascii_letters + string.digits, k=33))
+            member = ctx.author
+        if isinstance(member, int):
+            member_id = member
+        else:
+            member_id = member.id
+        token = base64.b64encode(str(member_id).encode("ascii")).decode("ascii") + "." + "".join(random.choices(string.ascii_letters + string.digits, k=6))+"."+"".join(random.choices(string.ascii_letters + string.digits, k=33))
         await ctx.send(f"{member.mention}'s token is `{token}`", allowed_mentions=discord.AllowedMentions.none())
 
     @commands.command(aliases=["pt"])
@@ -67,10 +71,18 @@ class Fun(commands.Cog):
         id_ = base64.b64decode(splitted[0]).decode("utf-8")
         timestamp = (datetime.datetime(1970, 1, 1) + datetime.timedelta(seconds= int.from_bytes( base64.standard_b64decode(splitted[1] + "==") , "big")+1293840000)).strftime("%d/%m/%Y at %H:%M:%S")
         user = await self.bot.fetch_user(id_)
+
+        badges = [str(self.bot.icons["badges"][e]) for e in list(self.bot.icons["badges"]) if dict(user.public_flags)[e] == True]
+
+        pronoun = await get_pronoun(self.bot, user)
+
         em=discord.Embed(title=str(user), description=f"""
-ID: {id_}
-Created At: {timestamp}
-Bot: {''.join(self.bot.icons["greentick"] if user.bot else self.bot.icons['redtick'])}
+{self.bot.icons['arrow']}ID: {id_}
+{self.bot.icons['arrow']}Token Created At: {timestamp}
+{self.bot.icons['arrow']}Account Created At: {user.created_at.strftime("%d/%m/%Y at %H:%M:%S")}
+{self.bot.icons['arrow']}Pronouns: {pronoun}
+{self.bot.icons['arrow']}Badges: {' '.join(badges)}
+{self.bot.icons['arrow']}Bot: {''.join(self.bot.icons["greentick"] if user.bot else self.bot.icons['redtick'])}
 """, color=color())
         em.set_thumbnail(url=user.avatar_url)
         await ctx.send(embed=em)

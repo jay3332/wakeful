@@ -793,7 +793,7 @@ class Utility(commands.Cog):
         em.add_field(name="Info", value=f"""
 {self.bot.icons['arrow']}Name: {member.name}
 {self.bot.icons['arrow']}Nickname: {''.join("N/A" if member.nick is None else member.nick)}
-{self.bot.icons['arrow']}Badges [{len(badges)}]: {''.join(badges if len(badges) != 0 else "N/A")}
+{self.bot.icons['arrow']}Badges [{len(badges)}]: {' '.join(badges if len(badges) != 0 else "N/A")}
 {self.bot.icons['arrow']}Status: {''.join(member.raw_status.title() if member.raw_status != "dnd" else "DND")}
 {self.bot.icons['arrow']}Platform: {platform}
 {self.bot.icons['arrow']}Pronouns: {pronoun}
