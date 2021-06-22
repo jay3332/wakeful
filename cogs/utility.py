@@ -629,9 +629,8 @@ class Utility(commands.Cog):
                 embeds = []
                 res = WrapList(results, 3)
                 for txt in res:
-                    em=discord.Embed(title=f"Results for: `{query}`", color=color())
+                    em=discord.Embed(title=f"Results for: `{query}`", description="\n".join(f"**[{str(res.title)}]({str(res.url)})**\n{str(res.description)}\n" for res in txt), color=color())
                     em.set_footer(text=f"Safe-Search: {safe_search}", icon_url=ctx.author.avatar_url)
-                    em.add_field(name=f"\uFEFF", value="\n".join(f"**[{str(res.title)}]({str(res.url)})**\n{str(res.description)}\n" for res in txt), inline=False)
                     if image is not None:
                         em.set_thumbnail(url=image)
                     embeds.append(em)
