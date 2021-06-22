@@ -1180,7 +1180,7 @@ class Utility(commands.Cog):
                 else:
                     emojiName = "`N/A`"
                 em=discord.Embed(title="Custom", description=f"""
-{self.bot.icons['arrow']}Text: `{activity.name}`
+{self.bot.icons['arrow']}Text: `{''.join(activity.name if activity.name is not None else "N/A")}`
 {self.bot.icons['arrow']}Emoji Name: {emojiName}
 """, color=color())
                 if activity.emoji is not None:
