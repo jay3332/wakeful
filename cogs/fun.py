@@ -266,27 +266,6 @@ class Fun(commands.Cog):
         em.set_footer(text=f"Powered by boredapi.com", icon_url=ctx.author.avatar_url)
         await ctx.send(embed=em)
 
-    @commands.command()
-    @commands.cooldown(1, 5, commands.BucketType.user)
-    async def meme(self, ctx):
-        async with ctx.typing():
-            res = await self.bot.session.get("https://reddit.com/r/memes/top.json")
-            res = await res.json()
-            amount = len(res["data"]["children"])
-            meme = res["data"]["children"][random.randrange(0,amount)]["data"]
-        if meme["pinned"] != True and meme["over_18"] != True and not "youtu" in meme["url"] and meme["is_video"] != True:
-            title = meme["title"]
-            url = meme["url"]
-            permalink = meme["permalink"]
-            upvotes = meme["ups"]
-            comments = meme["num_comments"]
-            em = discord.Embed(title=title, url=f"https://reddit.com{permalink}", color=color())
-            em.set_footer(text=f"👍 {upvotes}• 💬 {comments}", icon_url=ctx.author.avatar_url)
-            em.set_image(url=url)
-            await ctx.reply(embed=em, mention_author=False)
-        else:
-            await ctx.reinvoke()
-
     @commands.command(aliases=["r"])
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def reddit(self, ctx, subreddit : str = None):
@@ -312,7 +291,7 @@ class Fun(commands.Cog):
                 res = await (await self.bot.session.get(f"https://reddit.com/r/{subreddit}/top.json")).json()
                 amount = len(res["data"]["children"])
                 post = res["data"]["children"][random.randrange(0,amount)]["data"]
-            if post["pinned"] == False and post["over_18"] == False and not "youtu" in post["url"] and post["is_video"] == False:
+            if post["pinned"] == False and post["over_18"] == False and "i.redd.it" in post["url"] or "i.imgur.com" in post["url"] and post["url"] is not None and post["is_video"] == False:
                 title = post["title"]
                 url = post["url"]
                 permalink = post["permalink"]
