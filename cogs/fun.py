@@ -273,14 +273,16 @@ class Fun(commands.Cog):
             subreddit = random.choice([
                             "memes",
                             "art",
-                            "unixporn",
                             "youngpeopleyoutube",
                             "comedyheaven",
                             "ksi",
                             "oddlysatisfying",
                             "softwaregore",
                             "earthporn",
-                            "nextfuckinglevel"
+                            "dankmemes",
+                            "ihadastroke",
+                            "aww",
+                            "interestingasfuck"
                             ])
         if subreddit.startswith("r/"):
             subreddit = subreddit[2:]
