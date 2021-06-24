@@ -1,4 +1,3 @@
-from re import split
 import discord, io, asyncdagpi, asyncio, datetime, string, random, json, wonderwords, typing, aiogtts, base64
 from discord.ext import commands
 from fuzzywuzzy import fuzz
@@ -8,10 +7,9 @@ from utils.checks import *
 from utils.errors import *
 from utils.functions import *
 from akinator.async_aki import Akinator
-from cogs.music import is_vc
-from cogs.utility import cleanup, make
+from __main__ import bot as bot_
 
-dagpi = asyncdagpi.Client(get_config("DAGPI"))
+dagpi = asyncdagpi.Client(bot_.config["DAGPI"])
 akin = Akinator()
 
 @executor_function
@@ -51,7 +49,7 @@ class Fun(commands.Cog):
 
     @commands.command()
     @commands.cooldown(1,5,commands.BucketType.user)
-    async def token(self, ctx, member : typing.Union[discord.Member, discord.User, int] = None):
+    async def faketoken(self, ctx, member : typing.Union[discord.Member, discord.User, int] = None):
         if member is None:
             member = ctx.author
         if isinstance(member, int):
@@ -83,7 +81,7 @@ class Fun(commands.Cog):
 {self.bot.icons['arrow']}Pronouns: {pronoun}
 {self.bot.icons['arrow']}Badges: {' '.join(badges if len(badges) != 0 else "N/A")}
 {self.bot.icons['arrow']}Bot: {''.join(self.bot.icons["greentick"] if user.bot else self.bot.icons['redtick'])}
-""", color=color())
+""", color=self.bot.color)
         em.set_thumbnail(url=user.avatar_url)
         await ctx.send(embed=em)
     
@@ -93,18 +91,18 @@ class Fun(commands.Cog):
         if gameRunning(ctx, ctx.command.name):
             channel = self.bot.games[ctx.command.name][str(ctx.guild.id)]["channel"]
             message = self.bot.games[ctx.command.name][str(ctx.guild.id)]["message"]
-            em=discord.Embed(description=f"There is already a game of {ctx.command.name} running in {channel.mention}, click [here]({message.jump_url}) to look at it", color=color())
+            em=discord.Embed(description=f"There is already a game of {ctx.command.name} running in {channel.mention}, click [here]({message.jump_url}) to look at it", color=self.bot.color)
             return await ctx.reply(embed=em, mention_author=False)
 
         controls = {
             "yes": self.bot.icons['greentick'],
             "no": self.bot.icons['redtick'],
-            "idk": self.bot.icons['shrug'],
+            "idk": self.bot.icons['shrug']
         }
 
         emojis = [controls[e] for e in list(controls)]
 
-        em=discord.Embed(description=f"{self.bot.icons['loading']} Now starting the game...", color=color())
+        em=discord.Embed(description=f"{self.bot.icons['loading']} Now starting the game...", color=self.bot.color)
         msg = await ctx.reply(embed=em, mention_author=False)
 
         game = await akin.start_game()
@@ -120,7 +118,7 @@ class Fun(commands.Cog):
 {game}
 {controls['yes']} = Yes
 {controls['no']} = No
-{controls['idk']} = I don't know""", color=color())
+{controls['idk']} = I don't know""", color=self.bot.color)
                 await msg.edit(embed=em)
             for emoji in list(controls):
                 await msg.add_reaction(str(controls[emoji]))
@@ -128,7 +126,7 @@ class Fun(commands.Cog):
             try:
                 reaction, user = await self.bot.wait_for("reaction_add", timeout=30, check=lambda reaction, user: user == ctx.author and str(reaction.emoji) in emojis and reaction.message == msg)
             except asyncio.TimeoutError:
-                em=discord.Embed(description="The game has been stopped as you've not been responding for 30 seconds", color=color())
+                em=discord.Embed(description="The game has been stopped as you've not been responding for 30 seconds", color=self.bot.color)
                 await msg.edit(embed=em)
                 self.bot.games["akinator"].pop(str(ctx.guild.id))
                 break
@@ -146,7 +144,7 @@ class Fun(commands.Cog):
 {question}
 {controls['yes']} = Yes
 {controls['no']} = No
-{controls['idk']} = I don't know""", color=color())
+{controls['idk']} = I don't know""", color=self.bot.color)
                 await msg.edit(embed=em)
         await akin.win()
 
@@ -159,14 +157,14 @@ class Fun(commands.Cog):
             res = await self.bot.session.get(f"https://api.agify.io?name={name.replace(' ', '')}")
             res = await res.json()
             age = res["age"]
-            em=discord.Embed(description=f"{name.title()}'s predicted age is {age}", color=color())
+            em=discord.Embed(description=f"{name.title()}'s predicted age is {age}", color=self.bot.color)
             em.set_footer(text=f"Powered by agify.io", icon_url=ctx.author.avatar_url)
             await ctx.send(embed=em)
         elif isinstance(name, discord.Member):
             res = await self.bot.session.get(f"https://api.agify.io?name={name.name.replace(' ', '')}")
             res = await res.json()
             age = res["age"]
-            em=discord.Embed(description=f"{name.mention}'s estimated age is {age}", color=color())
+            em=discord.Embed(description=f"{name.mention}'s estimated age is {age}", color=self.bot.color)
             em.set_footer(text=f"Powered by agify.io", icon_url=ctx.author.avatar_url)
             await ctx.send(embed=em)
 
@@ -182,11 +180,11 @@ class Fun(commands.Cog):
         try:
             voice_channel = ctx.author.voice.channel.id
         except AttributeError:
-            em=discord.Embed(description=f"You have to join a voice channel to use this command", color=color())
+            em=discord.Embed(description=f"You have to join a voice channel to use this command", color=self.bot.color)
             await ctx.send(embed=em)
         else:
             link = await self.bot.together.create_link(voice_channel, ctx.command.name)
-            em=discord.Embed(description=f"Click this [link]({link}) to enable {ctx.command.name} together", color=color())
+            em=discord.Embed(description=f"Click this [link]({link}) to enable {ctx.command.name} together", color=self.bot.color)
             await ctx.send(embed=em)
 
     @_together.command()
@@ -196,11 +194,11 @@ class Fun(commands.Cog):
         try:
             voice_channel = ctx.author.voice.channel.id
         except AttributeError:
-            em=discord.Embed(description=f"You have to join a voice channel to use this command", color=color())
+            em=discord.Embed(description=f"You have to join a voice channel to use this command", color=self.bot.color)
             await ctx.send(embed=em)
         else:
             link = await self.bot.together.create_link(voice_channel, ctx.command.name)
-            em=discord.Embed(description=f"Click this [link]({link}) to enable {ctx.command.name} together", color=color())
+            em=discord.Embed(description=f"Click this [link]({link}) to enable {ctx.command.name} together", color=self.bot.color)
             await ctx.send(embed=em)
 
     @_together.command()
@@ -210,11 +208,11 @@ class Fun(commands.Cog):
         try:
             voice_channel = ctx.author.voice.channel.id
         except AttributeError:
-            em=discord.Embed(description=f"You have to join a voice channel to use this command", color=color())
+            em=discord.Embed(description=f"You have to join a voice channel to use this command", color=self.bot.color)
             await ctx.send(embed=em)
         else:
             link = await self.bot.together.create_link(voice_channel, ctx.command.name)
-            em=discord.Embed(description=f"Click this [link]({link}) to enable {ctx.command.name} together", color=color())
+            em=discord.Embed(description=f"Click this [link]({link}) to enable {ctx.command.name} together", color=self.bot.color)
             await ctx.send(embed=em)
 
     @_together.command()
@@ -224,11 +222,11 @@ class Fun(commands.Cog):
         try:
             voice_channel = ctx.author.voice.channel.id
         except AttributeError:
-            em=discord.Embed(description=f"You have to join a voice channel to use this command", color=color())
+            em=discord.Embed(description=f"You have to join a voice channel to use this command", color=self.bot.color)
             await ctx.send(embed=em)
         else:
             link = await self.bot.together.create_link(voice_channel, ctx.command.name)
-            em=discord.Embed(description=f"Click this [link]({link}) to enable {ctx.command.name} together", color=color())
+            em=discord.Embed(description=f"Click this [link]({link}) to enable {ctx.command.name} together", color=self.bot.color)
             await ctx.send(embed=em)
 
     @_together.command()
@@ -238,11 +236,11 @@ class Fun(commands.Cog):
         try:
             voice_channel = ctx.author.voice.channel.id
         except AttributeError:
-            em=discord.Embed(description=f"You have to join a voice channel to use this command", color=color())
+            em=discord.Embed(description=f"You have to join a voice channel to use this command", color=self.bot.color)
             await ctx.send(embed=em)
         else:
             link = await self.bot.together.create_link(voice_channel, ctx.command.name)
-            em=discord.Embed(description=f"Click this [link]({link}) to enable {ctx.command.name} together", color=color())
+            em=discord.Embed(description=f"Click this [link]({link}) to enable {ctx.command.name} together", color=self.bot.color)
             await ctx.send(embed=em)
 
     @commands.command()
@@ -254,14 +252,14 @@ class Fun(commands.Cog):
             res = await self.bot.session.get(f"https://api.genderize.io?name={name.replace(' ', '')}")
             res = await res.json()
             gender = res["gender"]
-            em=discord.Embed(description=f"{name.title()}'s predicted gender is {gender}", color=color())
+            em=discord.Embed(description=f"{name.title()}'s predicted gender is {gender}", color=self.bot.color)
             em.set_footer(text=f"Powered by genderize.io", icon_url=ctx.author.avatar_url)
             await ctx.send(embed=em)
         elif isinstance(name, discord.Member):
             res = await self.bot.session.get(f"https://api.genderize.io?name={name.name.replace(' ', '')}")
             res = await res.json()
             gender = res["gender"]
-            em=discord.Embed(description=f"{name.mention}'s predicted gender is {gender}", color=color())
+            em=discord.Embed(description=f"{name.mention}'s predicted gender is {gender}", color=self.bot.color)
             em.set_footer(text=f"Powered by genderize.io", icon_url=ctx.author.avatar_url)
             await ctx.send(embed=em)
 
@@ -275,22 +273,22 @@ class Fun(commands.Cog):
             res = await res.json()
             if res["country"] != []:
                 nation = res["country"][0]["country_id"]
-                em=discord.Embed(description=f"{name.title()}'s predicted nation is {nation}", color=color())
+                em=discord.Embed(description=f"{name.title()}'s predicted nation is {nation}", color=self.bot.color)
                 em.set_footer(text=f"Powered by nationalize.io", icon_url=ctx.author.avatar_url)
                 await ctx.send(embed=em)
             else:
-                em=discord.Embed(description=f"I could not predict `{name.title()}`'s nation", color=color())
+                em=discord.Embed(description=f"I could not predict `{name.title()}`'s nation", color=self.bot.color)
                 await ctx.send(embed=em)
         elif isinstance(name, discord.Member):
             res = await self.bot.session.get(f"https://api.nationalize.io?name={name.name.replace(' ', '')}")
             res = await res.json()
             if res["country"] != []:
                 nation = res["country"][0]["country_id"]
-                em=discord.Embed(description=f"{name.mention}'s predicted nation is {nation}", color=color())
+                em=discord.Embed(description=f"{name.mention}'s predicted nation is {nation}", color=self.bot.color)
                 em.set_footer(text=f"Powered by nationalize.io", icon_url=ctx.author.avatar_url)
                 await ctx.send(embed=em)
             else:
-                em=discord.Embed(description=f"I could not predict {name.mention}'s nation", color=color())
+                em=discord.Embed(description=f"I could not predict {name.mention}'s nation", color=self.bot.color)
                 await ctx.send(embed=em)
 
     @commands.command()
@@ -299,9 +297,9 @@ class Fun(commands.Cog):
         res = await self.bot.session.get("https://www.boredapi.com/api/activity")
         res = await res.json()
         if res["link"] != "":
-            em=discord.Embed(title="Here's an activity to do", description=res["activity"], color=color(), url=res["link"])
+            em=discord.Embed(title="Here's an activity to do", description=res["activity"], color=self.bot.color, url=res["link"])
         else:
-            em=discord.Embed(title="Here's an activity to do", description=res["activity"], color=color())
+            em=discord.Embed(title="Here's an activity to do", description=res["activity"], color=self.bot.color)
         em.set_footer(text=f"Powered by boredapi.com", icon_url=ctx.author.avatar_url)
         await ctx.send(embed=em)
 
@@ -325,6 +323,10 @@ class Fun(commands.Cog):
                             ])
         if subreddit.startswith("r/"):
             subreddit = subreddit[2:]
+        about = await (await self.bot.session.get(f"https://www.reddit.com/r/{subreddit}/about.json")).json()
+        if about["data"]["over18"] == True and not ctx.channel.is_nsfw():
+            return await ctx.send("NSFW subreddits can only be posted in nsfw channels")
+
         for x in range(5):
             async with ctx.typing():
                 res = await (await self.bot.session.get(f"https://reddit.com/r/{subreddit}/top.json")).json()
@@ -339,13 +341,13 @@ class Fun(commands.Cog):
 
                 amount = len(res["data"]["children"])
                 post = res["data"]["children"][random.randrange(0,amount)]["data"]
-            if post["pinned"] == False and post["over_18"] == False and "i.redd.it" in post["url"] or "i.imgur.com" in post["url"] and post["url"] is not None and post["is_video"] == False:
+            if post["pinned"] == False and (ctx.channel.is_nsfw() == False and post["over_18"] == False) and "i.redd.it" in post["url"] or "i.imgur.com" in post["url"] and post["url"] is not None and post["is_video"] == False:
                 title = post["title"]
                 url = post["url"]
                 permalink = post["permalink"]
                 upvotes = post["ups"]
                 comments = post["num_comments"]
-                em = discord.Embed(title=f"r/{subreddit}", description=title, url=f"https://reddit.com{permalink}", color=color())
+                em = discord.Embed(title=f"r/{subreddit}", description=title, url=f"https://reddit.com{permalink}", color=self.bot.color)
                 em.set_footer(text=f"👍 {upvotes}• 💬 {comments}", icon_url=ctx.author.avatar_url)
                 em.set_image(url=url)
                 return await ctx.reply(embed=em, mention_author=False)
@@ -360,7 +362,7 @@ class Fun(commands.Cog):
             sentence = wonderwords.RandomSentence().sentence()
             img = await self.bot.session.get("https://media.discordapp.net/attachments/832746281335783426/850000934658244668/typeracer.jpg")
             _file = await typeracer(io.BytesIO(await img.read()), sentence)
-            em=discord.Embed(description="First one to type this sentence wins", color=color())
+            em=discord.Embed(description="First one to type this sentence wins", color=self.bot.color)
             em.set_image(url="attachment://typeracer.png")
         _msg = await ctx.reply(embed=em, file=_file, mention_author=False)
         try:
@@ -368,10 +370,10 @@ class Fun(commands.Cog):
             delta = datetime.datetime.utcnow() - start_time
             hours, remainder = divmod(int(delta.total_seconds()), 3600)
             minutes, seconds = divmod(remainder, 60)
-            em=discord.Embed(description=f"We have a winner! {msg.author.mention} has typed the sentence in `{seconds}` seconds", color=color())
+            em=discord.Embed(description=f"We have a winner! {msg.author.mention} has typed the sentence in `{seconds}` seconds", color=self.bot.color)
             await msg.reply(embed=em, mention_author=False)
         except asyncio.TimeoutError:
-            em=discord.Embed(description=f"No one sent the right sentence, it was `{sentence}`", color=color())
+            em=discord.Embed(description=f"No one sent the right sentence, it was `{sentence}`", color=self.bot.color)
             await _msg.reply(embed=em)
 
     @commands.command(aliases=["gtl"])
@@ -383,7 +385,7 @@ class Fun(commands.Cog):
             brand = logo.brand
             hint = logo.hint
             question = logo.question
-            em = discord.Embed(description=f"Try guessing this logo in under 20 seconds - Hint: ||`{hint}`||", color=color())
+            em = discord.Embed(description=f"Try guessing this logo in under 20 seconds - Hint: ||`{hint}`||", color=self.bot.color)
             em.set_image(url=question)
         emsg = await ctx.send(embed=em)
         try:
@@ -391,7 +393,7 @@ class Fun(commands.Cog):
             msg = await self.bot.wait_for('message', check=lambda message: message.content.lower() == str(brand).lower() and message.channel == ctx.channel, timeout=20)
             await msg.reply(f"Correct! The logo was `{brand}`", mention_author=False, allowed_mentions=discord.AllowedMentions.none())
         except asyncio.TimeoutError:
-            em=discord.Embed(description=f"You took too long to answer, it was `{logo.brand}`", color=color())
+            em=discord.Embed(description=f"You took too long to answer, it was `{logo.brand}`", color=self.bot.color)
             em.set_thumbnail(url=logo.answer)
             await emsg.edit(embed=em)
         
@@ -401,7 +403,7 @@ class Fun(commands.Cog):
         res = await self.bot.session.get(f"https://http.cat/{code}")
         buf = io.BytesIO(await res.read())
         file=discord.File(buf, filename=f"{code}.png")
-        em=discord.Embed(color=color())
+        em=discord.Embed(color=self.bot.color)
         em.set_image(url=f"attachment://{code}.png")
         em.set_footer(text=f"Powered by http.cat", icon_url=ctx.author.avatar_url)
         await ctx.send(embed=em, file=file)
@@ -411,7 +413,7 @@ class Fun(commands.Cog):
     async def joke(self, ctx):
         async with ctx.typing():
             joke = await dagpi.joke()
-            em = discord.Embed(description=joke, color=color())
+            em = discord.Embed(description=joke, color=self.bot.color)
             em.set_footer(text=f"Powered by dagpi.xyz", icon_url=ctx.author.avatar_url)
         await ctx.reply(embed=em, mention_author=False)
 
@@ -420,7 +422,7 @@ class Fun(commands.Cog):
     async def eightball(self, ctx, *, question):
         async with ctx.typing():
             response = await dagpi.eight_ball()
-            em = discord.Embed(color=color())
+            em = discord.Embed(color=self.bot.color)
             em.add_field(name="input", value=f"```\n{question}```", inline=False)
             em.add_field(name="output", value=f"```\n{response}```", inline=False)
             em.set_footer(text=f"Powered by dagpi.xyz", icon_url=ctx.author.avatar_url)
@@ -431,7 +433,7 @@ class Fun(commands.Cog):
     async def roast(self, ctx):
         async with ctx.typing():
             roast = await dagpi.roast()
-            em = discord.Embed(description=roast, color=color())
+            em = discord.Embed(description=roast, color=self.bot.color)
             em.set_footer(text=f"Powered by dagpi.xyz", icon_url=ctx.author.avatar_url)
         await ctx.reply(embed=em, mention_author=False)
 
@@ -440,7 +442,7 @@ class Fun(commands.Cog):
     async def pp(self, ctx, member : discord.Member = None):
         if member is None:
             member = ctx.author
-        em=discord.Embed(title=f"{member.name}'s pp", description="8"+"".join("=" for x in range(random.randrange(0,10)))+"D", color=color())
+        em=discord.Embed(title=f"{member.name}'s pp", description="8"+"".join("=" for x in range(random.randrange(0,10)))+"D", color=self.bot.color)
         await ctx.reply(embed=em, mention_author=False)
 
     @commands.command()
@@ -448,7 +450,7 @@ class Fun(commands.Cog):
     async def gayrate(self, ctx, member : discord.Member = None):
         if member is None:
             member = ctx.author
-        em=discord.Embed(title=f"{member.name}'s gayrate", description=f"{member.name} is `{random.randrange(0,100)}`% gay", color=color())
+        em=discord.Embed(title=f"{member.name}'s gayrate", description=f"{member.name} is `{random.randrange(0,100)}`% gay", color=self.bot.color)
         await ctx.reply(embed=em, mention_author=False)
 
     @commands.command()
@@ -459,7 +461,7 @@ class Fun(commands.Cog):
         async with ctx.typing():
             res = await self.bot.session.post("https://captionbot.azurewebsites.net/api/messages", json={"Content": url, "Type": "CaptionRequest"}, headers={"Content-Type": "application/json; charset=utf-8"})
         text = await res.text()
-        em=discord.Embed(description=text, color=color())
+        em=discord.Embed(description=text, color=self.bot.color)
         em.set_image(url=url)
         await ctx.reply(embed=em, mention_author=False)
 
@@ -489,7 +491,7 @@ class Fun(commands.Cog):
             except discord.HTTPException:
                 await ctx.reply(mention_author=False, file=getFile(res))
         else:
-            em=discord.Embed(description="​I couldn't find any ascii letters in your text", color=color())
+            em=discord.Embed(description="​I couldn't find any ascii letters in your text", color=self.bot.color)
             await ctx.reply(embed=em, mention_author=False)
 
     @commands.command()
@@ -499,7 +501,7 @@ class Fun(commands.Cog):
             res = await self.bot.session.get("https://api.adviceslip.com/advice")
         res = (await res.read()).decode()
         advice = (json.loads(res))["slip"]["advice"]
-        em=discord.Embed(description=advice, color=color())
+        em=discord.Embed(description=advice, color=self.bot.color)
         await ctx.reply(embed=em, mention_author=False)
 
     @commands.command()

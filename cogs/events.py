@@ -1,6 +1,4 @@
-import discord, difflib, asyncio, traceback, aiohttp, asyncpg
-from discord.ext.commands.core import command
-from requests.models import InvalidURL
+import discord, difflib, asyncio, traceback, aiohttp
 from jishaku.models import copy_context_with
 from discord.ext import commands
 from utils.webhook import Webhook, AsyncWebhookAdapter
@@ -51,7 +49,7 @@ class Errors(commands.Cog):
             
         elif isinstance(error, commands.CommandOnCooldown):
             if not is_mod(self.bot, ctx.author):
-                em=discord.Embed(description=f"This command is on cooldown, try again in `{round(error.retry_after, 1)}` seconds.", color=color())
+                em=discord.Embed(description=f"This command is on cooldown, try again in `{round(error.retry_after, 1)}` seconds.", color=self.bot.color)
                 await ctx.reply(embed=em, mention_author=False)
             else:
                 ctx.command.reset_cooldown(ctx)
@@ -60,7 +58,7 @@ class Errors(commands.Cog):
         elif isinstance(error, commands.MissingRequiredArgument):
             param = str(error.param).split(":")
             param = param[0].replace(" ", "")
-            em=discord.Embed(description=f"`{param}` is a required argument that is missing", color=color())
+            em=discord.Embed(description=f"`{param}` is a required argument that is missing", color=self.bot.color)
             await ctx.reply(embed=em, mention_author=False)
 
         elif isinstance(error, commands.CommandNotFound):
@@ -74,7 +72,7 @@ class Errors(commands.Cog):
                     command = None
                 if command:
                     if not command.hidden:
-                        em=discord.Embed(description=f"`{cmd}` is not a valid command, did you mean `{match[0]}`?", color=color())
+                        em=discord.Embed(description=f"`{cmd}` is not a valid command, did you mean `{match[0]}`?", color=self.bot.color)
                         msg = await ctx.reply(embed=em, mention_author=False, delete_after=5)
                         reactions = [self.bot.icons['greentick'], self.bot.icons['redtick']]
                         for reaction in reactions:
@@ -87,33 +85,33 @@ class Errors(commands.Cog):
                         elif str(reaction.emoji) == self.bot.icons['redtick']:
                             await msg.delete()
                 else:
-                    em=discord.Embed(description=f"`{cmd}` is not a valid command", color=color())
+                    em=discord.Embed(description=f"`{cmd}` is not a valid command", color=self.bot.color)
                     m = await ctx.reply(embed=em, mention_author=False, delete_after=3)
 
         elif isinstance(error, commands.NSFWChannelRequired):
-            em=discord.Embed(description=f"This command has to be executed in an nsfw channel", color=color())
+            em=discord.Embed(description=f"This command has to be executed in an nsfw channel", color=self.bot.color)
             await ctx.reply(embed=em, mention_author=False)
 
         elif isinstance(error, commands.MemberNotFound):
-            em=discord.Embed(description=f"Couldn't find member `{error.argument}`", color=color())
+            em=discord.Embed(description=f"Couldn't find member `{error.argument}`", color=self.bot.color)
             await ctx.reply(embed=em, mention_author=False)
 
         elif isinstance(error, commands.BotMissingPermissions):
             perms = ", ".join(perm.replace("_", " ").lower() for perm in error.missing_perms)
-            em=discord.Embed(description=f"I require `{perms}` permissions to execute this command", color=color())
+            em=discord.Embed(description=f"I require `{perms}` permissions to execute this command", color=self.bot.color)
             await ctx.reply(embed=em, mention_author=False)
 
         elif isinstance(error, commands.MissingPermissions):
             perms = ", ".join(perm.replace("_", " ").lower() for perm in error.missing_perms)
-            em=discord.Embed(description=f"You're missing `{perms}` permissions to execute this command", color=color())
+            em=discord.Embed(description=f"You're missing `{perms}` permissions to execute this command", color=self.bot.color)
             await ctx.reply(embed=em, mention_author=False)
 
         elif isinstance(error, commands.NotOwner):
             if list(error.args) != [] and len(list(error.args)) != 0:
                 msg = list(error.args)[0]
-                em=discord.Embed(description=msg, color=color())
+                em=discord.Embed(description=msg, color=self.bot.color)
                 return await ctx.reply(embed=em, mention_author=False)
-            em=discord.Embed(description="You aren't allowed to execute this command", color=color())
+            em=discord.Embed(description="You aren't allowed to execute this command", color=self.bot.color)
             await ctx.reply(embed=em, mention_author=False)
 
         elif isinstance(error, commands.CommandInvokeError):
@@ -126,7 +124,7 @@ class Errors(commands.Cog):
 
             elif isinstance(error, aiohttp.ClientConnectionError):
                 address = f"{error.host}:{error.port}"
-                em=discord.Embed(description=f"I couldn't connect to `{address}`", color=color())
+                em=discord.Embed(description=f"I couldn't connect to `{address}`", color=self.bot.color)
                 await ctx.reply(embed=em, mention_author=False)
 
             elif isinstance(error, aiohttp.InvalidURL):
@@ -134,11 +132,11 @@ class Errors(commands.Cog):
 
             elif isinstance(error, commands.BotMissingPermissions):
                 perms = ", ".join(perm.replace("_", " ").lower() for perm in error.missing_perms)
-                em=discord.Embed(description=f"I need {perms} permissions to execute this command", color=color())
+                em=discord.Embed(description=f"I need {perms} permissions to execute this command", color=self.bot.color)
                 await ctx.reply(embed=em, mention_author=False)
 
             elif isinstance(error, discord.Forbidden):
-                em=discord.Embed(description=f"I don't have permission to do this", color=color())
+                em=discord.Embed(description=f"I don't have permission to do this", color=self.bot.color)
                 await ctx.reply(embed=em, mention_author=False)
             else:
                 if is_mod(self.bot, ctx.author):
@@ -150,7 +148,7 @@ class Errors(commands.Cog):
                     else:
                         raise error
                 else:
-                    em=discord.Embed(description=f"```py\n{error}```", color=color())
+                    em=discord.Embed(description=f"```py\n{error}```", color=self.bot.color)
                     await ctx.reply(embed=em, mention_author=False)
                     raise error
 
@@ -164,39 +162,43 @@ class Errors(commands.Cog):
                 else:
                     raise error
             else:
-                em=discord.Embed(description=f"```py\n{error}```", color=color())
+                em=discord.Embed(description=f"```py\n{error}```", color=self.bot.color)
                 await ctx.reply(embed=em, mention_author=False)
                 raise error
 
     @commands.Cog.listener()
     async def on_guild_join(self, guild):
-        webhook = Webhook.from_url(str(get_config("LOGS")), adapter=AsyncWebhookAdapter(self.bot.session))
+        webhook = Webhook.from_url(str(self.bot.config["LOGS"]), adapter=AsyncWebhookAdapter(self.bot.session))
         em=discord.Embed(title="Join Guild", description=f"""
 {self.bot.icons['arrow']}Name: `{guild.name}`
 {self.bot.icons['arrow']}Members: `{guild.member_count}`
 {self.bot.icons['arrow']}Owner: `{guild.owner}` ({guild.owner.id})
-""", color=color())
+""", color=self.bot.color)
         em.set_thumbnail(url=guild.icon_url)
         em.set_footer(text=f"ID: {guild.id}")
         await webhook.send(embed=em)
 
     @commands.Cog.listener()
     async def on_guild_remove(self, guild):
-        webhook = Webhook.from_url(str(get_config("LOGS")), adapter=AsyncWebhookAdapter(self.bot.session))
+        webhook = Webhook.from_url(str(self.bot.config["LOGS"]), adapter=AsyncWebhookAdapter(self.bot.session))
         em=discord.Embed(title="Leave Guild", description=f"""
 {self.bot.icons['arrow']}Name: `{guild.name}`
 {self.bot.icons['arrow']}Members: `{guild.member_count}`
 {self.bot.icons['arrow']}Owner: `{guild.owner}` ({guild.owner.id})
-""", color=color())
+""", color=self.bot.color)
         em.set_thumbnail(url=guild.icon_url)
         em.set_footer(text=f"ID: {guild.id}")
         await webhook.send(embed=em)
  
     @commands.Cog.listener()
     async def on_command(self, ctx):
-        msg = await self.bot.wait_for("message", check=lambda msg: msg.author == self.bot.user and msg.reference.resolved == ctx.message)
-        await self.bot.wait_for("message_delete", check=lambda msg: msg == ctx.message) 
-        await msg.delete()
+        try:
+            msg = await self.bot.wait_for("message", check=lambda msg: msg.author == self.bot.user and msg.reference.resolved == ctx.message)
+        except Exception:
+            pass
+        else:
+            await self.bot.wait_for("message_delete", check=lambda msg: msg == ctx.message) 
+            await msg.delete()
 
     @commands.Cog.listener()
     async def on_command_completion(self, ctx):

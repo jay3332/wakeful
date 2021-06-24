@@ -37,6 +37,8 @@
         "stop": "⏹️",
         "right": "▶",
         "fullright": "⏩",
-        "info": "ℹ️"
+        "info": "ℹ️",
+        "on": "☑️",
+        "off": "❎"
     }
 }

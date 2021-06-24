@@ -22,7 +22,7 @@ def youtube(query, download = False):
     del ytdl
     return info
 
-def get_config(string : str):
+async def get_config(string : str):
     with open("config.json", "r") as f:
         conf = json.load(f)
     return conf[string]
@@ -32,9 +32,6 @@ def get_cog(bot, name):
         cog = bot.get_cog(cog)
         if cog.qualified_name.lower() == name.lower():
             return cog
-    
-def color():
-    return int(get_config("COLOR"), 16)
 
 async def get_pronoun(bot : typing.Union[discord.Client, discord.ext.commands.Bot], member : discord.Member):
     pronouns={

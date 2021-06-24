@@ -10,19 +10,19 @@ class Chatbot(commands.Cog):
 
     @commands.command()
     async def chatbot(self, ctx):
-        em=discord.Embed(description="Alright! I've started the chatbot, you can now talk to him, to cancel use `chat stop`, `chat close` or `chat cancel`", color=color())
+        em=discord.Embed(description="Alright! I've started the chatbot, you can now talk to him, to cancel use `chat stop`, `chat close` or `chat cancel`", color=self.bot.color)
         await ctx.reply(embed=em, mention_author=False)
-        cleverbot = ac.Cleverbot(get_config("CLEVERBOT"))
+        cleverbot = ac.Cleverbot(self.bot.config["CLEVERBOT"])
         while True:
             try:
                 msg = await self.bot.wait_for("message", check=lambda msg: msg.author == ctx.author and msg.channel == ctx.channel, timeout=30)
             except asyncio.TimeoutError:
-                em=discord.Embed(description="I've stopped the chatbot, as you've not been responding for 30 seconds", color=color())
+                em=discord.Embed(description="I've stopped the chatbot, as you've not been responding for 30 seconds", color=self.bot.color)
                 await msg.reply(embed=em, mention_author=False)
                 break
             else:
                 if msg.content.lower() in ["chat stop", "chat close", "chat cancel"]:
-                    em=discord.Embed(description="Alright! I've successfully stopped the chatbot", color=color())
+                    em=discord.Embed(description="Alright! I've successfully stopped the chatbot", color=self.bot.color)
                     await msg.reply(embed=em, mention_author=False)
                     break
                 else:

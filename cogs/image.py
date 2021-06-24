@@ -3,8 +3,9 @@ from discord.ext import commands
 from utils.get import *
 from utils.functions import *
 from jishaku.functools import executor_function
+from __main__ import bot as bot_
 
-dagpi = asyncdagpi.Client(get_config("DAGPI"))
+dagpi = asyncdagpi.Client(bot_.config["DAGPI"])
 
 class Image(commands.Cog):
 
@@ -29,15 +30,15 @@ class Image(commands.Cog):
         output.save(buffer, format="png")
         return discord.File(io.BytesIO(buffer.getvalue()), "circular.png")
 
-    @commands.command(aliases=["circle", "round", "circular"])
+    @commands.command(name="rounden", aliases=["circle", "round", "circular"])
     @commands.cooldown(1,15,commands.BucketType.user)
-    async def rounden(self, ctx, member : typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
+    async def _rounden(self, ctx, member : typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
         url = await getImage(ctx, member)
         async with ctx.typing():
             img = await self.bot.session.get(str(url))
             img = await img.read()
             res = await self.rounden(io.BytesIO(img), (0,0))
-            em=discord.Embed(color=color())
+            em=discord.Embed(color=self.bot.color)
             em.set_image(url="attachment://circular.png")
         await ctx.reply(file=res, embed=em, mention_author=False)
 
@@ -48,7 +49,7 @@ class Image(commands.Cog):
         async with ctx.typing():
             img = await dagpi.image_process(asyncdagpi.ImageFeatures.pixel(), url=str(url))
             file=discord.File(img.image, f"{ctx.command.name}.png")
-            em=discord.Embed(color=color())
+            em=discord.Embed(color=self.bot.color)
             em.set_image(url=f"attachment://{ctx.command.name}.png")
         await ctx.send(file=file, embed=em)
 
@@ -63,7 +64,7 @@ class Image(commands.Cog):
                 bottom_text=f"All My Homies use {good}"
             )
             file=discord.File(img.image, f"{ctx.command.name}.png")
-            em=discord.Embed(color=color())
+            em=discord.Embed(color=self.bot.color)
             em.set_image(url=f"attachment://{ctx.command.name}.png")
         await ctx.send(file=file, embed=em)
 
@@ -79,7 +80,7 @@ class Image(commands.Cog):
                 bottom_text=bottom
             )
             file=discord.File(img.image, f"{ctx.command.name}.png")
-            em=discord.Embed(color=color())
+            em=discord.Embed(color=self.bot.color)
             em.set_image(url=f"attachment://{ctx.command.name}.png")
         await ctx.send(file=file, embed=em)
 
@@ -95,7 +96,7 @@ class Image(commands.Cog):
                 bottom_text=bottom
             )
             file=discord.File(img.image, f"{ctx.command.name}.png")
-            em=discord.Embed(color=color())
+            em=discord.Embed(color=self.bot.color)
             em.set_image(url=f"attachment://{ctx.command.name}.png")
         await ctx.send(file=file, embed=em)
 
@@ -106,7 +107,7 @@ class Image(commands.Cog):
         async with ctx.typing():
             img = await dagpi.image_process(asyncdagpi.ImageFeatures.america(), url=str(url))
             file=discord.File(img.image, f"{ctx.command.name}.png")
-            em=discord.Embed(color=color())
+            em=discord.Embed(color=self.bot.color)
             em.set_image(url=f"attachment://{ctx.command.name}.png")
         await ctx.send(file=file, embed=em)
 
@@ -117,7 +118,7 @@ class Image(commands.Cog):
         async with ctx.typing():
             img = await dagpi.image_process(asyncdagpi.ImageFeatures.triggered(), url=str(url))
             file=discord.File(img.image, f"{ctx.command.name}.gif")
-            em=discord.Embed(color=color())
+            em=discord.Embed(color=self.bot.color)
             em.set_image(url=f"attachment://{ctx.command.name}.gif")
         await ctx.send(file=file, embed=em)
 
@@ -128,7 +129,7 @@ class Image(commands.Cog):
         async with ctx.typing():
             img = await dagpi.image_process(asyncdagpi.ImageFeatures.wasted(), url=str(url))
             file=discord.File(img.image, f"{ctx.command.name}.png")
-            em=discord.Embed(color=color())
+            em=discord.Embed(color=self.bot.color)
             em.set_image(url=f"attachment://{ctx.command.name}.png")
         await ctx.send(file=file, embed=em)
 
@@ -139,7 +140,7 @@ class Image(commands.Cog):
         async with ctx.typing():
             img = await dagpi.image_process(asyncdagpi.ImageFeatures.invert(), url=str(url))
             file=discord.File(img.image, f"{ctx.command.name}.png")
-            em=discord.Embed(color=color())
+            em=discord.Embed(color=self.bot.color)
             em.set_image(url=f"attachment://{ctx.command.name}.png")
         await ctx.send(file=file, embed=em)
 
@@ -150,7 +151,7 @@ class Image(commands.Cog):
         async with ctx.typing():
             img = await dagpi.image_process(asyncdagpi.ImageFeatures.sobel(), url=str(url))
             file=discord.File(img.image, f"{ctx.command.name}.png")
-            em=discord.Embed(color=color())
+            em=discord.Embed(color=self.bot.color)
             em.set_image(url=f"attachment://{ctx.command.name}.png")
         await ctx.send(file=file, embed=em)
 
@@ -161,7 +162,7 @@ class Image(commands.Cog):
         async with ctx.typing():
             img = await dagpi.image_process(asyncdagpi.ImageFeatures.triangle(), url=str(url))
             file=discord.File(img.image, f"{ctx.command.name}.png")
-            em=discord.Embed(color=color())
+            em=discord.Embed(color=self.bot.color)
             em.set_image(url=f"attachment://{ctx.command.name}.png")
         await ctx.send(file=file, embed=em)
 
@@ -172,7 +173,7 @@ class Image(commands.Cog):
         async with ctx.typing():
             img = await dagpi.image_process(asyncdagpi.ImageFeatures.angel(), url=str(url))
             file=discord.File(img.image, f"{ctx.command.name}.png")
-            em=discord.Embed(color=color())
+            em=discord.Embed(color=self.bot.color)
             em.set_image(url=f"attachment://{ctx.command.name}.png")
         await ctx.send(file=file, embed=em)
 
@@ -183,7 +184,7 @@ class Image(commands.Cog):
         async with ctx.typing():
             img = await dagpi.image_process(asyncdagpi.ImageFeatures.satan(), url=str(url))
             file=discord.File(img.image, f"{ctx.command.name}.png")
-            em=discord.Embed(color=color())
+            em=discord.Embed(color=self.bot.color)
             em.set_image(url=f"attachment://{ctx.command.name}.png")
         await ctx.send(file=file, embed=em)
 
@@ -194,7 +195,7 @@ class Image(commands.Cog):
         async with ctx.typing():
             img = await dagpi.image_process(asyncdagpi.ImageFeatures.delete(), url=str(url))
             file=discord.File(img.image, f"{ctx.command.name}.png")
-            em=discord.Embed(color=color())
+            em=discord.Embed(color=self.bot.color)
             em.set_image(url=f"attachment://{ctx.command.name}.png")
         await ctx.send(file=file, embed=em)
 
@@ -205,7 +206,7 @@ class Image(commands.Cog):
         async with ctx.typing():
             img = await dagpi.image_process(asyncdagpi.ImageFeatures.fedora(), url=str(url))
             file=discord.File(img.image, f"{ctx.command.name}.png")
-            em=discord.Embed(color=color())
+            em=discord.Embed(color=self.bot.color)
             em.set_image(url=f"attachment://{ctx.command.name}.png")
         await ctx.send(file=file, embed=em)
 
@@ -216,7 +217,7 @@ class Image(commands.Cog):
         async with ctx.typing():
             img = await dagpi.image_process(asyncdagpi.ImageFeatures.hitler(), url=str(url))
             file=discord.File(img.image, f"{ctx.command.name}.png")
-            em=discord.Embed(color=color())
+            em=discord.Embed(color=self.bot.color)
             em.set_image(url=f"attachment://{ctx.command.name}.png")
         await ctx.send(file=file, embed=em)
 
@@ -227,7 +228,7 @@ class Image(commands.Cog):
         async with ctx.typing():
             img = await dagpi.image_process(asyncdagpi.ImageFeatures.wanted(), url=str(url))
             file=discord.File(img.image, f"{ctx.command.name}.png")
-            em=discord.Embed(color=color())
+            em=discord.Embed(color=self.bot.color)
             em.set_image(url=f"attachment://{ctx.command.name}.png")
         await ctx.send(file=file, embed=em)
 
@@ -237,7 +238,7 @@ class Image(commands.Cog):
         async with ctx.typing():
             img = await dagpi.image_process(asyncdagpi.ImageFeatures.youtube(), url=getImage(ctx, member), username=member.display_name, text=text)
             file=discord.File(img.image, f"{ctx.command.name}.png")
-            em=discord.Embed(color=color())
+            em=discord.Embed(color=self.bot.color)
             em.set_image(url=f"attachment://{ctx.command.name}.png")
         await ctx.send(file=file, embed=em)
 
@@ -247,7 +248,7 @@ class Image(commands.Cog):
         async with ctx.typing():
             img = await dagpi.image_process(asyncdagpi.ImageFeatures.discord(), url=str(member.avatar_url_as(format="png")), username=member.display_name, text=text)
             file=discord.File(img.image, f"{ctx.command.name}.png")
-            em=discord.Embed(color=color())
+            em=discord.Embed(color=self.bot.color)
             em.set_image(url=f"attachment://{ctx.command.name}.png")
         await ctx.send(file=file, embed=em)
 
@@ -267,7 +268,7 @@ class Image(commands.Cog):
         async with ctx.typing():
             img = await dagpi.image_process(asyncdagpi.ImageFeatures.jail(), url=str(url))
             file=discord.File(img.image, f"{ctx.command.name}.png")
-            em=discord.Embed(color=color())
+            em=discord.Embed(color=self.bot.color)
             em.set_image(url=f"attachment://{ctx.command.name}.png")
         await ctx.send(file=file, embed=em)
 
@@ -278,7 +279,7 @@ class Image(commands.Cog):
         async with ctx.typing():
             img = await dagpi.image_process(asyncdagpi.ImageFeatures.pride(), url=str(url), flag=flag)
             file=discord.File(img.image, f"{ctx.command.name}.png")
-            em=discord.Embed(color=color())
+            em=discord.Embed(color=self.bot.color)
             em.set_image(url=f"attachment://{ctx.command.name}.png")
         await ctx.send(file=file, embed=em)
 
@@ -289,7 +290,7 @@ class Image(commands.Cog):
         async with ctx.typing():
             img = await dagpi.image_process(asyncdagpi.ImageFeatures.trash(), url=str(url))
             file=discord.File(img.image, f"{ctx.command.name}.png")
-            em=discord.Embed(color=color())
+            em=discord.Embed(color=self.bot.color)
             em.set_image(url=f"attachment://{ctx.command.name}.png")
         await ctx.send(file=file, embed=em)
 
@@ -300,7 +301,7 @@ class Image(commands.Cog):
         async with ctx.typing():
             img = await dagpi.image_process(asyncdagpi.ImageFeatures.magik(), url=str(url))
             file=discord.File(img.image, f"{ctx.command.name}.png")
-            em=discord.Embed(color=color())
+            em=discord.Embed(color=self.bot.color)
             em.set_image(url=f"attachment://{ctx.command.name}.png")
         await ctx.send(file=file, embed=em)
 
@@ -311,7 +312,7 @@ class Image(commands.Cog):
         async with ctx.typing():
             img = await dagpi.image_process(asyncdagpi.ImageFeatures.paint(), url=str(url))
             file=discord.File(img.image, f"{ctx.command.name}.png")
-            em=discord.Embed(color=color())
+            em=discord.Embed(color=self.bot.color)
             em.set_image(url=f"attachment://{ctx.command.name}.png")
         await ctx.send(file=file, embed=em)
 
@@ -322,7 +323,7 @@ class Image(commands.Cog):
         async with ctx.typing():
             img = await dagpi.image_process(asyncdagpi.ImageFeatures.captcha(), url=str(url), text=text)
             file=discord.File(img.image, f"{ctx.command.name}.png")
-            em=discord.Embed(color=color())
+            em=discord.Embed(color=self.bot.color)
             em.set_image(url=f"attachment://{ctx.command.name}.png")
         await ctx.send(file=file, embed=em)
 
@@ -334,7 +335,7 @@ class Image(commands.Cog):
             res = await self.bot.session.get(f"https://nekobot.xyz/api/imagegen?type=clyde&text={message}")
             res = await res.json()
             res = res["message"]
-            em=discord.Embed(color=color())
+            em=discord.Embed(color=self.bot.color)
             em.set_image(url=res)
         await ctx.reply(embed=em, mention_author=False)
 
@@ -358,7 +359,7 @@ class Image(commands.Cog):
             res = await self.bot.session.get(f"https://nekobot.xyz/api/imagegen?type=changemymind&text={message}")
             res = await res.json()
             res = res["message"]
-            em=discord.Embed(color=color())
+            em=discord.Embed(color=self.bot.color)
             em.set_image(url=res)
         await ctx.reply(embed=em, mention_author=False)
 
@@ -370,7 +371,7 @@ class Image(commands.Cog):
             res = await self.bot.session.get(f"https://nekobot.xyz/api/imagegen?type=phcomment&image={member.avatar_url_as(format='png')}&username={member.display_name}&text={message}")
             res = await res.json()
             res = res["message"]
-            em=discord.Embed(color=color())
+            em=discord.Embed(color=self.bot.color)
             em.set_image(url=res)
         await ctx.reply(embed=em, mention_author=False)
 
@@ -382,7 +383,7 @@ class Image(commands.Cog):
             res = await self.bot.session.get(f"https://nekobot.xyz/api/imagegen?type=iphonex&url={url}")
             res = await res.json()
             image = res["message"]
-            em=discord.Embed(color=color())
+            em=discord.Embed(color=self.bot.color)
             em.set_image(url=image)
         await ctx.reply(embed=em, mention_author=False)
 
@@ -394,7 +395,7 @@ class Image(commands.Cog):
             res = await self.bot.session.get(f"https://nekobot.xyz/api/imagegen?type=jpeg&url={url}")
             res = await res.json()
             image = res["message"]
-            em=discord.Embed(color=color())
+            em=discord.Embed(color=self.bot.color)
             em.set_image(url=image)
         await ctx.reply(embed=em, mention_author=False)
 
@@ -406,7 +407,7 @@ class Image(commands.Cog):
             res = await self.bot.session.get(f"https://nekobot.xyz/api/imagegen?type=deepfry&image={url}")
             res = await res.json()
             image = res["message"]
-            em=discord.Embed(color=color())
+            em=discord.Embed(color=self.bot.color)
             em.set_image(url=image)
         await ctx.reply(embed=em, mention_author=False)
 

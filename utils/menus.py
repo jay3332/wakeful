@@ -34,7 +34,6 @@ import bisect
 import logging
 import re
 from collections import OrderedDict, namedtuple
-from utils.get import get_config
 
 # Needed for the setup.py script
 __version__ = '1.1'

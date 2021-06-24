@@ -1,9 +1,7 @@
 import discord, typing, io, inspect
 import twemoji_parser as twemoji
-from wand import image, color
+from wand import image
 
-from pilmoji import Pilmoji
-from PIL import Image, ImageFont
 from discord.ext import commands
 from utils.get import *
 from __main__ import get_prefix
@@ -78,7 +76,7 @@ Example: `poll "Am I cool?" Yes=✅,No=❌`
 
         answers = "\n".join(f"{questions[e]['question']} - {questions[e]['emoji']}" for e in options)
 
-        em=discord.Embed(description=f"{question}\n\n{answers}", color=color())
+        em=discord.Embed(description=f"{question}\n\n{answers}", color=self.bot.color)
         em.set_author(name=ctx.author, icon_url=ctx.author.avatar_url)
         msg = await ctx.reply(embed=em, mention_author=False)
 

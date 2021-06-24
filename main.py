@@ -37,17 +37,21 @@ class wakeful(commands.AutoShardedBot):
         self.github = "https://github.com/jottew/wakeful" # the github the bot is hosted on
         self.invite = "https://discord.gg/RkCqvMJsDY"
         self.icons = conf["ICONS"]
+        with open('config.json') as f:
+            self.config = json.load(f)
+        self.color = int(conf["COLOR"], 16)
         self.together = discordTogether.DiscordTogether(self)
         self.cmdsSinceRestart = 0
         self.message_cache = {}
         self.directorys = []
         self.command_usage = {}
         self.roos = []
-        self.maintainance = False
         self.games = {
             "akinator": {}
         }
+        self.maintainance = False
         self.emptyPrefix = False
+        self.cmdsSinceRestart = 0
         self.ownersid = 797044260196319282
         self.afks = {}
         #self.banner = "https://media.discordapp.net/attachments/832746281335783426/849721738987307008/banner.png"
@@ -137,7 +141,7 @@ class wakeful(commands.AutoShardedBot):
                             if is_mod(self, msg.author):
                                 pass
                             else:
-                                em=discord.Embed(description=f"This command has been disabled by the server administrators", color=color())
+                                em=discord.Embed(description=f"This command has been disabled by the server administrators", color=self.color)
                                 return await msg.channel.send(embed=em)
                         else:
                             pass
@@ -148,10 +152,10 @@ class wakeful(commands.AutoShardedBot):
             
             if msg.content == f"<@!{self.user.id}>" or msg.content == f"<@{self.user.id}>":
                 if msg.guild:
-                    em=discord.Embed(description=f"The prefix for `{msg.guild.name}` is `{prefix[2]}`", color=color())
+                    em=discord.Embed(description=f"The prefix for `{msg.guild.name}` is `{prefix[2]}`", color=self.color)
                     return await msg.channel.send(embed=em)
                 else:
-                    em=discord.Embed(description=f"The prefix for dms is `{prefix[2]}`", color=color())
+                    em=discord.Embed(description=f"The prefix for dms is `{prefix[2]}`", color=self.color)
                     return await msg.channel.send(embed=em)
 
 bot = wakeful(command_prefix=get_prefix, case_insensitive=True, ShardCount=10, intents=discord.Intents.all())
@@ -177,6 +181,12 @@ async def presence():
     else:
         pass
 
+@tasks.loop(seconds=10)
+async def update_config():
+    with open('config.json') as f:
+        conf = json.load(f)
+    bot.config = conf
+
 for filename in os.listdir("./cogs"):
     if filename.endswith(".py"):
         try:
@@ -186,7 +196,9 @@ for filename in os.listdir("./cogs"):
             logger.info(f"{Fore.RED}An error occured while loading cogs.{filename[:-3]}{Fore.RESET}")
             raise exc
 
+bot.config = conf
 bot.load_extension("jishaku")
 presence.start()
+update_config.start()
 bot.db=bot.loop.run_until_complete(asyncpg.create_pool(host="localhost", port="5432", user=conf["dbuser"], password=conf["dbpw"], database="wakeful"))
 bot.run(token) # run stable

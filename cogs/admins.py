@@ -35,11 +35,11 @@ class Admin(commands.Cog, command_attrs=dict(hidden=True)):
     @commands.is_owner()
     async def delete(self, ctx):
         if not ctx.message.reference:
-            em=discord.Embed(description="Please reply to the message you want to delete", color=color)
+            em=discord.Embed(description="Please reply to the message you want to delete", color=self.bot.color)
             return await ctx.reply(embed=em, mention_author=False)
         ref = ctx.message.reference.resolved
         if ref.author != self.bot.user:
-            em=discord.Embed(description="This command is only to delete my messages", color=color())
+            em=discord.Embed(description="This command is only to delete my messages", color=self.bot.color)
             return await ctx.reply(embed=em, mention_author=False)
         await ref.delete()
         try:
@@ -74,7 +74,7 @@ class Admin(commands.Cog, command_attrs=dict(hidden=True)):
                 await ctx.message.add_reaction(self.bot.icons["redtick"])
                 em=discord.Embed(
                     description='\n'.join(f"`{a}`\n{self.bot.icons['redtick']} ```py\n{errors[a]}```" for a in list(errors)),
-                    color=color()
+                    color=self.bot.color
                 )
                 await ctx.reply(embed=em, mention_author=False)
         else:
@@ -87,7 +87,7 @@ class Admin(commands.Cog, command_attrs=dict(hidden=True)):
                     exc = "".join(traceback.format_exception(type(exc), exc, exc.__traceback__))
                     em=discord.Embed(
                         description=f"```py\n{exc}```",
-                        color=color()
+                        color=self.bot.color
                     )
                     return await ctx.reply(embed=em, mention_author=False)
                 else:
@@ -105,14 +105,14 @@ class Admin(commands.Cog, command_attrs=dict(hidden=True)):
     async def add(self, ctx, user : discord.User):
         if is_mod(self.bot, ctx.author):
             await self.bot.db.fetch("INSERT INTO blacklist (user_id) VALUES ($1)", user.id)
-            em=discord.Embed(description=f"Successfully blacklisted {user.mention}", color=color())
+            em=discord.Embed(description=f"Successfully blacklisted {user.mention}", color=self.bot.color)
             await ctx.reply(embed=em, mention_author=False)
 
     @blacklist.command(hidden=True)
     async def remove(self, ctx, user : discord.User):
         if is_mod(self.bot, ctx.author):
             await self.bot.db.fetch("DELETE FROM blacklist WHERE user_id = $1", user.id)
-            em=discord.Embed(description=f"Successfully unblacklisted {user.mention}", color=color())
+            em=discord.Embed(description=f"Successfully unblacklisted {user.mention}", color=self.bot.color)
             await ctx.reply(embed=em, mention_author=False)
 
     @blacklist.command(hidden=True)
@@ -122,10 +122,10 @@ class Admin(commands.Cog, command_attrs=dict(hidden=True)):
                 thing = await self.bot.db.fetchrow("SELECT * FROM blacklist WHERE user_id = $1", user.id)
                 thing["user_id"]
             except TypeError:
-                em=discord.Embed(description=f"{user.mention} isn't blacklisted", color=color())
+                em=discord.Embed(description=f"{user.mention} isn't blacklisted", color=self.bot.color)
                 await ctx.reply(embed=em, mention_author=False)
             else:
-                em=discord.Embed(description=f"{user.mention} is blacklisted", color=color())
+                em=discord.Embed(description=f"{user.mention} is blacklisted", color=self.bot.color)
                 await ctx.reply(embed=em, mention_author=False)
 
     @commands.group(invoke_without_command=True, name="setstatus", aliases=["setrp", "setrichpresence", "setactivity"], hidden=True)
@@ -198,7 +198,7 @@ class Admin(commands.Cog, command_attrs=dict(hidden=True)):
             shell = f"[stderr]\n{stderr.decode()}"
         if stdout:
             shell = f"[stdout]\n{stdout.decode()}"
-        em=discord.Embed(description=f"```sh\n$git pull\n{shell}```", color=color())
+        em=discord.Embed(description=f"```sh\n$git pull\n{shell}```", color=self.bot.color)
         await ctx.reply(embed=em, mention_author=False)
 
     @developer.command(hidden=True)
@@ -206,9 +206,9 @@ class Admin(commands.Cog, command_attrs=dict(hidden=True)):
     async def prefix(self, ctx):
         self.bot.emptyPrefix = not self.bot.emptyPrefix
         if self.bot.emptyPrefix == True:
-            em=discord.Embed(description="I've enabled empty prefix", color=color())
+            em=discord.Embed(description="I've enabled empty prefix", color=self.bot.color)
         else:
-            em=discord.Embed(description="I've disabled empty prefix", color=color())
+            em=discord.Embed(description="I've disabled empty prefix", color=self.bot.color)
         await ctx.reply(embed=em, mention_author=False)
 
     @developer.command(hidden=True)
@@ -216,15 +216,15 @@ class Admin(commands.Cog, command_attrs=dict(hidden=True)):
     async def maintainance(self, ctx):
         self.bot.maintainance = not self.bot.maintainance
         if self.bot.maintainance == True:
-            em=discord.Embed(description="I've enabled maintainance mode", color=color())
+            em=discord.Embed(description="I've enabled maintainance mode", color=self.bot.color)
         else:
-            em=discord.Embed(description="I've disabled maintainance mode", color=color())
+            em=discord.Embed(description="I've disabled maintainance mode", color=self.bot.color)
         await ctx.reply(embed=em, mention_author=False)
 
     @developer.command(hidden=True, aliases=["rs"])
     @commands.is_owner()
     async def restart(self, ctx):
-        em=discord.Embed(description="Are you sure you want to execute this command?", color=color())
+        em=discord.Embed(description="Are you sure you want to execute this command?", color=self.bot.color)
         msg = await ctx.reply(embed=em, mention_author=False)
         reactions = [self.bot.icons['greentick'], self.bot.icons['redtick']]
         for reaction in reactions:
@@ -233,7 +233,7 @@ class Admin(commands.Cog, command_attrs=dict(hidden=True)):
         if str(reaction.emoji) == self.bot.icons['greentick']:
             for reaction_ in reactions:
                 await msg.remove_reaction(reaction_, self.bot.user)
-            em=discord.Embed(description=f"Now restarting... {self.bot.icons['loading']}", color=color())
+            em=discord.Embed(description=f"Now restarting... {self.bot.icons['loading']}", color=self.bot.color)
             await msg.edit(embed=em)
             for i in list(self.bot.directorys):
                 i.cleanup()
@@ -316,13 +316,13 @@ WHERE schemaname != 'pg_catalog' AND
         if command is None:
 
             if len(list(self.bot.command_usage)) == 0 and list(self.bot.command_usage) == []:
-                em=discord.Embed(description="N/A", color=color())
+                em=discord.Embed(description="N/A", color=self.bot.color)
                 await ctx.reply(embed=em, mention_author=False)
             else:
-                res = WrapList(list(self.bot.command_usage), 6)
+                res = WrapList(list(self.bot.command_usage.items()), 6)
                 embeds = []
                 for txt in res:
-                    em=discord.Embed(title="Command Usage", description="\n".join(f"`{text}` - `{self.bot.command_usage[text]['usage']}`" for text in txt), color=color())
+                    em=discord.Embed(title="Command Usage", description="\n".join(f"`{text}` - `{self.bot.command_usage[text]['usage']}`" for text in txt), color=self.bot.color)
                     embeds.append(em)
                 pag = self.bot.paginate(Paginator(embeds, per_page=1))
                 await pag.start(ctx)
@@ -347,7 +347,7 @@ WHERE schemaname != 'pg_catalog' AND
             em=discord.Embed(
                 title=command_name,
                 description=f"`{command_name}` - `{cmd['usage']}`",
-                color=color()
+                color=self.bot.color
             )
             await ctx.reply(embed=em, mention_author=False)
 

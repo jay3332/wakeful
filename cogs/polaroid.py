@@ -13,13 +13,15 @@ class Polaroid(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @executor_function
-    def do_polaroid(self, image, method : str, args : list = [], kwargs : dict = {}):
+    def run_polaroid(self, image, method : str, args : list = [], kwargs : dict = {}):
         img = polaroid.Image(image)
         method = getattr(img, method)
         method(*args, **kwargs)
         bytes_ = io.BytesIO(img.save_bytes())
         return bytes_
+
+    async def do_polaroid(self, image, method : str, args : list = [], kwargs : dict = {}):
+        return await asyncio.get_running_loop().run_in_executor(None, self.run_polaroid, image, method, args, kwargs)
 
     @commands.command()
     @commands.cooldown(1,5,commands.BucketType.user)
@@ -28,7 +30,7 @@ class Polaroid(commands.Cog):
             image = str(await getImage(ctx, url))
             img = await (await self.bot.session.get(image)).read()
             res = await self.do_polaroid(img, method="apply_gradient")
-        em=discord.Embed(color=color())
+        em=discord.Embed(color=self.bot.color)
         em.set_image(url=f"attachment://{ctx.command.name}.png")
         await ctx.reply(embed=em, file=discord.File(res, filename=f"{ctx.command.name}.png"), mention_author=False)
 
@@ -39,7 +41,7 @@ class Polaroid(commands.Cog):
             image = str(await getImage(ctx, url))
             img = await (await self.bot.session.get(image)).read()
             res = await self.do_polaroid(img, method="fliph")
-        em=discord.Embed(color=color())
+        em=discord.Embed(color=self.bot.color)
         em.set_image(url=f"attachment://{ctx.command.name}.png")
         await ctx.reply(embed=em, file=discord.File(res, filename=f"{ctx.command.name}.png"), mention_author=False)
 
@@ -50,7 +52,7 @@ class Polaroid(commands.Cog):
             image = str(await getImage(ctx, url))
             img = await (await self.bot.session.get(image)).read()
             res = await self.do_polaroid(img, method="flipv")
-        em=discord.Embed(color=color())
+        em=discord.Embed(color=self.bot.color)
         em.set_image(url=f"attachment://{ctx.command.name}.png")
         await ctx.reply(embed=em, file=discord.File(res, filename=f"{ctx.command.name}.png"), mention_author=False)
 
@@ -61,21 +63,21 @@ class Polaroid(commands.Cog):
             image = str(await getImage(ctx, url))
             img = await (await self.bot.session.get(image)).read()
             res = await self.do_polaroid(img, method="box_blur")
-        em=discord.Embed(color=color())
+        em=discord.Embed(color=self.bot.color)
         em.set_image(url=f"attachment://{ctx.command.name}.png")
         await ctx.reply(embed=em, file=discord.File(res, filename=f"{ctx.command.name}.png"), mention_author=False)
 
     @commands.command()
     @commands.cooldown(1,5,commands.BucketType.user)
     async def resize(self, ctx, width : int, height : int, url : typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
-        if width > 3000 or height > 3000:
-            return await ctx.send("The dimensions can't be over 3000 pixels", mention_author=False)
+        if width > 1000 or height > 1000:
+            return await ctx.send("The dimensions can't be over 1000 pixels", mention_author=False)
 
         async with ctx.typing():
             image = str(await getImage(ctx, url))
             img = await (await self.bot.session.get(image)).read()
             res = await self.do_polaroid(img, method="resize", args=(width,height,1))
-        em=discord.Embed(color=color())
+        em=discord.Embed(color=self.bot.color)
         em.set_image(url=f"attachment://{ctx.command.name}.png")
         await ctx.reply(embed=em, file=discord.File(res, filename=f"{ctx.command.name}.png"), mention_author=False)
 
@@ -86,18 +88,7 @@ class Polaroid(commands.Cog):
             image = str(await getImage(ctx, url))
             img = await (await self.bot.session.get(image)).read()
             res = await self.do_polaroid(img, method="resize", args=(2000,900,1))
-        em=discord.Embed(color=color())
-        em.set_image(url=f"attachment://{ctx.command.name}.png")
-        await ctx.reply(embed=em, file=discord.File(res, filename=f"{ctx.command.name}.png"), mention_author=False)
-
-    @commands.command()
-    @commands.cooldown(1,5,commands.BucketType.user)
-    async def ultrawide(self, ctx, url : typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
-        async with ctx.typing():
-            image = str(await getImage(ctx, url))
-            img = await (await self.bot.session.get(image)).read()
-            res = await self.do_polaroid(img, method="resize", args=(4000,900,1))
-        em=discord.Embed(color=color())
+        em=discord.Embed(color=self.bot.color)
         em.set_image(url=f"attachment://{ctx.command.name}.png")
         await ctx.reply(embed=em, file=discord.File(res, filename=f"{ctx.command.name}.png"), mention_author=False)
 
@@ -108,7 +99,7 @@ class Polaroid(commands.Cog):
             image = str(await getImage(ctx, url))
             img = await (await self.bot.session.get(image)).read()
             res = await self.do_polaroid(img, method="brighten", kwargs={"treshold":50})
-        em=discord.Embed(color=color())
+        em=discord.Embed(color=self.bot.color)
         em.set_image(url=f"attachment://{ctx.command.name}.png")
         await ctx.reply(embed=em, file=discord.File(res, filename=f"{ctx.command.name}.png"), mention_author=False)
 
@@ -119,7 +110,7 @@ class Polaroid(commands.Cog):
             image = str(await getImage(ctx, url))
             img = await (await self.bot.session.get(image)).read()
             res = await self.do_polaroid(img, method="solarize")
-        em=discord.Embed(color=color())
+        em=discord.Embed(color=self.bot.color)
         em.set_image(url=f"attachment://{ctx.command.name}.png")
         await ctx.reply(embed=em, file=discord.File(res, filename=f"{ctx.command.name}.png"), mention_author=False)
 
@@ -130,7 +121,7 @@ class Polaroid(commands.Cog):
             image = str(await getImage(ctx, url))
             img = await (await self.bot.session.get(image)).read()
             res = await self.do_polaroid(img, method="oil", kwargs={"radius":5, "intensity":5})
-        em=discord.Embed(color=color())
+        em=discord.Embed(color=self.bot.color)
         em.set_image(url=f"attachment://{ctx.command.name}.png")
         await ctx.reply(embed=em, file=discord.File(res, filename=f"{ctx.command.name}.png"), mention_author=False)
 
@@ -146,7 +137,7 @@ class Polaroid(commands.Cog):
             image = str(await getImage(ctx, url))
             img = await (await self.bot.session.get(image)).read()
             res = await self.do_polaroid(img, method="filter", args=[ctx.command.name])
-        em=discord.Embed(color=color())
+        em=discord.Embed(color=self.bot.color)
         em.set_image(url=f"attachment://{ctx.command.name}.png")
         await ctx.reply(embed=em, file=discord.File(res, filename=f"{ctx.command.name}.png"), mention_author=False)
 
@@ -157,7 +148,7 @@ class Polaroid(commands.Cog):
             image = str(await getImage(ctx, url))
             img = await (await self.bot.session.get(image)).read()
             res = await self.do_polaroid(img, method="filter", args=[ctx.command.name])
-        em=discord.Embed(color=color())
+        em=discord.Embed(color=self.bot.color)
         em.set_image(url=f"attachment://{ctx.command.name}.png")
         await ctx.reply(embed=em, file=discord.File(res, filename=f"{ctx.command.name}.png"), mention_author=False)
 
@@ -168,7 +159,7 @@ class Polaroid(commands.Cog):
             image = str(await getImage(ctx, url))
             img = await (await self.bot.session.get(image)).read()
             res = await self.do_polaroid(img, method="filter", args=[ctx.command.name])
-        em=discord.Embed(color=color())
+        em=discord.Embed(color=self.bot.color)
         em.set_image(url=f"attachment://{ctx.command.name}.png")
         await ctx.reply(embed=em, file=discord.File(res, filename=f"{ctx.command.name}.png"), mention_author=False)
 
@@ -179,7 +170,7 @@ class Polaroid(commands.Cog):
             image = str(await getImage(ctx, url))
             img = await (await self.bot.session.get(image)).read()
             res = await self.do_polaroid(img, method="filter", args=[ctx.command.name])
-        em=discord.Embed(color=color())
+        em=discord.Embed(color=self.bot.color)
         em.set_image(url=f"attachment://{ctx.command.name}.png")
         await ctx.reply(embed=em, file=discord.File(res, filename=f"{ctx.command.name}.png"), mention_author=False)
 
@@ -190,7 +181,7 @@ class Polaroid(commands.Cog):
             image = str(await getImage(ctx, url))
             img = await (await self.bot.session.get(image)).read()
             res = await self.do_polaroid(img, method="filter", args=[ctx.command.name])
-        em=discord.Embed(color=color())
+        em=discord.Embed(color=self.bot.color)
         em.set_image(url=f"attachment://{ctx.command.name}.png")
         await ctx.reply(embed=em, file=discord.File(res, filename=f"{ctx.command.name}.png"), mention_author=False)
 
@@ -201,7 +192,7 @@ class Polaroid(commands.Cog):
             image = str(await getImage(ctx, url))
             img = await (await self.bot.session.get(image)).read()
             res = await self.do_polaroid(img, method="filter", args=[ctx.command.name])
-        em=discord.Embed(color=color())
+        em=discord.Embed(color=self.bot.color)
         em.set_image(url=f"attachment://{ctx.command.name}.png")
         await ctx.reply(embed=em, file=discord.File(res, filename=f"{ctx.command.name}.png"), mention_author=False)
 
@@ -212,7 +203,7 @@ class Polaroid(commands.Cog):
             image = str(await getImage(ctx, url))
             img = await (await self.bot.session.get(image)).read()
             res = await self.do_polaroid(img, method="filter", args=[ctx.command.name])
-        em=discord.Embed(color=color())
+        em=discord.Embed(color=self.bot.color)
         em.set_image(url=f"attachment://{ctx.command.name}.png")
         await ctx.reply(embed=em, file=discord.File(res, filename=f"{ctx.command.name}.png"), mention_author=False)
 
@@ -223,7 +214,7 @@ class Polaroid(commands.Cog):
             image = str(await getImage(ctx, url))
             img = await (await self.bot.session.get(image)).read()
             res = await self.do_polaroid(img, method="filter", args=[ctx.command.name])
-        em=discord.Embed(color=color())
+        em=discord.Embed(color=self.bot.color)
         em.set_image(url=f"attachment://{ctx.command.name}.png")
         await ctx.reply(embed=em, file=discord.File(res, filename=f"{ctx.command.name}.png"), mention_author=False)
 
@@ -234,7 +225,7 @@ class Polaroid(commands.Cog):
             image = str(await getImage(ctx, url))
             img = await (await self.bot.session.get(image)).read()
             res = await self.do_polaroid(img, method="filter", args=["pastel_pink"])
-        em=discord.Embed(color=color())
+        em=discord.Embed(color=self.bot.color)
         em.set_image(url=f"attachment://{ctx.command.name}.png")
         await ctx.reply(embed=em, file=discord.File(res, filename=f"{ctx.command.name}.png"), mention_author=False)
 
@@ -245,7 +236,7 @@ class Polaroid(commands.Cog):
             image = str(await getImage(ctx, url))
             img = await (await self.bot.session.get(image)).read()
             res = await self.do_polaroid(img, method="filter", args=[ctx.command.name])
-        em=discord.Embed(color=color())
+        em=discord.Embed(color=self.bot.color)
         em.set_image(url=f"attachment://{ctx.command.name}.png")
         await ctx.reply(embed=em, file=discord.File(res, filename=f"{ctx.command.name}.png"), mention_author=False)
 
@@ -256,7 +247,7 @@ class Polaroid(commands.Cog):
             image = str(await getImage(ctx, url))
             img = await (await self.bot.session.get(image)).read()
             res = await self.do_polaroid(img, method="filter", args=[ctx.command.name])
-        em=discord.Embed(color=color())
+        em=discord.Embed(color=self.bot.color)
         em.set_image(url=f"attachment://{ctx.command.name}.png")
         await ctx.reply(embed=em, file=discord.File(res, filename=f"{ctx.command.name}.png"), mention_author=False)
 
@@ -267,7 +258,7 @@ class Polaroid(commands.Cog):
             image = str(await getImage(ctx, url))
             img = await (await self.bot.session.get(image)).read()
             res = await self.do_polaroid(img, method="filter", args=[ctx.command.name])
-        em=discord.Embed(color=color())
+        em=discord.Embed(color=self.bot.color)
         em.set_image(url=f"attachment://{ctx.command.name}.png")
         await ctx.reply(embed=em, file=discord.File(res, filename=f"{ctx.command.name}.png"), mention_author=False)
 
@@ -278,7 +269,7 @@ class Polaroid(commands.Cog):
             image = str(await getImage(ctx, url))
             img = await (await self.bot.session.get(image)).read()
             res = await self.do_polaroid(img, method="filter", args=[ctx.command.name])
-        em=discord.Embed(color=color())
+        em=discord.Embed(color=self.bot.color)
         em.set_image(url=f"attachment://{ctx.command.name}.png")
         await ctx.reply(embed=em, file=discord.File(res, filename=f"{ctx.command.name}.png"), mention_author=False)
 
@@ -289,7 +280,7 @@ class Polaroid(commands.Cog):
             image = str(await getImage(ctx, url))
             img = await (await self.bot.session.get(image)).read()
             res = await self.do_polaroid(img, method="filter", args=[ctx.command.name])
-        em=discord.Embed(color=color())
+        em=discord.Embed(color=self.bot.color)
         em.set_image(url=f"attachment://{ctx.command.name}.png")
         await ctx.reply(embed=em, file=discord.File(res, filename=f"{ctx.command.name}.png"), mention_author=False)
 
@@ -300,7 +291,7 @@ class Polaroid(commands.Cog):
             image = str(await getImage(ctx, url))
             img = await (await self.bot.session.get(image)).read()
             res = await self.do_polaroid(img, method="filter", args=[ctx.command.name])
-        em=discord.Embed(color=color())
+        em=discord.Embed(color=self.bot.color)
         em.set_image(url=f"attachment://{ctx.command.name}.png")
         await ctx.reply(embed=em, file=discord.File(res, filename=f"{ctx.command.name}.png"), mention_author=False)
 
@@ -311,7 +302,7 @@ class Polaroid(commands.Cog):
             image = str(await getImage(ctx, url))
             img = await (await self.bot.session.get(image)).read()
             res = await self.do_polaroid(img, method="filter", args=[ctx.command.name])
-        em=discord.Embed(color=color())
+        em=discord.Embed(color=self.bot.color)
         em.set_image(url=f"attachment://{ctx.command.name}.png")
         await ctx.reply(embed=em, file=discord.File(res, filename=f"{ctx.command.name}.png"), mention_author=False)
 
@@ -322,7 +313,7 @@ class Polaroid(commands.Cog):
             image = str(await getImage(ctx, url))
             img = await (await self.bot.session.get(image)).read()
             res = await self.do_polaroid(img, method="filter", args=[ctx.command.name])
-        em=discord.Embed(color=color())
+        em=discord.Embed(color=self.bot.color)
         em.set_image(url=f"attachment://{ctx.command.name}.png")
         await ctx.reply(embed=em, file=discord.File(res, filename=f"{ctx.command.name}.png"), mention_author=False)
 
@@ -333,7 +324,7 @@ class Polaroid(commands.Cog):
             image = str(await getImage(ctx, url))
             img = await (await self.bot.session.get(image)).read()
             res = await self.do_polaroid(img, method="filter", args=[ctx.command.name])
-        em=discord.Embed(color=color())
+        em=discord.Embed(color=self.bot.color)
         em.set_image(url=f"attachment://{ctx.command.name}.png")
         await ctx.reply(embed=em, file=discord.File(res, filename=f"{ctx.command.name}.png"), mention_author=False)
 
@@ -344,7 +335,7 @@ class Polaroid(commands.Cog):
             image = str(await getImage(ctx, url))
             img = await (await self.bot.session.get(image)).read()
             res = await self.do_polaroid(img, method="filter", args=[ctx.command.name])
-        em=discord.Embed(color=color())
+        em=discord.Embed(color=self.bot.color)
         em.set_image(url=f"attachment://{ctx.command.name}.png")
         await ctx.reply(embed=em, file=discord.File(res, filename=f"{ctx.command.name}.png"), mention_author=False)
 
@@ -355,7 +346,7 @@ class Polaroid(commands.Cog):
             image = str(await getImage(ctx, url))
             img = await (await self.bot.session.get(image)).read()
             res = await self.do_polaroid(img, method="filter", args=[ctx.command.name])
-        em=discord.Embed(color=color())
+        em=discord.Embed(color=self.bot.color)
         em.set_image(url=f"attachment://{ctx.command.name}.png")
         await ctx.reply(embed=em, file=discord.File(res, filename=f"{ctx.command.name}.png"), mention_author=False)
 
@@ -366,7 +357,7 @@ class Polaroid(commands.Cog):
             image = str(await getImage(ctx, url))
             img = await (await self.bot.session.get(image)).read()
             res = await self.do_polaroid(img, method="filter", args=[ctx.command.name])
-        em=discord.Embed(color=color())
+        em=discord.Embed(color=self.bot.color)
         em.set_image(url=f"attachment://{ctx.command.name}.png")
         await ctx.reply(embed=em, file=discord.File(res, filename=f"{ctx.command.name}.png"), mention_author=False)
 
@@ -377,7 +368,7 @@ class Polaroid(commands.Cog):
             image = str(await getImage(ctx, url))
             img = await (await self.bot.session.get(image)).read()
             res = await self.do_polaroid(img, method="filter", args=[ctx.command.name])
-        em=discord.Embed(color=color())
+        em=discord.Embed(color=self.bot.color)
         em.set_image(url=f"attachment://{ctx.command.name}.png")
         await ctx.reply(embed=em, file=discord.File(res, filename=f"{ctx.command.name}.png"), mention_author=False)
 
@@ -388,7 +379,7 @@ class Polaroid(commands.Cog):
             image = str(await getImage(ctx, url))
             img = await (await self.bot.session.get(image)).read()
             res = await self.do_polaroid(img, method="filter", args=[ctx.command.name])
-        em=discord.Embed(color=color())
+        em=discord.Embed(color=self.bot.color)
         em.set_image(url=f"attachment://{ctx.command.name}.png")
         await ctx.reply(embed=em, file=discord.File(res, filename=f"{ctx.command.name}.png"), mention_author=False)
 
