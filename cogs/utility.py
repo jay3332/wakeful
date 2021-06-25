@@ -2004,7 +2004,7 @@ class Utility(commands.Cog):
         else:
             msg = f"Okay, I've marked you as afk for `{reason}`"
         em=discord.Embed(description=msg, color=self.bot.color)
-        await ctx.send(embed=em, mention_author=False)
+        await ctx.send(embed=em)
         await asyncio.sleep(3)
         self.bot.afks[ctx.author.id] = {"reason": reason}
 
