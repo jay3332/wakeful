@@ -73,7 +73,7 @@ class Fun(commands.Cog):
         timestamp = (datetime.datetime(1970, 1, 1) + datetime.timedelta(seconds= int.from_bytes( base64.standard_b64decode(splitted[1] + "==") , "big")+1293840000)).strftime("%d/%m/%Y at %H:%M:%S")
         user = await self.bot.fetch_user(id_)
 
-        badges = [str(self.bot.icons["badges"][e]) for e in list(self.bot.icons["badges"]) if dict(user.public_flags)[e] == True]
+        badges = [str(self.bot.icons["badges"][e]) for e in list(self.bot.icons["badges"]) if dict(user.public_flags)[e] is True]
 
         pronoun = await get_pronoun(self.bot, user)
 
@@ -339,7 +339,7 @@ class Fun(commands.Cog):
         except KeyError:
             return await ctx.send("This subreddit was not found")
 
-        if data["over18"] == True and not ctx.channel.is_nsfw():
+        if data["over18"] is True and not ctx.channel.is_nsfw():
             return await ctx.send("NSFW subreddits can only be posted in nsfw channels")
 
         for x in range(5):
@@ -362,12 +362,12 @@ class Fun(commands.Cog):
 
             if ctx.channel.is_nsfw():
                 over_18 = False
-            elif post["over_18"] == False:
+            elif post["over_18"] is False:
                 over_18 = False
             else:
                 over_18 = True
 
-            if post["pinned"] == False and over_18 == False and "i.redd.it" in post["url"] or "i.imgur.com" in post["url"] and post["url"] is not None and post["is_video"] == False:
+            if post["pinned"] is False and over_18 is False and "i.redd.it" in post["url"] or "i.imgur.com" in post["url"] and post["url"] is not None and post["is_video"] is False:
                 title = post["title"]
                 url = post["url"]
                 permalink = post["permalink"]
@@ -519,6 +519,25 @@ class Fun(commands.Cog):
         else:
             em=discord.Embed(description="​I couldn't find any ascii letters in your text", color=self.bot.color)
             await ctx.reply(embed=em, mention_author=False)
+
+    @commands.command()
+    @commands.cooldown(1,5,commands.BucketType.user)
+    async def eject(self, ctx, member : typing.Union[discord.Member, str], color : str = None, is_impostor : bool = None):
+        if color is None:
+            color = random.choice(['black', 'blue', 'brown', 'cyan', 'darkgreen', 'lime', 'orange', 'pink', 'purple', 'red', 'white', 'yellow'])
+
+        if is_impostor is None:
+            if random.randint(1,2) == 1:
+                is_impostor = True
+            else:
+                is_impostor = False
+
+        async with ctx.typing():
+            res = await (await self.bot.session.get(f"https://vacefron.nl/api/ejected?name={''.join(member if isinstance(member, str) else member.name)}&impostor={is_impostor}&crewmate={color}")).read()
+
+        em=discord.Embed(color=self.bot.color)
+        em.set_image(url=f"attachment://{ctx.command.name}.png")
+        await ctx.send(embed=em, file=discord.File(io.BytesIO(res), filename=f"{ctx.command.name}.png"))
 
     @commands.command()
     @commands.cooldown(1,5,commands.BucketType.user)

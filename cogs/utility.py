@@ -412,6 +412,9 @@ class Utility(commands.Cog):
                     res = await asyncio.wait_for(download(title, url, "mp4"), timeout=300)
             except asyncio.TimeoutError:
                 return await ctx.reply("The download has been cancelled, as it took over 5 minutes", mention_author=False)
+            except Exception as exc:
+                em=discord.Embed(description=f"{self.bot.icons['redtick']} An error occured: ```py\n{exc}```", color=self.bot.color)
+                return await msg.edit(embed=em)
 
             em=discord.Embed(description=f"{self.bot.icons['loading']} Now uploading video", color=self.bot.color)
             await msg.edit(embed=em)
@@ -424,6 +427,8 @@ class Utility(commands.Cog):
             except discord.HTTPException:
                 em=discord.Embed(description="The video was too large to be sent", color=self.bot.color)
                 await ctx.send(embed=em)
+
+            await msg.delete()
 
     @youtube.command(aliases=["audio"])
     @commands.cooldown(1,15,commands.BucketType.user)
@@ -450,6 +455,9 @@ class Utility(commands.Cog):
                     res = await asyncio.wait_for(download(title, url, "mp3"), timeout=300)
             except asyncio.TimeoutError:
                 return await ctx.reply("The download has been cancelled, as it took over 5 minutes", mention_author=False)
+            except Exception as exc:
+                em=discord.Embed(description=f"{self.bot.icons['redtick']} An error occured: ```py\n{exc}```", color=self.bot.color)
+                return await msg.edit(embed=em)
 
             em=discord.Embed(description=f"{self.bot.icons['loading']} Now uploading audio", color=self.bot.color)
             await msg.edit(embed=em)
@@ -463,6 +471,8 @@ class Utility(commands.Cog):
             except discord.HTTPException:
                 em=discord.Embed(description="The video was too large to be sent", color=self.bot.color)
                 await ctx.send(embed=em)
+            
+            await msg.delete()
 
     @commands.command(aliases=["ei"])
     @commands.cooldown(1, 5, commands.BucketType.user)
@@ -476,7 +486,7 @@ class Utility(commands.Cog):
             )
             em.add_field(
                 name="Animated?",
-                value="".join(self.bot.icons['greentick'] if emoji.animated == True else self.bot.icons['redtick']),
+                value="".join(self.bot.icons['greentick'] if emoji.animated is True else self.bot.icons['redtick']),
                 inline=True
             )
             em.set_thumbnail(url=str(emoji.url)+"?size=1024")
@@ -501,7 +511,7 @@ class Utility(commands.Cog):
             )
             em.add_field(
                 name="Animated?",
-                value="".join(self.bot.icons['greentick'] if emoji.animated == True else self.bot.icons['redtick']),
+                value="".join(self.bot.icons['greentick'] if emoji.animated is True else self.bot.icons['redtick']),
                 inline=True
             )
             em.set_thumbnail(url=str(emoji.url)+"?size=1024")
@@ -798,7 +808,7 @@ class Utility(commands.Cog):
 
         join_position = sum(member.joined_at > m.joined_at if m.joined_at is not None else "1" for m in ctx.guild.members)
 
-        badges = [str(self.bot.icons["badges"][e]) for e in list(self.bot.icons["badges"]) if dict(member.public_flags)[e] == True]
+        badges = [str(self.bot.icons["badges"][e]) for e in list(self.bot.icons["badges"]) if dict(member.public_flags)[e] is True]
 
         em=discord.Embed(title=str(member), color=self.bot.color)
         em.add_field(name="Info", value=f"""
@@ -1652,7 +1662,7 @@ class Utility(commands.Cog):
                 disabled = []
             else:
                 disabled = disabled.split(",")
-            if given_command.hidden == True or given_command.name in disabled :
+            if given_command.hidden is True or given_command.name in disabled :
                 if not is_mod(self.bot, ctx.author):
                     return await ctx.reply(f"There isn't a cog or command with the name `{command}`", mention_author=False)
             #-------------------------------------
@@ -1666,7 +1676,7 @@ class Utility(commands.Cog):
             else:
                 parameters = {}
                 for param in list(given_command.params):
-                    if not param in ["self", "ctx"]:
+                    if param not in ["self", "ctx"]:
                         parameter = dict(given_command.params)[str(param)]
                         if parameter.kind.name.lower() == "positional_or_keyword":
                             parameters[str(param)] = "required"
@@ -1785,7 +1795,7 @@ class Utility(commands.Cog):
         cogs = []
         for cog in self.bot.cogs:
             cog = get_cog(self.bot, cog)
-            if not cog.qualified_name.lower() in ["jishaku"]:
+            if cog.qualified_name.lower() not in ["jishaku"]:
                 if is_mod(self.bot, ctx.author):
                     cmds = [cmd for cmd in cog.get_commands()]
                 else:
