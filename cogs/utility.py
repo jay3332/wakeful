@@ -191,10 +191,10 @@ class Utility(commands.Cog):
     async def read(self, ctx):
         if not ctx.message.reference:
             em=discord.Embed(description=f"Please reply to the message you want to read", color=self.bot.color)
-            return await ctx.reply(embed=em, mention_author=False)
+            return await ctx.send(embed=em)
         if not ctx.message.reference.resolved.attachments:
             em=discord.Embed(description=f"The message you replied to doesn't have any attachments", color=self.bot.color)
-            return await ctx.reply(embed=em, mention_author=False)
+            return await ctx.send(embed=em)
         res = (await ctx.message.reference.resolved.attachments[0].read()).decode()
         text = WrapText(res, 2024)
         embeds = []
@@ -232,15 +232,15 @@ class Utility(commands.Cog):
         if attachment is not None:
             if not attachment.url.endswith(".mp4") and not attachment.url.endswith(".mp3"):
                 em=discord.Embed(description="Please attach a mp4 or mp3 file", color=self.bot.color)
-                return await ctx.reply(embed=em, mention_author=False)
+                return await ctx.send(embed=em)
         else:
             em=discord.Embed(description="Please attach a mp4 or mp3 file", color=self.bot.color)
-            return await ctx.reply(embed=em, mention_author=False)
+            return await ctx.send(embed=em)
         
         start_time = datetime.datetime.utcnow()
 
         em=discord.Embed(description=f"{self.bot.icons['loading']} Now downloading song...", color=self.bot.color)
-        msg = await ctx.reply(embed=em, mention_author=False)
+        msg = await ctx.send(embed=em)
 
         res = io.BytesIO(await (await self.bot.session.get(attachment.url or attachment.proxy_url)).read())
 
@@ -395,7 +395,7 @@ class Utility(commands.Cog):
             await ctx.reply("That is not a valid youtube video url", mention_author=False)
         else:
             em=discord.Embed(description=f"{self.bot.icons['loading']} Now downloading video", color=self.bot.color)
-            msg = await ctx.reply(embed=em, mention_author=False)
+            msg = await ctx.send(embed=em)
 
             start_time = datetime.datetime.utcnow()
 
@@ -422,18 +422,18 @@ class Utility(commands.Cog):
                 await ctx.reply(content=f"Download took: {minutes}m, {seconds}s", file=res, mention_author=False)
             except discord.HTTPException:
                 em=discord.Embed(description="The video was too large to be sent", color=self.bot.color)
-                await ctx.reply(embed=em, mention_author=False)
+                await ctx.send(embed=em)
 
     @youtube.command(aliases=["audio"])
     @commands.cooldown(1,15,commands.BucketType.user)
     async def mp3(self, ctx, url):
         if not re.search(r"^(https?\:\/\/)?((www\.)?youtube\.com|youtu\.?be)\/.+$", url):
             em=discord.Embed(description="That is not a valid youtube video url", color=self.bot.color)
-            await ctx.reply(embed=em, mention_author=False)
+            await ctx.send(embed=em)
         else:
 
             em=discord.Embed(description=f"{self.bot.icons['loading']} Now downloading audio", color=self.bot.color)
-            msg = await ctx.reply(embed=em, mention_author=False)
+            msg = await ctx.send(embed=em)
 
             start_time = datetime.datetime.utcnow()
 
@@ -461,7 +461,7 @@ class Utility(commands.Cog):
                 await ctx.reply(content=f"Download took: {minutes}m, {seconds}s", file=res, mention_author=False)
             except discord.HTTPException:
                 em=discord.Embed(description="The video was too large to be sent", color=self.bot.color)
-                await ctx.reply(embed=em, mention_author=False)
+                await ctx.send(embed=em)
 
     @commands.command(aliases=["ei"])
     @commands.cooldown(1, 5, commands.BucketType.user)
@@ -480,7 +480,7 @@ class Utility(commands.Cog):
             )
             em.set_thumbnail(url=str(emoji.url)+"?size=1024")
             em.set_footer(text=f"ID: {emoji.id}", icon_url=ctx.author.avatar_url)
-            await ctx.reply(embed=em, mention_author=False)
+            await ctx.send(embed=em)
         elif isinstance(emoji, discord.Emoji):
             em=discord.Embed(title=emoji.name, color=self.bot.color)
             em.add_field(
@@ -505,12 +505,12 @@ class Utility(commands.Cog):
             )
             em.set_thumbnail(url=str(emoji.url)+"?size=1024")
             em.set_footer(text=f"ID: {emoji.id}", icon_url=ctx.author.avatar_url)
-            await ctx.reply(embed=em, mention_author=False)
+            await ctx.send(embed=em)
         elif isinstance(emoji, str):
             await ctx.message.add_reaction(self.bot.icons['redtick'])
             em=discord.Embed(description=f"This command does not support default emojis, please use bigemoji, emojitoimage or input a custom emoji", color=self.bot.color)
             
-            await ctx.reply(embed=em, mention_author=False)
+            await ctx.send(embed=em)
 
 
     @commands.command(aliases=["shorten"])
@@ -524,7 +524,7 @@ class Utility(commands.Cog):
         em=discord.Embed(description=f"Here's your [shortened url]({res})", color=self.bot.color)
         
         em.set_thumbnail(url="https://support.rebrandly.com/hc/article_attachments/360020801793/rebrandly_url_shortener_010.png")
-        await ctx.reply(embed=em, mention_author=False)
+        await ctx.send(embed=em)
 
     @commands.group(invoke_without_command=True, aliases=["emoji"])
     @commands.cooldown(1,5,commands.BucketType.user)
@@ -539,11 +539,11 @@ class Utility(commands.Cog):
         except asyncpg.UniqueViolationError:
             em=discord.Embed(description=f"You've already opted into the emojis program", color=self.bot.color)
             
-            await ctx.reply(embed=em, mention_author=False)
+            await ctx.send(embed=em)
         else:
             em=discord.Embed(description=f"Alright! I've successfully opted you into the emojis program", color=self.bot.color)
             
-            await ctx.reply(embed=em, mention_author=False)
+            await ctx.send(embed=em)
 
     @emojis.command(aliases=["opt-out"])
     @commands.cooldown(1,5,commands.BucketType.user)
@@ -554,11 +554,11 @@ class Utility(commands.Cog):
         except TypeError:
             em=discord.Embed(description=f"You aren't opted into the emojis program", color=self.bot.color)
             
-            await ctx.reply(embed=em, mention_author=False)
+            await ctx.send(embed=em)
         else:
             em=discord.Embed(description=f"Alright! I've successfully opted you out of the emojis program", color=self.bot.color)
             
-            await ctx.reply(embed=em, mention_author=False)
+            await ctx.send(embed=em)
 
     @commands.command(name="sha256")
     @commands.cooldown(1, 5, commands.BucketType.user)
@@ -605,10 +605,10 @@ class Utility(commands.Cog):
             )
             em.set_thumbnail(url="https://cdn.discordapp.com/attachments/381963689470984203/814267252437942272/pypi.png")
             
-            await ctx.reply(embed=em, mention_author=False)
+            await ctx.send(embed=em)
         except aiohttp.ContentTypeError:
             em=discord.Embed(description=f"This package wasn't found", color=self.bot.color)
-            await ctx.reply(embed=em, mention_author=False)
+            await ctx.send(embed=em)
 
     @commands.group(aliases=["g"], invoke_without_command=True)
     @commands.cooldown(1, 5, commands.BucketType.user)
@@ -673,7 +673,7 @@ class Utility(commands.Cog):
             await pag.start(ctx)
         else:
             em=discord.Embed(description=f"I couldn't find any images with the query `{query}`", color=self.bot.color)
-            await ctx.reply(embed=em, mention_author=False)
+            await ctx.send(embed=em)
 
     @commands.command(aliases=["trans", "tr"])
     @commands.cooldown(1, 5, commands.BucketType.user)
@@ -685,7 +685,7 @@ class Utility(commands.Cog):
             em.add_field(name=f"Output [{translation.dest.upper()}]", value=f"```{translation.text}```", inline=True)
             em.set_author(name=ctx.author, icon_url=ctx.author.avatar_url)
             em.set_thumbnail(url="https://upload.wikimedia.org/wikipedia/commons/d/db/Google_Translate_Icon.png")
-        await ctx.reply(embed=em, mention_author=False)
+        await ctx.send(embed=em)
 
     @commands.command()
     @commands.cooldown(1, 5, commands.BucketType.user)
@@ -696,7 +696,7 @@ class Utility(commands.Cog):
         res = await res.json()
         em = discord.Embed(title=f"Commits", description="\n".join(f"[`{commit['sha'][:6]}`]({commit['html_url']}) {commit['commit']['message']}" for commit in res[:5]), url=self.bot.github+"/commits", color=self.bot.color)
         em.set_thumbnail(url="https://image.flaticon.com/icons/png/512%2F25%2F25231.png")
-        await ctx.reply(embed=em, mention_author=False)
+        await ctx.send(embed=em)
 
     @commands.command(aliases=["guildav", "servericon", "serverav", "sav", "srvav"])
     @commands.guild_only()
@@ -715,7 +715,7 @@ class Utility(commands.Cog):
                 em=discord.Embed(description=f"[png]({avatar_png}) | [jpg]({avatar_jpg}) | [jpeg]({avatar_jpeg}) | [webp]({avatar_webp})", color=self.bot.color)
             em.set_image(url=ctx.guild.icon_url)
             em.set_author(name=f"{ctx.guild.name}", icon_url=ctx.guild.icon_url)
-        await ctx.reply(embed=em, mention_author=False)
+        await ctx.send(embed=em)
 
     @commands.command(aliases=["si", "guildinfo", "gi"])
     @commands.guild_only()
@@ -767,7 +767,7 @@ class Utility(commands.Cog):
 {self.bot.icons['arrow']}Region: `{ctx.guild.region}`
 {self.bot.icons['arrow']}Created at: `{created_at}` ({humanize.naturaltime(ctx.guild.created_at)})""", inline=True)
 
-        await ctx.reply(embed=em, mention_author=False)
+        await ctx.send(embed=em)
 
     @commands.command(aliases=["ui", "whois"], description="A command to get information about the given member", usage="[@member]")
     @commands.guild_only()
@@ -851,13 +851,13 @@ class Utility(commands.Cog):
         pronoun = await get_pronoun(self.bot, member)
 
         em=discord.Embed(description=f"{member.mention}'s pronouns are `{pronoun}`", color=self.bot.color)
-        await ctx.reply(embed=em, mention_author=False)
+        await ctx.send(embed=em)
 
     @commands.command()
     @commands.cooldown(1,5,commands.BucketType.user)
     async def suggest(self, ctx):
         em=discord.Embed(description=f"Please now enter your suggestion below or type `cancel` to cancel", color=self.bot.color)
-        msg = await ctx.reply(embed=em, mention_author=False)
+        msg = await ctx.send(embed=em)
         try:
             suggestion = await self.bot.wait_for("message", check=lambda msg: msg.channel == ctx.channel and msg.author == ctx.author, timeout=30)
         except asyncio.TimeoutError:
@@ -910,7 +910,7 @@ class Utility(commands.Cog):
             if isImage(message.attachments[0].url):
                 em.set_thumbnail(url=message.attachments[0].url)
 
-        await ctx.reply(embed=em, mention_author=False)
+        await ctx.send(embed=em)
 
     @commands.command(aliases=["gif"])
     @commands.cooldown(1,5,commands.BucketType.user)
@@ -923,10 +923,10 @@ class Utility(commands.Cog):
             image = res["images"]["original"]["url"]
             em=discord.Embed(title=res["title"], url=res["url"], color=self.bot.color)
             em.set_image(url=image)
-            await ctx.reply(embed=em, mention_author=False)
+            await ctx.send(embed=em)
         else:
             em=discord.Embed(description=f"I couldn't find any results with the query `{query}`", color=self.bot.color)
-            await ctx.reply(embed=em, mention_author=False)
+            await ctx.send(embed=em)
 
 
     @commands.command(aliases=["urban"])
@@ -958,25 +958,25 @@ class Utility(commands.Cog):
             await pag.start(ctx)
         else:
             em=discord.Embed(description=f"I could not find any results for `{term}`", color=self.bot.color)
-            await ctx.reply(embed=em, mention_author=False)
+            await ctx.send(embed=em)
 
     @commands.command(aliases=["src"])
     @commands.cooldown(1,5,commands.BucketType.user)
     async def source(self, ctx, *, command_name : str = None):
         if command_name is None:
             em=discord.Embed(description=f"My source code can be found [here]({self.bot.github})", color=self.bot.color)
-            return await ctx.reply(embed=em, mention_author=False)
+            return await ctx.send(embed=em)
 
         command = self.bot.get_command(command_name)
         if command is None:
             em=discord.Embed(description=f"Couldn't find command `{command_name}`", color=self.bot.color)
-            return await ctx.reply(embed=em, mention_author=False)
+            return await ctx.send(embed=em)
 
         try:
             source_lines, _ = inspect.getsourcelines(command.callback)
         except (TypeError, OSError):
             em=discord.Embed(description=f"Couldn't retrieve source for `{command_name}`", color=self.bot.color)
-            await ctx.reply(embed=em, mention_author=False)
+            await ctx.send(embed=em)
         else:
             source_lines = ''.join(source_lines).split('\n')
             src = textwrap.dedent("\n".join(line for line in source_lines))
@@ -995,7 +995,7 @@ class Utility(commands.Cog):
         else:
             em.set_footer(text=f"Author: N/A • Updated: {updated.strftime('%d/%m/%Y at %H:%M:%S')}")
         em.set_thumbnail(url="https://images.emojiterra.com/google/android-11/128px/1f4f0.png")
-        await ctx.reply(embed=em, mention_author=False)
+        await ctx.send(embed=em)
 
     @news.command(hidden=True, aliases=["update"])
     @commands.is_owner()
@@ -1039,26 +1039,26 @@ class Utility(commands.Cog):
                 em=discord.Embed(description=f"[png]({avatar_png}) | [jpg]({avatar_jpg}) | [jpeg]({avatar_jpeg}) | [webp]({avatar_webp})", color=self.bot.color)
             em.set_image(url=member.avatar_url)
             em.set_author(name=f"{member}", icon_url=member.avatar_url)
-        await ctx.reply(embed=em, mention_author=False)
+        await ctx.send(embed=em)
 
     @commands.command(aliases=["lc"])
     @commands.cooldown(1,5,commands.BucketType.user)
     async def lettercount(self, ctx, *, text):
         em=discord.Embed(description=f"Your text is {len(text)} letters long", color=self.bot.color)
-        await ctx.reply(embed=em, mention_author=False)
+        await ctx.send(embed=em)
 
     @commands.command(aliases=["wc"])
     @commands.cooldown(1,5,commands.BucketType.user)
     async def wordcount(self, ctx, *, text):
         text_list = text.split(" ")
         em=discord.Embed(description=f"Your text is {len(text_list)} words long", color=self.bot.color)
-        await ctx.reply(embed=em, mention_author=False)
+        await ctx.send(embed=em)
 
     @commands.command()
     @commands.cooldown(1,5,commands.BucketType.user)
     async def invite(self, ctx):
         em=discord.Embed(description=f"Here's my [invite](https://discord.com/api/oauth2/authorize?client_id={self.bot.user.id}&permissions=8&scope=bot)", color=self.bot.color)
-        await ctx.reply(embed=em, mention_author=False)
+        await ctx.send(embed=em)
 
     @commands.command(aliases=["up"])
     @commands.cooldown(1,5,commands.BucketType.user)
@@ -1069,7 +1069,7 @@ class Utility(commands.Cog):
         days, hours = divmod(hours, 24)
         em=discord.Embed(title="Uptime", description=f"{days}d, {hours}h, {minutes}m, {seconds}s", color=self.bot.color)
         em.set_thumbnail(url="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c0/Eo_circle_green_arrow-up.svg/1200px-Eo_circle_green_arrow-up.svg.png")
-        await ctx.reply(embed=em, mention_author=False)
+        await ctx.send(embed=em)
 
     @commands.command(aliases=["botinfo", "about", "bi"])
     @commands.cooldown(1, 5, commands.BucketType.user)
@@ -1114,7 +1114,7 @@ class Utility(commands.Cog):
 {self.bot.icons['arrow']}[Invite](https://discord.com/api/oauth2/authorize?client_id={self.bot.user.id}&permissions=8&scope=bot)""", inline=True)
             em.set_thumbnail(url=self.bot.user.avatar_url)
         em.set_footer(text=f"Python {version[0]}.{version[1]}.{version[2]} • discord.py {discord.__version__}")
-        await ctx.reply(embed=em, mention_author=False)
+        await ctx.send(embed=em)
 
     @commands.command()
     @commands.cooldown(1,5,commands.BucketType.user)
@@ -1157,10 +1157,10 @@ class Utility(commands.Cog):
             em.add_field(name="Album", value=activity.album, inline=False)
             em.add_field(name="Duration", value=f"{minutes}m {seconds}s", inline=False)
             em.set_thumbnail(url=activity.album_cover_url)
-            await ctx.reply(embed=em, mention_author=False)
+            await ctx.send(embed=em)
         else:
             em=discord.Embed(description=f"{member.mention} isn't listening to spotify", color=self.bot.color)
-            await ctx.reply(embed=em, mention_author=False)
+            await ctx.send(embed=em)
     
     @commands.command(aliases=["rp", "activity", "richpresence", "status"])
     @commands.cooldown(1,5,commands.BucketType.user)
@@ -1249,7 +1249,7 @@ class Utility(commands.Cog):
             await ctx.reply(res["data"], mention_author=False, allowed_mentions=discord.AllowedMentions.none())
         else:
             em=discord.Embed(description=res["error"], color=self.bot.color)
-            await ctx.reply(embed=em, mention_author=False)
+            await ctx.send(embed=em)
 
     @commands.command(aliases=["run", "tio"])
     @commands.cooldown(1,10,commands.BucketType.user)
@@ -1295,7 +1295,7 @@ class Utility(commands.Cog):
         except KeyError:
             em=discord.Embed(description=f"I couldn't find the platform `{platform}`", color=self.bot.color)
             
-            await ctx.reply(embed=em, mention_author=False)
+            await ctx.send(embed=em)
         else:
             async with ctx.typing():
                 res = await self.bot.session.get(f"https://api.fortnitetracker.com/v1/profile/{platformm}/{username}", headers={"TRN-Api-Key":self.bot.config["FORTNITE"]})
@@ -1305,7 +1305,7 @@ class Utility(commands.Cog):
             except KeyError:
                 em=discord.Embed(description=res["error"], color=self.bot.color)
                 
-                await ctx.reply(embed=em, mention_author=False)
+                await ctx.send(embed=em)
             else:
                 accid = res["accountId"]
                 avatar = res["avatar"]
@@ -1333,7 +1333,7 @@ class Utility(commands.Cog):
 """,
                         inline=True
                     )
-                await ctx.reply(embed=em, mention_author=False)
+                await ctx.send(embed=em)
 
     @commands.command()
     @commands.has_guild_permissions(manage_emojis=True)
@@ -1355,7 +1355,7 @@ class Utility(commands.Cog):
             msg = self.bot.message_cache[ctx.guild.id][ctx.channel.id]
         except KeyError:
             em=discord.Embed(description=f"There's no message to snipe", color=self.bot.color)
-            return await ctx.reply(embed=em, mention_author=False)
+            return await ctx.send(embed=em)
 
         content = msg.content
 
@@ -1393,7 +1393,7 @@ class Utility(commands.Cog):
         reaction, user = await self.bot.wait_for("reaction_add", check=lambda reaction, user: str(reaction.emoji) == "🚮" and reaction.message == msg and not user.bot)
         await msg.delete()
         em=discord.Embed(description=f"The screenshot has been deleted by {user.mention}", color=self.bot.color)
-        await ctx.reply(embed=em, mention_author=False)
+        await ctx.send(embed=em)
 
 
     @commands.command()
@@ -1404,17 +1404,17 @@ class Utility(commands.Cog):
             res["commands"]
         except TypeError:
             em=discord.Embed(description=f"There are no disabled commands", color=self.bot.color)
-            await ctx.reply(embed=em, mention_author=False)
+            await ctx.send(embed=em)
         else:
             commands = res["commands"]
             commands = commands.split(",")
             if len(commands) != 0 and commands != ['']:
                 em=discord.Embed(title="Disabled commands", description=", ".join(cmd for cmd in commands if cmd != ""), color=self.bot.color)
 
-                await ctx.reply(embed=em, mention_author=False)
+                await ctx.send(embed=em)
             else:
                 em=discord.Embed(description=f"There are no disabled commands", color=self.bot.color)
-                await ctx.reply(embed=em, mention_author=False)
+                await ctx.send(embed=em)
 
     @commands.group(aliases=["rtfd"], invoke_without_command=True)
     @commands.cooldown(1,5,commands.BucketType.user)
@@ -1425,10 +1425,10 @@ class Utility(commands.Cog):
             nodes = res["nodes"]
         if nodes != {}:
             em=discord.Embed(description="\n".join(f"[`{e}`]({nodes[e]})" for e in nodes), color=self.bot.color)
-            await ctx.reply(embed=em, mention_author=False)
+            await ctx.send(embed=em)
         else:
             em=discord.Embed(description=f"No results found for `{query}`", color=self.bot.color)
-            await ctx.reply(embed=em, mention_author=False)
+            await ctx.send(embed=em)
 
     @rtfm.command(name="python", aliases=["py"])
     @commands.cooldown(1,5,commands.BucketType.user)
@@ -1439,10 +1439,10 @@ class Utility(commands.Cog):
             nodes = res["nodes"]
         if nodes != {}:
             em=discord.Embed(description="\n".join(f"[`{e}`]({nodes[e]})" for e in nodes), color=self.bot.color)
-            await ctx.reply(embed=em, mention_author=False)
+            await ctx.send(embed=em)
         else:
             em=discord.Embed(description=f"No results found for `{query}`", color=self.bot.color)
-            await ctx.reply(embed=em, mention_author=False)
+            await ctx.send(embed=em)
 
     @rtfm.command(aliases=["cs"])
     @commands.cooldown(1,5,commands.BucketType.user)
@@ -1455,13 +1455,13 @@ class Utility(commands.Cog):
             nodes = res["nodes"]
             if nodes != {}:
                 em=discord.Embed(description="\n".join(f"[`{e}`]({nodes[e]})" for e in nodes), color=self.bot.color)
-                await ctx.reply(embed=em, mention_author=False)
+                await ctx.send(embed=em)
             else:
                 em=discord.Embed(description=f"No results found for `{query}`", color=self.bot.color)
-                await ctx.reply(embed=em, mention_author=False)
+                await ctx.send(embed=em)
         else:
             em=discord.Embed(description=f"Invalid result, maybe [the url]({url}) was invalid", color=self.bot.color)
-            await ctx.reply(embed=em, mention_author=False)
+            await ctx.send(embed=em)
 
     @commands.command()
     @commands.cooldown(1,5,commands.BucketType.user)
@@ -1475,7 +1475,7 @@ class Utility(commands.Cog):
             except Exception:
                 em=discord.Embed(description=f"I couldn't retrieve the weather for `{state}`", color=self.bot.color)
                 
-                await ctx.reply(embed=em, mention_author=False)
+                await ctx.send(embed=em)
             else:
                 results = await google.search(location[0]["title"], safesearch=True)
                 image = None
@@ -1499,7 +1499,7 @@ class Utility(commands.Cog):
                 if image is not None:
                     em.set_thumbnail(url=image)
                 em.set_footer(text=f"Powered by metaweather.com", icon_url=ctx.author.avatar_url)
-                await ctx.reply(embed=em, mention_author=False)
+                await ctx.send(embed=em)
 
     @commands.command()
     @commands.cooldown(1,5,commands.BucketType.user)
@@ -1508,7 +1508,7 @@ class Utility(commands.Cog):
             res = await self.bot.session.get(f"https://api.snaz.in/v2/steam/user-profile/{steamid}")
         if res.status != 200:
             em=discord.Embed(description=f"I couldn't find the member `{steamid}`", color=self.bot.color)
-            await ctx.reply(embed=em, mention_author=False)
+            await ctx.send(embed=em)
         else:
             res = await res.json()
             username = res["username"]
@@ -1536,7 +1536,7 @@ class Utility(commands.Cog):
             em.add_field(name="Background URL", value="".join(f"[Click here]({background})" if background is not None else "N/A"), inline=True)
             if avatar is not None:
                 em.set_thumbnail(url=avatar)
-            await ctx.reply(embed=em, mention_author=False)
+            await ctx.send(embed=em)
 
     @commands.command(aliases=["corona", "coronavirus", "covid19"])
     @commands.cooldown(1,5,commands.BucketType.user)
@@ -1562,10 +1562,10 @@ class Utility(commands.Cog):
 {self.bot.icons['arrow']}Recovered Today: {stats['todayRecovered']}
 """, color=self.bot.color)
             em.set_thumbnail(url=stats["countryInfo"]["flag"])
-            await ctx.reply(embed=em, mention_author=False)
+            await ctx.send(embed=em)
         else:
             em=discord.Embed(description=f"I couldn't find any covid stats for `{country}`", color=self.bot.color)
-            await ctx.reply(embed=em, mention_author=False)
+            await ctx.send(embed=em)
 
     @commands.command(aliases=["calculator", "calculater", "calc"])
     @commands.cooldown(1,5,commands.BucketType.user)
@@ -1638,7 +1638,7 @@ class Utility(commands.Cog):
                 value=content,
                 inline=True
             )
-            await ctx.reply(embed=em, mention_author=False)
+            await ctx.send(embed=em)
 
         elif self.bot.get_command(str(command)) is not None:
             given_command = self.bot.get_command(str(command))
@@ -1712,7 +1712,7 @@ class Utility(commands.Cog):
             except AttributeError:
                 em.add_field(name=f"Subcommands [0]", value="N/A", inline=False)
             em.add_field(name="Category", value=given_command.cog_name, inline=False)
-            await ctx.reply(embed=em, mention_author=False)
+            await ctx.send(embed=em)
         else:
             disabled = await self.bot.db.fetchrow("SELECT commands FROM commands WHERE guild = $1", ctx.guild.id)
             try:
@@ -1726,7 +1726,7 @@ class Utility(commands.Cog):
                 commands_ = [cmd for cmd in given_cog.walk_commands() if cmd.parent is None]
                 if commands_ is not None and commands_ != []:
                     em=discord.Embed(title=f"{given_cog.qualified_name} commands [{len(commands_)}]", description=f"{given_cog.description}\n\n> "+", ".join(f"`{cmd.name}`" for cmd in commands_), color=self.bot.color)
-                    await ctx.reply(embed=em, mention_author=False)
+                    await ctx.send(embed=em)
                 else:
                     await ctx.reply(f"There isn't a cog or command with the name `{command}`", mention_author=False)
             else:
@@ -1855,10 +1855,10 @@ class Utility(commands.Cog):
 {self.bot.icons['arrow']}UID: `{uid}`
 """, color=self.bot.color, url=f"https://namemc.com/profile/{name}")
             em.set_thumbnail(url=f"https://crafatar.com/avatars/{uid}?default=MHF_Steve&overlay&size=256")
-            await ctx.reply(embed=em, mention_author=False)
+            await ctx.send(embed=em)
         else:
             em=discord.Embed(description=f"I couldn't find a player with the name `{username}`", color=self.bot.color)
-            await ctx.reply(embed=em, mention_author=False)
+            await ctx.send(embed=em)
 
     @minecraft.command()
     @commands.cooldown(1,10,commands.BucketType.user)
@@ -1870,10 +1870,10 @@ class Utility(commands.Cog):
             uid = uid["id"]
             em=discord.Embed(title=f"{name}'s avatar", color=self.bot.color, url=f"https://namemc.com/profile/{name}")
             em.set_image(url=f"https://crafatar.com/avatars/{uid}?default=MHF_Steve&overlay&size128")
-            await ctx.reply(embed=em, mention_author=False)
+            await ctx.send(embed=em)
         else:
             em=discord.Embed(description=f"I couldn't find a player with the name `{username}`", color=self.bot.color)
-            await ctx.reply(embed=em, mention_author=False)
+            await ctx.send(embed=em)
 
     @minecraft.command()
     @commands.cooldown(1,10,commands.BucketType.user)
@@ -1885,10 +1885,10 @@ class Utility(commands.Cog):
             uid = uid["id"]
             em=discord.Embed(title=f"{name}'s skin", color=self.bot.color, url=f"https://namemc.com/profile/{name}")
             em.set_image(url=f"https://crafatar.com/renders/body/{uid}?default=MHF_Steve&overlay&scale=5")
-            await ctx.reply(embed=em, mention_author=False)
+            await ctx.send(embed=em)
         else:
             em=discord.Embed(description=f"I couldn't find a player with the name `{username}`", color=self.bot.color)
-            await ctx.reply(embed=em, mention_author=False)
+            await ctx.send(embed=em)
 
     @minecraft.command()
     @commands.cooldown(1,10,commands.BucketType.user)
@@ -1900,10 +1900,10 @@ class Utility(commands.Cog):
             uid = uid["id"]
             em=discord.Embed(title=f"{name}'s head", color=self.bot.color, url=f"https://namemc.com/profile/{name}")
             em.set_image(url=f"https://crafatar.com/renders/head/{uid}?default=MHF_Steve&overlay&scale=5")
-            await ctx.reply(embed=em, mention_author=False)
+            await ctx.send(embed=em)
         else:
             em=discord.Embed(description=f"I couldn't find a player with the name `{username}`", color=self.bot.color)
-            await ctx.reply(embed=em, mention_author=False)
+            await ctx.send(embed=em)
 
     @minecraft.command()
     @commands.cooldown(1,10,commands.BucketType.user)
@@ -1927,14 +1927,14 @@ class Utility(commands.Cog):
 """,
                         inline=True
                     )
-                await ctx.reply(embed=em, mention_author=False)
+                await ctx.send(embed=em)
             else:
                 em=discord.Embed(description=f"`{name}` has no friends on namemc.com", color=self.bot.color, url=f"https://namemc.com/profile/{name}")
                 em.set_thumbnail(url=f"https://crafatar.com/avatars/{uid}?default=MHF_Steve&overlay&size=256")
-                await ctx.reply(embed=em, mention_author=False)
+                await ctx.send(embed=em)
         else:
             em=discord.Embed(description=f"I couldn't find a player with the name `{username}`", color=self.bot.color)
-            await ctx.reply(embed=em, mention_author=False)
+            await ctx.send(embed=em)
 
     @commands.command()
     @commands.cooldown(1,5,commands.BucketType.user)
@@ -1943,7 +1943,7 @@ class Utility(commands.Cog):
             invite = await self.bot.fetch_invite(invite)
         except discord.NotFound:
             em=discord.Embed(description=f"I couldn't find this invite", color=self.bot.color)
-            await ctx.reply(embed=em, mention_author=False)
+            await ctx.send(embed=em)
         else:
             guild = invite.guild
             if guild.description is not None:
@@ -1960,14 +1960,14 @@ class Utility(commands.Cog):
             em.set_footer(text=f"ID: {guild.id}", icon_url=ctx.author.avatar_url)
             if guild.banner_url is not None:
                 em.set_image(url=guild.banner_url)
-            await ctx.reply(embed=em, mention_author=False)
+            await ctx.send(embed=em)
 
     @commands.command()
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def ping(self, ctx):
         em=discord.Embed(title="🏓 Pong", description=f"{self.bot.icons['loading']} Now measuring latency...", color=self.bot.color)
         start=time.perf_counter()
-        msg = await ctx.reply(embed=em, mention_author=False)
+        msg = await ctx.send(embed=em)
         end=time.perf_counter()
         final=end-start
         typing = round(final*1000)
@@ -1991,7 +1991,7 @@ class Utility(commands.Cog):
         else:
             msg = f"Okay, I've marked you as afk for `{reason}`"
         em=discord.Embed(description=msg, color=self.bot.color)
-        await ctx.reply(embed=em, mention_author=False)
+        await ctx.send(embed=em, mention_author=False)
         await asyncio.sleep(3)
         self.bot.afks[ctx.author.id] = {"reason": reason}
 
@@ -2011,7 +2011,7 @@ class Utility(commands.Cog):
             color=self.bot.color
         )
         if len(em.description) < 2048:
-            await ctx.reply(embed=em, mention_author=False)
+            await ctx.send(embed=em)
         else:
             f = await getFile(raw, "json")
             await ctx.reply(file=f, mention_author=False)

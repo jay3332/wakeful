@@ -174,6 +174,17 @@ class Errors(commands.Cog):
                 raise error
 
     @commands.Cog.listener()
+    async def on_member_update(self, before, after):
+        if after.guild.id != 336642139381301249:
+            return
+
+        role = after.guild.premium_subscriber_role
+        if not role in before.roles and role in after.roles:
+            channel = after.guild.get_channel(381963689470984203)
+            em=discord.Embed(description=f"{self.bot.icons['vibecat']} {after.mention} has just boosted the server {await self.bot.roo(self.bot).pog()}", color=self.bot.color)
+            await channel.send(embed=em)
+
+    @commands.Cog.listener()
     async def on_guild_join(self, guild):
         webhook = Webhook.from_url(str(self.bot.config["LOGS"]), adapter=AsyncWebhookAdapter(self.bot.session))
         em=discord.Embed(title="Join Guild", description=f"""
