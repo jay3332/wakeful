@@ -128,6 +128,10 @@ class Player(wavelink.Player):
         self.updating = True
 
         if not self.controller:
+            embed = self.build_embed()
+            if embed is None:
+                return await self.context.send("There currently isn't a song playing")
+
             self.controller = InteractiveController(embed=self.build_embed(), player=self)
             await self.controller.start(self.context)
 
@@ -151,8 +155,9 @@ class Player(wavelink.Player):
     def build_embed(self) -> typing.Optional[discord.Embed]:
         """Method which builds our players controller embed."""
         track = self.current
+
         if not track:
-            return
+            return None
 
         player: Player = self.bot.wavelink.get_player(self.context.guild.id, cls=Player)
 
