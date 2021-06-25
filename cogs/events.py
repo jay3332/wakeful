@@ -80,7 +80,8 @@ class Errors(commands.Cog):
 
                         reaction, user = await self.bot.wait_for("reaction_add", check=lambda reaction, user: user == ctx.author and str(reaction.emoji) in reactions and reaction.message == msg)
                         if str(reaction.emoji) == self.bot.icons['greentick']:
-                            alt_ctx = await copy_context_with(ctx, author=ctx.author, content=f"{ctx.prefix}{match[0]}")
+                            args = ctx.message.content.removeprefix(f"{ctx.prefix}{cmd}")
+                            alt_ctx = await copy_context_with(ctx, author=ctx.author, content=f"{ctx.prefix}{match[0]}{args}")
                             await self.bot.invoke(alt_ctx)
                         elif str(reaction.emoji) == self.bot.icons['redtick']:
                             await msg.delete()

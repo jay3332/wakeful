@@ -324,12 +324,27 @@ class Fun(commands.Cog):
         if subreddit.startswith("r/"):
             subreddit = subreddit[2:]
         about = await (await self.bot.session.get(f"https://www.reddit.com/r/{subreddit}/about.json")).json()
-        if about["data"]["over18"] == True and not ctx.channel.is_nsfw():
+        try:
+            reason = about["reason"]
+        except:
+            pass
+        else:
+            return await ctx.send(f"This subreddit is {reason}")
+
+        try:
+            data = about["data"]
+        except KeyError:
+            return await ctx.send("This subreddit was not found")
+
+        if data["over18"] == True and not ctx.channel.is_nsfw():
             return await ctx.send("NSFW subreddits can only be posted in nsfw channels")
 
         for x in range(5):
             async with ctx.typing():
                 res = await (await self.bot.session.get(f"https://reddit.com/r/{subreddit}/top.json")).json()
+
+                if len(res["children"]) == 0:
+                    return await ctx.send("This subreddit doesn't have any posts")
 
                 try:
                     error = res["error"]
@@ -341,7 +356,15 @@ class Fun(commands.Cog):
 
                 amount = len(res["data"]["children"])
                 post = res["data"]["children"][random.randrange(0,amount)]["data"]
-            if post["pinned"] == False and (ctx.channel.is_nsfw() == False and post["over_18"] == False) and "i.redd.it" in post["url"] or "i.imgur.com" in post["url"] and post["url"] is not None and post["is_video"] == False:
+
+            if ctx.channel.is_nsfw():
+                over_18 = False
+            elif post["over_18"] == False:
+                over_18 = False
+            else:
+                over_18 = True
+
+            if post["pinned"] == False and over_18 and "i.redd.it" in post["url"] or "i.imgur.com" in post["url"] and post["url"] is not None and post["is_video"] == False:
                 title = post["title"]
                 url = post["url"]
                 permalink = post["permalink"]

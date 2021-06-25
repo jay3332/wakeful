@@ -620,27 +620,27 @@ class Utility(commands.Cog):
             else:
                 safe_search_setting=True
                 safe_search="Enabled"
+                
             try:
                 results = await google.search(str(query), safesearch=safe_search_setting)
             except async_cse.NoResults:
-                em=discord.Embed(description=f"I couldn't find any results for `{query}`", color=self.bot.color)
-                await ctx.reply(embed=em, mention_author=False)
-            else:
-                embeds = []
-                image = None
-                for res in results:
-                    if isImage(res.image_url):
-                        image = res.image_url
-                embeds = []
-                res = WrapList(results, 3)
-                for txt in res:
-                    em=discord.Embed(title=f"Results for: `{query}`", description="\n".join(f"**[{str(res.title)}]({str(res.url)})**\n{str(res.description)}\n" for res in txt), color=self.bot.color)
-                    em.set_footer(text=f"Safe-Search: {safe_search}", icon_url=ctx.author.avatar_url)
-                    if image is not None:
-                        em.set_thumbnail(url=image)
-                    embeds.append(em)
-                pag = self.bot.paginate(Paginator(embeds, per_page=1))
-                await pag.start(ctx)
+                return await ctx.send(f"I couldn't find any results for `{query}`")
+
+            embeds = []
+            image = None
+            for res in results:
+                if isImage(res.image_url):
+                    image = res.image_url
+            embeds = []
+            res = WrapList(results, 3)
+            for txt in res:
+                em=discord.Embed(title=f"Results for: `{query}`", description="\n".join(f"**[{str(res.title)}]({str(res.url)})**\n{str(res.description)}\n" for res in txt), color=self.bot.color)
+                em.set_footer(text=f"Safe-Search: {safe_search}", icon_url=ctx.author.avatar_url)
+                if image is not None:
+                    em.set_thumbnail(url=image)
+                embeds.append(em)
+            pag = self.bot.paginate(Paginator(embeds, per_page=1))
+            await pag.start(ctx)
 
     @google.command(aliases=["i"])
     @commands.cooldown(1, 5, commands.BucketType.user)
@@ -652,7 +652,12 @@ class Utility(commands.Cog):
             safe_search_setting=True
             safe_search="Enabled"
         async with ctx.typing():
-            results = await google.search(query, safesearch=safe_search_setting, image_search=True)
+
+            try:
+                results = await google.search(query, safesearch=safe_search_setting, image_search=True)
+            except async_cse.NoResults:
+                return await ctx.send(f"I couldn't find any results for `{query}`")
+
             images = []
             for res in results:
                 if isImage(res.image_url):
@@ -860,7 +865,7 @@ class Utility(commands.Cog):
             await msg.edit(embed=em)
         else:
             if suggestion.content.lower() != "cancel":
-                webhook = Webhook.from_url(str(get_config("SUGGESTIONS")), adapter=AsyncWebhookAdapter(self.bot.session))
+                webhook = Webhook.from_url(str(self.bot.config["SUGGESTIONS"]), adapter=AsyncWebhookAdapter(self.bot.session))
                 em=discord.Embed(description=f"```{suggestion.clean_content}```", color=self.bot.color)
                 em.set_footer(text=f"Suggestion by {ctx.author} ({ctx.author.id})", icon_url=ctx.author.avatar_url)
                 attachment = None
@@ -911,7 +916,7 @@ class Utility(commands.Cog):
     @commands.cooldown(1,5,commands.BucketType.user)
     async def giphy(self, ctx, *, query : str):
         query = query.replace(" ", "%20")
-        res = await self.bot.session.get(f"https://api.giphy.com/v1/gifs/search?api_key={get_config('GIPHY')}&q={query}&limit=50&offset=0&rating=g&lang=en")
+        res = await self.bot.session.get(f"https://api.giphy.com/v1/gifs/search?api_key={self.bot.config['GIPHY']}&q={query}&limit=50&offset=0&rating=g&lang=en")
         res = await res.json()
         if res["data"] != [] and len(res["data"]) != 0:
             res = random.choice(res["data"])
@@ -1293,7 +1298,7 @@ class Utility(commands.Cog):
             await ctx.reply(embed=em, mention_author=False)
         else:
             async with ctx.typing():
-                res = await self.bot.session.get(f"https://api.fortnitetracker.com/v1/profile/{platformm}/{username}", headers={"TRN-Api-Key":get_config("FORTNITE")})
+                res = await self.bot.session.get(f"https://api.fortnitetracker.com/v1/profile/{platformm}/{username}", headers={"TRN-Api-Key":self.bot.config["FORTNITE"]})
                 res = await res.json()
             try:
                 error = str(res["accountId"])
@@ -1378,7 +1383,7 @@ class Utility(commands.Cog):
     @commands.cooldown(1,5,commands.BucketType.user)
     async def screenshot(self, ctx, website):
         async with ctx.typing():
-            res = await self.bot.session.get(f"https://api.screenshotmachine.com?key={get_config('SCREENSHOT')}&url={website}&dimension=1280x720&user-agent=Mozilla/5.0 (Windows NT 10.0; rv:80.0) Gecko/20100101 Firefox/80.0")
+            res = await self.bot.session.get(f"https://api.screenshotmachine.com?key={self.bot.config['SCREENSHOT']}&url={website}&dimension=1280x720&user-agent=Mozilla/5.0 (Windows NT 10.0; rv:80.0) Gecko/20100101 Firefox/80.0")
             res = io.BytesIO(await res.read())
             em=discord.Embed(color=self.bot.color)
             em.set_image(url="attachment://screenshot.jpg")
@@ -2032,7 +2037,7 @@ class Utility(commands.Cog):
             filetype = None
         
         async with ctx.typing():
-            res = (await (await self.bot.session.get("https://idevision.net/api/public/ocr", headers={"Authorization":get_config("IDEVISION")}, params={"filetype":filetype}, data=image)).json())["data"]
+            res = (await (await self.bot.session.get("https://idevision.net/api/public/ocr", headers={"Authorization":self.bot.config["IDEVISION"]}, params={"filetype":filetype}, data=image)).json())["data"]
 
         text = WrapText(res, 1024)
         if len(text) == 0:

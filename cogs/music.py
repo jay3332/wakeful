@@ -373,7 +373,7 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
     async def on_player_stop(self, node: wavelink.Node, payload):
         await payload.player.do_next()
 
-    @commands.Cog.listener("on_voice_state_update")
+    @commands.Cog.listener(name="on_voice_state_update")
     async def auto_leave(self, member, before, after):
         if member.guild.voice_client is not None and member.guild.me.voice is not None:
             if before.channel is not None and after.channel is None:
@@ -432,11 +432,12 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
 
         if player.context:
             if player.context.channel != ctx.channel:
-                await ctx.send(f'{ctx.author.mention}, you must be in {player.context.channel.mention} for this session.')
+                await ctx.send(f'You must be in {player.context.channel.mention} for this session.', allowed_mentions=discord.AllowedMentions.users)
                 raise IncorrectChannelError
 
         if ctx.command.name == 'connect' and not player.context:
             return
+
         elif self.is_privileged(ctx):
             return
 
@@ -449,7 +450,7 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
 
         if player.is_connected:
             if ctx.author not in channel.members:
-                await ctx.send(f'{ctx.author.mention}, you must be in `{channel.name}` to use voice commands.')
+                await ctx.send(f'You must be in `{channel.mention}` to use voice commands.', allowed_mentions=discord.AllowedMentions.users)
                 raise IncorrectChannelError
 
     def required(self, ctx):
@@ -536,6 +537,16 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
         else:
             player.looping = True
             await ctx.message.add_reaction(self.bot.icons["on"])
+
+    @commands.command(aliases=["dis"])
+    async def disconnect(self, ctx):
+        player: Player = self.bot.wavelink.get_player(guild_id=ctx.guild.id, cls=Player, context=ctx)
+
+        if not player.is_connected:
+            return await ctx.send("I am not connected to any voice channel")
+            
+        await player.disconnect()
+        await ctx.message.add_reaction(self.bot.icons["greentick"])
 
     @commands.command(aliases=["rplay"])
     @commands.cooldown(1,5,commands.BucketType.user)
