@@ -41,10 +41,10 @@ class Errors(commands.Cog):
 
     @commands.Cog.listener()
     async def on_command_error(self, ctx, error):
-        if self.bot.get_command(ctx.invoked_with).has_error_handler():
+        if ctx.command.has_error_handler() is True:
             return
 
-        if self.bot.get_cog(ctx.command.cog_name).has_error_handler():
+        if self.bot.get_cog(ctx.command.cog_name).has_error_handler() is True:
             return
 
         if isinstance(error, TooLong):
