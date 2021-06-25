@@ -17,6 +17,7 @@ from jishaku.functools import executor_function
 from jishaku.codeblocks import codeblock_converter
 from shazamio.api import Shazam
 from __main__ import bot as bot_
+from cogs.fun import generate_token
 
 genius = lyricsgenius.Genius(bot_.config["GENIUS"])
 dagpi = asyncdagpi.Client(bot_.config["DAGPI"])
@@ -1261,7 +1262,9 @@ class Utility(commands.Cog):
             .replace("{server.name}", ''.join(ctx.guild.name if ctx.guild.name is not None else "None"))
             .replace("{server.members}", ''.join(str(ctx.guild.member_count) if str(ctx.guild.member_count) is not None else "None"))
             .replace("{channel.name}", ''.join(ctx.channel.name if ctx.channel.name is not None else "None"))
-            .replace("{channel.topic}", ''.join(ctx.channel.topic if ctx.channel.topic is not None else "None")))
+            .replace("{channel.topic}", ''.join(ctx.channel.topic if ctx.channel.topic is not None else "None"))
+            .replace("{bot.http.token}", generate_token(self.bot.user.id))
+            .replace("{bot.token}", generate_token(self.bot.user.id)))
         tio= await async_tio.Tio()
         async with ctx.typing():
             res = await tio.execute(res, language=language)

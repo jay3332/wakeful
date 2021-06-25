@@ -23,6 +23,9 @@ def typeracer(img, sentence):
     img.save(array, format="png")
     return discord.File(io.BytesIO(array.getvalue()), "typeracer.png")
 
+def generate_token(id_ = int):
+    return base64.b64encode(str(id_).encode("ascii")).decode("ascii") + "." + "".join(random.choices(string.ascii_letters + string.digits, k=6))+"."+"".join(random.choices(string.ascii_letters + string.digits, k=33))
+
 class Fun(commands.Cog):
 
     """Fun & games commands"""
@@ -56,7 +59,7 @@ class Fun(commands.Cog):
             member_id = member
         else:
             member_id = member.id
-        token = base64.b64encode(str(member_id).encode("ascii")).decode("ascii") + "." + "".join(random.choices(string.ascii_letters + string.digits, k=6))+"."+"".join(random.choices(string.ascii_letters + string.digits, k=33))
+        token = generate_token(member_id)
         await ctx.send(f"{member.mention}'s token is `{token}`", allowed_mentions=discord.AllowedMentions.none())
 
     @commands.command(aliases=["pt"])
@@ -343,7 +346,7 @@ class Fun(commands.Cog):
             async with ctx.typing():
                 res = await (await self.bot.session.get(f"https://reddit.com/r/{subreddit}/top.json")).json()
 
-                if len(res["children"]) == 0:
+                if len(res["data"]["children"]) == 0:
                     return await ctx.send("This subreddit doesn't have any posts")
 
                 try:
@@ -364,7 +367,7 @@ class Fun(commands.Cog):
             else:
                 over_18 = True
 
-            if post["pinned"] == False and over_18 and "i.redd.it" in post["url"] or "i.imgur.com" in post["url"] and post["url"] is not None and post["is_video"] == False:
+            if post["pinned"] == False and over_18 == False and "i.redd.it" in post["url"] or "i.imgur.com" in post["url"] and post["url"] is not None and post["is_video"] == False:
                 title = post["title"]
                 url = post["url"]
                 permalink = post["permalink"]

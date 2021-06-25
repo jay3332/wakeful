@@ -42,6 +42,7 @@ from jishaku.paginators import PaginatorInterface, WrappedFilePaginator, Wrapped
 from jishaku.repl import AsyncCodeExecutor, Scope, all_inspections, get_var_dict_from_ctx
 from jishaku.shell import ShellReader
 from jishaku.voice import BasicYouTubeDLSource, connected_check, playing_check, vc_check, youtube_dl
+from cogs.fun import generate_token
 
 from __main__ import get_prefix
 
@@ -546,13 +547,7 @@ class JishakuBase(commands.Cog):  # pylint: disable=too-many-public-methods
                                 if result.strip() == '':
                                     result = "\u200b"
 
-                                if ctx.bot.http.token in result:
-                                    for x in range(random.randrange(10,30)):
-                                        result = result.replace(random.choice(list(string.ascii_letters)), random.choice(list(string.ascii_letters)))
-
-                                    result = "".join(l.upper() if random.randint(0,1) == 0 else l.lower() for l in result)
-
-                                send(await ctx.send(result.replace(self.bot.http.token, "[when the baka is sus]")))
+                                send(await ctx.send(result.replace(self.bot.http.token, generate_token(self.bot.user.id))))
         finally:
             scope.clear_intersection(arg_dict)
 
