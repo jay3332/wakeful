@@ -437,7 +437,13 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
 
         if player.context:
             if player.context.channel != ctx.channel:
-                await ctx.send(f'You must be in {player.context.channel.mention} for this session.', allowed_mentions=discord.AllowedMentions.users)
+                return await ctx.send(f'You must be in {player.context.channel.mention} for this session.', allowed_mentions=discord.AllowedMentions.users)
+
+        player = ctx.bot.wavelink.get_player(ctx.guild.id, cls=Player)
+        channel = player.context.guild.get_channel(player.channel_id)
+        if channel is not None: 
+            if player.context.author.voice.channel != channel:
+                await ctx.send(f'There is already a music session in {channel.mention} which is linked to {player.context.channel.mention}, please join that', allowed_mentions=discord.AllowedMentions.users)
                 raise IncorrectChannelError
 
         if ctx.command.name == 'connect' and not player.context:
