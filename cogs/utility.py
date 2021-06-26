@@ -248,7 +248,7 @@ class Utility(commands.Cog):
         em=discord.Embed(description=f"{self.bot.icons['loading']} Now recognizing song...", color=self.bot.color)
         await msg.edit(embed=em)
 
-        res = await client.recognize_song(res)
+        res = await bot.loop.run_until_complete(client.recognize_song, res)
 
         try:
             track = res["track"]
