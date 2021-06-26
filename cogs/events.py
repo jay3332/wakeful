@@ -65,7 +65,7 @@ class Errors(commands.Cog):
         elif isinstance(error, commands.MissingRequiredArgument):
             param = str(error.param).split(":")
             param = param[0].replace(" ", "")
-            await ctx.reply(f"`{self.bot.icons['redtick']} {param}` is a required argument that is missing", mention_author=False)
+            await ctx.reply(f"{self.bot.icons['redtick']} `{param}` is a required argument that is missing", mention_author=False)
 
         elif isinstance(error, commands.CommandNotFound):
             if ctx.prefix != "":
