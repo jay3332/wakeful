@@ -1444,7 +1444,7 @@ class Utility(commands.Cog):
 
     @commands.group(aliases=["rtfd"], invoke_without_command=True)
     @commands.cooldown(1,5,commands.BucketType.user)
-    async def rtfm(self, ctx, query):
+    async def rtfm(self, ctx, *, query):
         async with ctx.processing(ctx):
             res = await self.bot.session.get(f"https://idevision.net/api/public/rtfm?query={query}&location=https://discordpy.readthedocs.io/en/latest&show-labels=false&label-labels=false")
             res = await res.json()
@@ -1456,9 +1456,23 @@ class Utility(commands.Cog):
             em=discord.Embed(description=f"No results found for `{query}`", color=self.bot.color)
             await ctx.send(embed=em)
 
+    @rtfm.command(aliases=["m"])
+    @commands.cooldown(1,5,commands.BucketType.user)
+    async def master(self, ctx, *, query):
+        async with ctx.processing(ctx):
+            res = await self.bot.session.get(f"https://idevision.net/api/public/rtfm?query={query}&location=https://discordpy.readthedocs.io/en/master&show-labels=false&label-labels=false")
+            res = await res.json()
+            nodes = res["nodes"]
+        if nodes != {}:
+            em=discord.Embed(description="\n".join(f"[`{e}`]({nodes[e]})" for e in nodes), color=self.bot.color)
+            await ctx.send(embed=em)
+        else:
+            em=discord.Embed(description=f"No results found for `{query}`", color=self.bot.color)
+            await ctx.send(embed=em)
+
     @rtfm.command(name="python", aliases=["py"])
     @commands.cooldown(1,5,commands.BucketType.user)
-    async def _python(self, ctx, query):
+    async def _python(self, ctx, *, query):
         async with ctx.processing(ctx):
             res = await self.bot.session.get(f"https://idevision.net/api/public/rtfm?query={query}&location=https://docs.python.org/3&show-labels=false&label-labels=false")
             res = await res.json()
@@ -1472,7 +1486,7 @@ class Utility(commands.Cog):
 
     @rtfm.command(aliases=["cs"])
     @commands.cooldown(1,5,commands.BucketType.user)
-    async def custom(self, ctx, prefix, query):
+    async def custom(self, ctx, prefix, *, query):
         url = f"https://{prefix}.readthedocs.io/en/latest/"
         async with ctx.processing(ctx):
             res = await self.bot.session.get(f"https://idevision.net/api/public/rtfm?query={query}&location={url}&show-labels=false&label-labels=false")
