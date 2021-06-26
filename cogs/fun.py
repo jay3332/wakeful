@@ -40,7 +40,7 @@ class Fun(commands.Cog):
             raise TooLong("The text can't be over 500 characters long")
 
         buffer = io.BytesIO()
-        async with ctx.typing():
+        async with ctx.processing(ctx):
             await aiogtts.aiogTTS().write_to_fp(message, buffer, slow=True, lang="en")
         buffer.seek(0)
         await ctx.reply(file=discord.File(buffer, f"{message}.mp3"), mention_author=False)
@@ -100,7 +100,8 @@ class Fun(commands.Cog):
         controls = {
             "yes": self.bot.icons['greentick'],
             "no": self.bot.icons['redtick'],
-            "idk": self.bot.icons['shrug']
+            "idk": self.bot.icons['shrug'],
+            "stop": "🚮"
         }
 
         emojis = [controls[e] for e in list(controls)]
@@ -115,41 +116,74 @@ class Fun(commands.Cog):
             "message": msg
         }
 
+        questions = 1
+
         while akin.progression <= 80:
-            if round(akin.progression) == 0:
-                em=discord.Embed(description=f"""
+            if int(akin.progression) == 0:
+                em=discord.Embed(title=f"Question {questions}", description=f"""
 {game}
 {controls['yes']} = Yes
 {controls['no']} = No
-{controls['idk']} = I don't know""", color=self.bot.color)
+{controls['idk']} = I don't know
+{controls['stop']} = Stop""", color=self.bot.color)
                 await msg.edit(embed=em)
+
             for emoji in list(controls):
                 await msg.add_reaction(str(controls[emoji]))
 
             try:
-                reaction, user = await self.bot.wait_for("reaction_add", timeout=30, check=lambda reaction, user: user == ctx.author and str(reaction.emoji) in emojis and reaction.message == msg)
-            except asyncio.TimeoutError:
+                done, pending = await asyncio.wait([
+                        self.bot.wait_for("reaction_add", timeout=30, check=lambda reaction, user: user == ctx.author and str(reaction.emoji) in emojis and reaction.message == msg),
+                        self.bot.wait_for("reaction_remove", timeout=30, check=lambda reaction, user: user == ctx.author and str(reaction.emoji) in emojis and reaction.message == msg)
+                ], return_when=asyncio.FIRST_COMPLETED)
+            except (asyncio.TimeoutError, asyncio.CancelledError):
                 em=discord.Embed(description="The game has been stopped as you've not been responding for 30 seconds", color=self.bot.color)
                 await msg.edit(embed=em)
-                self.bot.games["akinator"].pop(str(ctx.guild.id))
+                return
+
+            try:
+                reaction, user = done.pop().result()
+            except (asyncio.TimeoutError, asyncio.CancelledError):
+                em=discord.Embed(description="The game has been stopped as you've not been responding for 30 seconds", color=self.bot.color)
+                await msg.edit(embed=em)
+                return
+
+            for future in pending:
+                future.cancel()
+
+            if str(reaction.emoji) == controls["yes"]:
+                first_answer = "yes"
+            elif str(reaction.emoji) == controls["no"]:
+                first_answer = "no"
+            elif str(reaction.emoji) == controls["idk"]:
+                first_answer = "idk"
+            elif str(reaction.emoji) == controls["stop"]:
                 break
-            else:
-                if str(reaction.emoji) == controls["yes"]:
-                    first_answer = "yes"
-                elif str(reaction.emoji) == controls["no"]:
-                    first_answer = "no"
-                elif str(reaction.emoji) == controls["idk"]:
-                    first_answer = "idk"
 
-                question = await akin.answer(first_answer)
+            question = await akin.answer(first_answer)
 
-                em=discord.Embed(description=f"""
+            questions += 1
+
+            em=discord.Embed(title=f"Question {questions}", description=f"""
 {question}
 {controls['yes']} = Yes
 {controls['no']} = No
-{controls['idk']} = I don't know""", color=self.bot.color)
-                await msg.edit(embed=em)
+{controls['idk']} = I don't know
+{controls['stop']} = Stop""", color=self.bot.color)
+            await msg.edit(embed=em)
         await akin.win()
+
+        self.bot.games["akinator"].pop(str(ctx.guild.id))
+
+        if int(akin.progression) != 0:
+            for reaction in list(controls):
+                await msg.remove_reaction(controls[reaction], self.bot.user)
+
+            em=discord.Embed(description=f"My guess is {akin.first_guess['name']}", timestamp=datetime.datetime.utcnow(), color=self.bot.color)
+            em.set_image(url=akin.first_guess['absolute_picture_path'])
+            await msg.edit(embed=em)
+        else:
+            await msg.delete()
 
     @commands.command()
     @commands.cooldown(1,5,commands.BucketType.user)
@@ -343,7 +377,7 @@ class Fun(commands.Cog):
             return await ctx.send("NSFW subreddits can only be posted in nsfw channels")
 
         for x in range(5):
-            async with ctx.typing():
+            async with ctx.typing(ctx):
                 res = await (await self.bot.session.get(f"https://reddit.com/r/{subreddit}/top.json")).json()
 
                 if len(res["data"]["children"]) == 0:
@@ -383,7 +417,7 @@ class Fun(commands.Cog):
     @commands.guild_only()
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def typeracer(self, ctx):
-        async with ctx.typing():
+        async with ctx.processing(ctx):
             start_time = datetime.datetime.utcnow()
             sentence = wonderwords.RandomSentence().sentence()
             img = await self.bot.session.get("https://media.discordapp.net/attachments/832746281335783426/850000934658244668/typeracer.jpg")
@@ -405,7 +439,7 @@ class Fun(commands.Cog):
     @commands.command(aliases=["gtl"])
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def guessthelogo(self, ctx):
-        async with ctx.typing():
+        async with ctx.processing(ctx):
             logo = await dagpi.logo()
             answer = logo.answer
             brand = logo.brand
@@ -437,7 +471,7 @@ class Fun(commands.Cog):
     @commands.command()
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def joke(self, ctx):
-        async with ctx.typing():
+        async with ctx.processing(ctx):
             joke = await dagpi.joke()
             em = discord.Embed(description=joke, color=self.bot.color)
             em.set_footer(text=f"Powered by dagpi.xyz", icon_url=ctx.author.avatar_url)
@@ -446,7 +480,7 @@ class Fun(commands.Cog):
     @commands.command(name="8ball")
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def eightball(self, ctx, *, question):
-        async with ctx.typing():
+        async with ctx.processing(ctx):
             response = await dagpi.eight_ball()
             em = discord.Embed(color=self.bot.color)
             em.add_field(name="input", value=f"```\n{question}```", inline=False)
@@ -457,7 +491,7 @@ class Fun(commands.Cog):
     @commands.command()
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def roast(self, ctx):
-        async with ctx.typing():
+        async with ctx.processing(ctx):
             roast = await dagpi.roast()
             em = discord.Embed(description=roast, color=self.bot.color)
             em.set_footer(text=f"Powered by dagpi.xyz", icon_url=ctx.author.avatar_url)
@@ -484,7 +518,7 @@ class Fun(commands.Cog):
     async def caption(self, ctx, member : typing.Union[discord.Member, str] = None):
         url = await getImage(ctx, member)
         print(type(url))
-        async with ctx.typing():
+        async with ctx.processing(ctx):
             res = await self.bot.session.post("https://captionbot.azurewebsites.net/api/messages", json={"Content": url, "Type": "CaptionRequest"}, headers={"Content-Type": "application/json; charset=utf-8"})
         text = await res.text()
         em=discord.Embed(description=text, color=self.bot.color)
@@ -495,7 +529,7 @@ class Fun(commands.Cog):
     @commands.cooldown(1,5,commands.BucketType.user)
     async def _ascii(self, ctx, *, text):
         text = text.replace(" ", "%20")
-        async with ctx.typing():
+        async with ctx.processing(ctx):
             res = await self.bot.session.get(f"https://artii.herokuapp.com/make?text={text}")
             res = (await res.read()).decode()
         await ctx.reply(f"```{res}```", mention_author=False, allowed_mentions=discord.AllowedMentions.none())
@@ -527,12 +561,9 @@ class Fun(commands.Cog):
             color = random.choice(['black', 'blue', 'brown', 'cyan', 'darkgreen', 'lime', 'orange', 'pink', 'purple', 'red', 'white', 'yellow'])
 
         if is_impostor is None:
-            if random.randint(1,2) == 1:
-                is_impostor = True
-            else:
-                is_impostor = False
+            is_impostor = random.choice(True, False)
 
-        async with ctx.typing():
+        async with ctx.processing(ctx):
             res = await (await self.bot.session.get(f"https://vacefron.nl/api/ejected?name={''.join(member if isinstance(member, str) else member.name)}&impostor={is_impostor}&crewmate={color}")).read()
 
         em=discord.Embed(color=self.bot.color)
@@ -542,7 +573,7 @@ class Fun(commands.Cog):
     @commands.command()
     @commands.cooldown(1,5,commands.BucketType.user)
     async def advice(self, ctx):
-        async with ctx.typing():
+        async with ctx.processing(ctx):
             res = await self.bot.session.get("https://api.adviceslip.com/advice")
         res = (await res.read()).decode()
         advice = (json.loads(res))["slip"]["advice"]

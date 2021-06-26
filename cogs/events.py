@@ -1,3 +1,4 @@
+from attr import has
 import discord, difflib, asyncio, traceback, aiohttp
 from jishaku.models import copy_context_with
 from discord.ext import commands
@@ -41,31 +42,30 @@ class Errors(commands.Cog):
 
     @commands.Cog.listener()
     async def on_command_error(self, ctx, error):
-        if ctx.command.has_error_handler() is True:
-            return
 
-        if self.bot.get_cog(ctx.command.cog_name).has_error_handler() is True:
-            return
+        if ctx.command is not None:
+            if hasattr(ctx.command, "on_error"):
+                return
+
+            if hasattr(self.bot.get_cog(ctx.command.cog_name), "on_error"):
+                return
 
         if isinstance(error, TooLong):
-            await ctx.reply(str(error), mention_author=False, allowed_mentions=discord.AllowedMentions.none())
+            await ctx.reply(f"{self.bot.icons['redtick']} {error}", mention_author=False, allowed_mentions=discord.AllowedMentions.none())
 
         if isinstance(error, NotFound):
-            await ctx.reply(str(error), mention_author=False, allowed_mentions=discord.AllowedMentions.none())
+            await ctx.reply(f"{self.bot.icons['redtick']} {error}", mention_author=False, allowed_mentions=discord.AllowedMentions.none())
             
         elif isinstance(error, commands.CommandOnCooldown):
             if not is_mod(self.bot, ctx.author):
-                em=discord.Embed(description=f"This command is on cooldown, try again in `{round(error.retry_after, 1)}` seconds.", color=self.bot.color)
-                await ctx.reply(embed=em, mention_author=False)
+                await ctx.reply(f"{self.bot.icons['redtick']} This command is on cooldown, try again in `{round(error.retry_after, 1)}` seconds", mention_author=False)
             else:
-                ctx.command.reset_cooldown(ctx)
-                await self.bot.process_commands(ctx.message)
+                await ctx.reinvoke()
 
         elif isinstance(error, commands.MissingRequiredArgument):
             param = str(error.param).split(":")
             param = param[0].replace(" ", "")
-            em=discord.Embed(description=f"`{param}` is a required argument that is missing", color=self.bot.color)
-            await ctx.reply(embed=em, mention_author=False)
+            await ctx.reply(f"`{self.bot.icons['redtick']} {param}` is a required argument that is missing", mention_author=False)
 
         elif isinstance(error, commands.CommandNotFound):
             if ctx.prefix != "":
@@ -78,8 +78,7 @@ class Errors(commands.Cog):
                     command = None
                 if command:
                     if not command.hidden:
-                        em=discord.Embed(description=f"`{cmd}` is not a valid command, did you mean `{match[0]}`?", color=self.bot.color)
-                        msg = await ctx.reply(embed=em, mention_author=False, delete_after=5)
+                        msg = await ctx.send(f"{self.bot.icons['redtick']} `{cmd}` is not a valid command, did you mean `{match[0]}`?", delete_after=5)
                         reactions = [self.bot.icons['greentick'], self.bot.icons['redtick']]
                         for reaction in reactions:
                             await msg.add_reaction(reaction)
@@ -89,6 +88,7 @@ class Errors(commands.Cog):
                             args = ctx.message.content.removeprefix(f"{ctx.prefix}{cmd}")
                             alt_ctx = await copy_context_with(ctx, author=ctx.author, content=f"{ctx.prefix}{match[0]}{args}")
                             await self.bot.invoke(alt_ctx)
+                            await msg.delete()
                         elif str(reaction.emoji) == self.bot.icons['redtick']:
                             await msg.delete()
                 else:
@@ -96,38 +96,35 @@ class Errors(commands.Cog):
                     m = await ctx.reply(embed=em, mention_author=False, delete_after=3)
 
         elif isinstance(error, commands.NSFWChannelRequired):
-            em=discord.Embed(description=f"This command has to be executed in an nsfw channel", color=self.bot.color)
-            await ctx.reply(embed=em, mention_author=False)
+            await ctx.send(f"{self.bot.icons['redtick']} This command can only be executed in nsfw marked channels")
 
         elif isinstance(error, commands.MemberNotFound):
-            em=discord.Embed(description=f"Couldn't find member `{error.argument}`", color=self.bot.color)
+            em=discord.Embed(description=f"{self.bot.icons['redtick']} Couldn't find member `{error.argument}`", color=self.bot.color)
             await ctx.reply(embed=em, mention_author=False)
 
         elif isinstance(error, commands.BotMissingPermissions):
             perms = ", ".join(perm.replace("_", " ").lower() for perm in error.missing_perms)
-            em=discord.Embed(description=f"I require `{perms}` permissions to execute this command", color=self.bot.color)
+            em=discord.Embed(description=f"{self.bot.icons['redtick']} I require `{perms}` permissions to execute this command", color=self.bot.color)
             await ctx.reply(embed=em, mention_author=False)
 
         elif isinstance(error, commands.MissingPermissions):
             perms = ", ".join(perm.replace("_", " ").lower() for perm in error.missing_perms)
-            em=discord.Embed(description=f"You're missing `{perms}` permissions to execute this command", color=self.bot.color)
+            em=discord.Embed(description=f"{self.bot.icons['redtick']} You're missing `{perms}` permissions to execute this command", color=self.bot.color)
             await ctx.reply(embed=em, mention_author=False)
 
         elif isinstance(error, commands.NotOwner):
             if list(error.args) != [] and len(list(error.args)) != 0:
                 msg = list(error.args)[0]
-                em=discord.Embed(description=msg, color=self.bot.color)
-                return await ctx.reply(embed=em, mention_author=False)
-            em=discord.Embed(description="You aren't allowed to execute this command", color=self.bot.color)
-            await ctx.reply(embed=em, mention_author=False)
+                return await ctx.send(f"{self.bot.icons['redtick']} {msg}")
+            await ctx.send(f"{self.bot.icons['redtick']} Only the bots owner is allowed to execute this command")
 
         elif isinstance(error, commands.CommandInvokeError):
             error = error.original
             if isinstance(error, TooLong):
-                await ctx.reply(str(error), mention_author=False, allowed_mentions=discord.AllowedMentions.none())
+                await ctx.reply(f"{self.bot.icons['redtick']} {error}", mention_author=False, allowed_mentions=discord.AllowedMentions.none())
 
             if isinstance(error, NotFound):
-                await ctx.reply(str(error), mention_author=False, allowed_mentions=discord.AllowedMentions.none())
+                await ctx.reply(f"{self.bot.icons['redtick']} {error}", mention_author=False, allowed_mentions=discord.AllowedMentions.none())
 
             elif isinstance(error, aiohttp.ClientConnectionError):
                 address = f"{error.host}:{error.port}"
@@ -143,8 +140,7 @@ class Errors(commands.Cog):
                 await ctx.reply(embed=em, mention_author=False)
 
             elif isinstance(error, discord.Forbidden):
-                em=discord.Embed(description=f"I don't have permission to do this", color=self.bot.color)
-                await ctx.reply(embed=em, mention_author=False)
+                await ctx.reply(f"{self.bot.icons['redtick']} I don't have permission to do this", mention_author=False)
             else:
                 if is_mod(self.bot, ctx.author):
                     errormsg = "".join(traceback.format_exception(type(error), error, error.__traceback__))

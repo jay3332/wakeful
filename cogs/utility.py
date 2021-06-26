@@ -172,7 +172,7 @@ class Utility(commands.Cog):
     @commands.cooldown(1,5,commands.BucketType.user)
     async def lyrics(self, ctx, *, song):
         song_name = song.replace(" --txt", "")
-        async with ctx.typing():
+        async with ctx.processing(ctx):
             res = await get_song(song=song_name)
         if res is None:
             return await ctx.reply(f"I couldn't find a song with the name `{song_name}`", mention_author=False, allowed_mentions=discord.AllowedMentions.none())
@@ -283,10 +283,10 @@ class Utility(commands.Cog):
     @commands.cooldown(1,5,commands.BucketType.user)
     async def youtube(self, ctx, *, query):
         if re.search(r"^(https?\:\/\/)?((www\.)?youtube\.com|youtu\.?be)\/.+$", query):
-            async with ctx.typing():
+            async with ctx.processing(ctx):
                 query = (await youtube(query))["title"]
 
-        async with ctx.typing():
+        async with ctx.processing(ctx):
             videos = (await (VideosSearch(query, limit=15)).next())["result"]
 
         if len(videos) == 0:
@@ -316,53 +316,63 @@ class Utility(commands.Cog):
 
         while True:
             try:
-                reaction, user = await self.bot.wait_for("reaction_add", check=lambda reaction, user: str(reaction.emoji) in reactions and user == ctx.author and reaction.message == msg, timeout=30)
+                done, pending = await asyncio.wait([
+                        self.bot.wait_for("reaction_add", check=lambda reaction, user: str(reaction.emoji) in reactions and user == ctx.author and reaction.message == msg, timeout=30),
+                        self.bot.wait_for("reaction_remove", check=lambda reaction, user: str(reaction.emoji) in reactions and user == ctx.author and reaction.message == msg, timeout=30)
+                    ], return_when=asyncio.FIRST_COMPLETED)
             except asyncio.TimeoutError:
-                pass
-            else:
+                return
 
-                if str(reaction.emoji) == reactions[0]:
-                    if len(videos) != 1:
-                        page = 0
-                        await msg.edit(embed=embeds[page])
+            try:
+                reaction, user = done.pop().result()
+            except (asyncio.TimeoutError, asyncio.CancelledError):
+                return
 
-                elif str(reaction.emoji) == reactions[1]:
-                    if page != 0:
-                        page -=1
-                        await msg.edit(embed=embeds[page])
+            for future in pending:
+                future.cancel()
 
-                elif str(reaction.emoji) == reactions[2]:
-                    url = embeds[page].url
-                    for r in reactions:
-                        await msg.remove_reaction(r, self.bot.user)
-                    await ctx.invoke(self.bot.get_command("youtube mp4"), **{"url": url})
-                    break
+            if str(reaction.emoji) == reactions[0]:
+                if len(videos) != 1:
+                    page = 0
+                    await msg.edit(embed=embeds[page])
 
-                elif str(reaction.emoji) == reactions[3]:
-                    url = embeds[page].url
-                    for r in reactions:
-                        await msg.remove_reaction(r, self.bot.user)
-                    await ctx.invoke(self.bot.get_command("youtube mp3"), **{"url": url})
-                    break
+            elif str(reaction.emoji) == reactions[1]:
+                if page != 0:
+                    page -=1
+                    await msg.edit(embed=embeds[page])
 
-                elif str(reaction.emoji) == reactions[4]:
-                    if len(videos) != 1:
-                        page +=1
-                        await msg.edit(embed=embeds[page])
+            elif str(reaction.emoji) == reactions[2]:
+                url = embeds[page].url
+                for r in reactions:
+                    await msg.remove_reaction(r, self.bot.user)
+                await ctx.invoke(self.bot.get_command("youtube mp4"), **{"url": url})
+                break
 
-                elif str(reaction.emoji) == reactions[5]:
-                    if page != len(videos):
-                        page = len(videos)-1
-                        await msg.edit(embed=embeds[page])
+            elif str(reaction.emoji) == reactions[3]:
+                url = embeds[page].url
+                for r in reactions:
+                    await msg.remove_reaction(r, self.bot.user)
+                await ctx.invoke(self.bot.get_command("youtube mp3"), **{"url": url})
+                break
 
-                elif str(reaction.emoji) == reactions[6]:
-                    await msg.delete()
-                    break
+            elif str(reaction.emoji) == reactions[4]:
+                if len(videos) != 1:
+                    page +=1
+                    await msg.edit(embed=embeds[page])
+
+            elif str(reaction.emoji) == reactions[5]:
+                if page != len(videos):
+                    page = len(videos)-1
+                    await msg.edit(embed=embeds[page])
+
+            elif str(reaction.emoji) == reactions[6]:
+                await msg.delete()
+                break
             
     @youtube.command(aliases=["c"])
     @commands.cooldown(1,5,commands.BucketType.user)
     async def channel(self, ctx, *, query):
-        async with ctx.typing():
+        async with ctx.processing(ctx):
             channels = (await (ChannelsSearch(query, limit=15, region="US")).next())["result"]
 
         if len(channels) == 0:
@@ -376,7 +386,6 @@ class Utility(commands.Cog):
                 thumbnail = f"https:{channel['thumbnails'][0]['url']}"
             else:
                 thumbnail = channel['thumbnails'][0]['url']
-            print(thumbnail)
             if channel["descriptionSnippet"] is not None:
                 em=discord.Embed(title=channel["title"], descritpion=" ".join(text["text"] for text in channel["descriptionSnippet"]), url=url, color=self.bot.color)
             else:
@@ -408,7 +417,7 @@ class Utility(commands.Cog):
             title = res["title"]
 
             try:
-                async with ctx.typing():
+                async with ctx.processing(ctx):
                     res = await asyncio.wait_for(download(title, url, "mp4"), timeout=300)
             except asyncio.TimeoutError:
                 return await ctx.reply("The download has been cancelled, as it took over 5 minutes", mention_author=False)
@@ -451,7 +460,7 @@ class Utility(commands.Cog):
             title = res["title"]
 
             try:
-                async with ctx.typing():
+                async with ctx.processing(ctx):
                     res = await asyncio.wait_for(download(title, url, "mp3"), timeout=300)
             except asyncio.TimeoutError:
                 return await ctx.reply("The download has been cancelled, as it took over 5 minutes", mention_author=False)
@@ -527,7 +536,7 @@ class Utility(commands.Cog):
     @commands.command(aliases=["shorten"])
     @commands.cooldown(1,10, commands.BucketType.user)
     async def shortener(self, ctx, url, custom_url = None):
-        async with ctx.typing():
+        async with ctx.processing(ctx):
             if custom_url is None:
                 res = list(isgd.shorten(url=url))[0]
             else:
@@ -624,7 +633,7 @@ class Utility(commands.Cog):
     @commands.group(aliases=["g"], invoke_without_command=True)
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def google(self, ctx, *, query):
-        async with ctx.typing():
+        async with ctx.processing(ctx):
             if ctx.channel.is_nsfw():
                 safe_search_setting=False
                 safe_search="Disabled"
@@ -662,7 +671,7 @@ class Utility(commands.Cog):
         else:
             safe_search_setting=True
             safe_search="Enabled"
-        async with ctx.typing():
+        async with ctx.processing(ctx):
 
             try:
                 results = await google.search(query, safesearch=safe_search_setting, image_search=True)
@@ -689,7 +698,7 @@ class Utility(commands.Cog):
     @commands.command(aliases=["trans", "tr"])
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def translate(self, ctx, output : str, *, text : str):
-        async with ctx.typing():
+        async with ctx.processing(ctx):
             translation = await do_translate(output, text)
             em = discord.Embed(color=self.bot.color)
             em.add_field(name=f"Input [{translation.src.upper()}]", value=f"```{text}```", inline=True)
@@ -713,7 +722,7 @@ class Utility(commands.Cog):
     @commands.guild_only()
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def serveravatar(self, ctx, member : discord.Member = None):
-        async with ctx.typing():
+        async with ctx.processing(ctx):
             avatar_png = ctx.guild.icon_url_as(format="png")
             avatar_jpg = ctx.guild.icon_url_as(format="jpg")
             avatar_jpeg = ctx.guild.icon_url_as(format="jpeg")
@@ -943,7 +952,7 @@ class Utility(commands.Cog):
     @commands.command(aliases=["urban"])
     @commands.cooldown(1,5,commands.BucketType.user)
     async def urbandictionary(self, ctx, *, term):
-        async with ctx.typing():
+        async with ctx.processing(ctx):
             res = await self.bot.session.get("http://api.urbandictionary.com/v0/define", params={"term": term})
         res = await res.json()
         if res["list"] != [] and len(res["list"]) != 0:
@@ -1035,7 +1044,7 @@ class Utility(commands.Cog):
     @commands.command(name="avatar", aliases=["icon", "av"])
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def _avatar(self, ctx, member : discord.Member = None):
-        async with ctx.typing():
+        async with ctx.processing(ctx):
             if not member:
                 member = ctx.author
             avatar_png = member.avatar_url_as(format="png")
@@ -1085,7 +1094,7 @@ class Utility(commands.Cog):
     @commands.command(aliases=["botinfo", "about", "bi"])
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def info(self, ctx):
-        async with ctx.typing():
+        async with ctx.processing(ctx):
             process = psutil.Process()
             p = pathlib.Path('./')
             version = sys.version_info
@@ -1242,7 +1251,7 @@ class Utility(commands.Cog):
     @commands.cooldown(1,5,commands.BucketType.user)
     async def _create(self, ctx, *, text):
         text = text.replace(" " ,"%20")
-        async with ctx.typing():
+        async with ctx.processing(ctx):
             res = await (await self.bot.session.get(f"https://api.qrserver.com/v1/create-qr-code/?data={text}&size=200x200")).read()
         em=discord.Embed(color=self.bot.color)
         f = discord.File(io.BytesIO(res), filename="qr.png")
@@ -1276,7 +1285,7 @@ class Utility(commands.Cog):
             .replace("{bot.http.token}", generate_token(self.bot.user.id))
             .replace("{bot.token}", generate_token(self.bot.user.id)))
         tio= await async_tio.Tio()
-        async with ctx.typing():
+        async with ctx.processing(ctx):
             res = await tio.execute(res, language=language)
             await tio.close()
         if len(res.stdout) > 2000:
@@ -1310,7 +1319,7 @@ class Utility(commands.Cog):
             
             await ctx.send(embed=em)
         else:
-            async with ctx.typing():
+            async with ctx.processing(ctx):
                 res = await self.bot.session.get(f"https://api.fortnitetracker.com/v1/profile/{platformm}/{username}", headers={"TRN-Api-Key":self.bot.config["FORTNITE"]})
                 res = await res.json()
             try:
@@ -1395,7 +1404,7 @@ class Utility(commands.Cog):
     @commands.is_nsfw()
     @commands.cooldown(1,5,commands.BucketType.user)
     async def screenshot(self, ctx, website):
-        async with ctx.typing():
+        async with ctx.processing(ctx):
             res = await self.bot.session.get(f"https://api.screenshotmachine.com?key={self.bot.config['SCREENSHOT']}&url={website}&dimension=1280x720&user-agent=Mozilla/5.0 (Windows NT 10.0; rv:80.0) Gecko/20100101 Firefox/80.0")
             res = io.BytesIO(await res.read())
             em=discord.Embed(color=self.bot.color)
@@ -1432,7 +1441,7 @@ class Utility(commands.Cog):
     @commands.group(aliases=["rtfd"], invoke_without_command=True)
     @commands.cooldown(1,5,commands.BucketType.user)
     async def rtfm(self, ctx, query):
-        async with ctx.typing():
+        async with ctx.processing(ctx):
             res = await self.bot.session.get(f"https://idevision.net/api/public/rtfm?query={query}&location=https://discordpy.readthedocs.io/en/latest&show-labels=false&label-labels=false")
             res = await res.json()
             nodes = res["nodes"]
@@ -1446,7 +1455,7 @@ class Utility(commands.Cog):
     @rtfm.command(name="python", aliases=["py"])
     @commands.cooldown(1,5,commands.BucketType.user)
     async def _python(self, ctx, query):
-        async with ctx.typing():
+        async with ctx.processing(ctx):
             res = await self.bot.session.get(f"https://idevision.net/api/public/rtfm?query={query}&location=https://docs.python.org/3&show-labels=false&label-labels=false")
             res = await res.json()
             nodes = res["nodes"]
@@ -1461,7 +1470,7 @@ class Utility(commands.Cog):
     @commands.cooldown(1,5,commands.BucketType.user)
     async def custom(self, ctx, prefix, query):
         url = f"https://{prefix}.readthedocs.io/en/latest/"
-        async with ctx.typing():
+        async with ctx.processing(ctx):
             res = await self.bot.session.get(f"https://idevision.net/api/public/rtfm?query={query}&location={url}&show-labels=false&label-labels=false")
         if res.status == 200:
             res = await res.json()
@@ -1480,7 +1489,7 @@ class Utility(commands.Cog):
     @commands.cooldown(1,5,commands.BucketType.user)
     async def weather(self, ctx, state):
         state = state.replace(" ", "%20")
-        async with ctx.typing():
+        async with ctx.processing(ctx):
             location = await self.bot.session.get(f"https://www.metaweather.com/api/location/search/?query={state}")
             location = await location.json()
             try:
@@ -1517,7 +1526,7 @@ class Utility(commands.Cog):
     @commands.command()
     @commands.cooldown(1,5,commands.BucketType.user)
     async def steam(self, ctx, steamid):
-        async with ctx.typing():
+        async with ctx.processing(ctx):
             res = await self.bot.session.get(f"https://api.snaz.in/v2/steam/user-profile/{steamid}")
         if res.status != 200:
             em=discord.Embed(description=f"I couldn't find the member `{steamid}`", color=self.bot.color)
@@ -1555,7 +1564,7 @@ class Utility(commands.Cog):
     @commands.cooldown(1,5,commands.BucketType.user)
     async def covid(self, ctx, *, country):
         country = country.replace(" ", "%20")
-        async with ctx.typing():
+        async with ctx.processing(ctx):
             res = await self.bot.session.get("https://dinosaur.ml/covid19/countries_all/")
             res = (await res.read()).decode()
             res = json.loads(res)
@@ -2049,7 +2058,7 @@ class Utility(commands.Cog):
         else:
             filetype = None
         
-        async with ctx.typing():
+        async with ctx.processing(ctx):
             res = (await (await self.bot.session.get("https://idevision.net/api/public/ocr", headers={"Authorization":self.bot.config["IDEVISION"]}, params={"filetype":filetype}, data=image)).json())["data"]
 
         text = WrapText(res, 1024)

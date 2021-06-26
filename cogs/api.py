@@ -13,7 +13,7 @@ class API(commands.Cog):
     @commands.command()
     @commands.cooldown(1,5,commands.BucketType.user)
     async def cat(self, ctx):
-        async with ctx.typing():
+        async with ctx.processing(ctx):
             res = await self.bot.session.get("https://api.thecatapi.com/v1/images/search")
         res = await res.json()
         image = res[0]["url"]
@@ -54,7 +54,7 @@ class API(commands.Cog):
             "width": 680,
             "code": text.content,
         }
-        async with ctx.typing():
+        async with ctx.processing(ctx):
             img = io.BytesIO(await (await self.bot.session.post(url, json=data)).read())
         em=discord.Embed(color=self.bot.color)
         em.set_image(url=f"attachment://window.png")
@@ -63,7 +63,7 @@ class API(commands.Cog):
     @commands.command()
     @commands.cooldown(1,5,commands.BucketType.user)
     async def xkcd(self, ctx, number : int = None):
-        async with ctx.typing():
+        async with ctx.processing(ctx):
             latest = await (await self.bot.session.get("https://xkcd.com/info.0.json")).json()
         res = None
         if number is None:
@@ -82,7 +82,7 @@ class API(commands.Cog):
     @commands.command()
     @commands.cooldown(1,5,commands.BucketType.user)
     async def dog(self, ctx):
-        async with ctx.typing():
+        async with ctx.processing(ctx):
             res = await self.bot.session.get("https://dog.ceo/api/breeds/image/random")
         res = await res.json()
         image = res["message"]
@@ -94,7 +94,7 @@ class API(commands.Cog):
     @commands.command()
     @commands.cooldown(1,5,commands.BucketType.user)
     async def bunny(self, ctx):
-        async with ctx.typing():
+        async with ctx.processing(ctx):
             res = await self.bot.session.get("https://api.bunnies.io/v2/loop/random/?media=gif")
         res = await res.json()
         image = res["media"]["gif"]
@@ -106,7 +106,7 @@ class API(commands.Cog):
     @commands.command()
     @commands.cooldown(1,5,commands.BucketType.user)
     async def duck(self, ctx):
-        async with ctx.typing():
+        async with ctx.processing(ctx):
             res = await self.bot.session.get("https://random-d.uk/api/v1/random?type=png")
         res = await res.json()
         image = res["url"]
@@ -118,7 +118,7 @@ class API(commands.Cog):
     @commands.command()
     @commands.cooldown(1,5,commands.BucketType.user)
     async def fox(self, ctx):
-        async with ctx.typing():
+        async with ctx.processing(ctx):
             res = await self.bot.session.get("https://randomfox.ca/floof/")
         res = await res.json()
         image = res["image"]
@@ -130,7 +130,7 @@ class API(commands.Cog):
     @commands.command()
     @commands.cooldown(1,5,commands.BucketType.user)
     async def lizard(self, ctx):
-        async with ctx.typing():
+        async with ctx.processing(ctx):
             res = await self.bot.session.get("https://nekos.life/api/v2/img/lizard")
         res = await res.json()
         image = res["url"]
@@ -142,7 +142,7 @@ class API(commands.Cog):
     @commands.command()
     @commands.cooldown(1,5,commands.BucketType.user)
     async def shiba(self, ctx):
-        async with ctx.typing():
+        async with ctx.processing(ctx):
             res = await self.bot.session.get("http://shibe.online/api/shibes")
         res = await res.json()
         image = res[0]
@@ -154,7 +154,7 @@ class API(commands.Cog):
     @commands.command()
     @commands.cooldown(1,5,commands.BucketType.user)
     async def koala(self, ctx):
-        async with ctx.typing():
+        async with ctx.processing(ctx):
             res = await self.bot.session.get("https://some-random-api.ml/img/koala")
         res = await res.json()
         image = res["link"]
@@ -166,7 +166,7 @@ class API(commands.Cog):
     @commands.command()
     @commands.cooldown(1,5,commands.BucketType.user)
     async def panda(self, ctx):
-        async with ctx.typing():
+        async with ctx.processing(ctx):
             res = await self.bot.session.get("https://some-random-api.ml/img/panda")
         res = await res.json()
         image = res["link"]
@@ -178,7 +178,7 @@ class API(commands.Cog):
     @commands.command()
     @commands.cooldown(1,5,commands.BucketType.user)
     async def bird(self, ctx):
-        async with ctx.typing():
+        async with ctx.processing(ctx):
             res = await self.bot.session.get("https://some-random-api.ml/img/bird")
         res = await res.json()
         image = res["link"]
@@ -190,7 +190,7 @@ class API(commands.Cog):
     @commands.command()
     @commands.cooldown(1,5,commands.BucketType.user)
     async def pikachu(self, ctx):
-        async with ctx.typing():
+        async with ctx.processing(ctx):
             res = await self.bot.session.get("https://some-random-api.ml/img/pikachu")
         res = await res.json()
         image = res["link"]
@@ -206,7 +206,7 @@ class API(commands.Cog):
     @fact.command(name="dog")
     @commands.cooldown(1,5,commands.BucketType.user)
     async def _dog(self, ctx):
-        async with ctx.typing():
+        async with ctx.processing(ctx):
             res = await self.bot.session.get("https://some-random-api.ml/facts/dog")
         res = await res.json()
         fact = res["fact"]
@@ -217,7 +217,7 @@ class API(commands.Cog):
     @fact.command(name="cat")
     @commands.cooldown(1,5,commands.BucketType.user)
     async def _cat(self, ctx):
-        async with ctx.typing():
+        async with ctx.processing(ctx):
             res = await self.bot.session.get("https://some-random-api.ml/facts/cat")
         res = await res.json()
         fact = res["fact"]
@@ -228,7 +228,7 @@ class API(commands.Cog):
     @fact.command(name="panda")
     @commands.cooldown(1,5,commands.BucketType.user)
     async def _panda(self, ctx):
-        async with ctx.typing():
+        async with ctx.processing(ctx):
             res = await self.bot.session.get("https://some-random-api.ml/facts/panda")
         res = await res.json()
         fact = res["fact"]
@@ -239,7 +239,7 @@ class API(commands.Cog):
     @commands.command()
     @commands.cooldown(1,5,commands.BucketType.user)
     async def chucknorris(self, ctx):
-        async with ctx.typing():
+        async with ctx.processing(ctx):
             res = await self.bot.session.get("https://api.chucknorris.io/jokes/random")
         res = await res.json()
         fact = res["value"]
@@ -250,7 +250,7 @@ class API(commands.Cog):
     @fact.command(name="fox")
     @commands.cooldown(1,5,commands.BucketType.user)
     async def _fox(self, ctx):
-        async with ctx.typing():
+        async with ctx.processing(ctx):
             res = await self.bot.session.get("https://some-random-api.ml/facts/fox")
         res = await res.json()
         fact = res["fact"]
@@ -261,7 +261,7 @@ class API(commands.Cog):
     @fact.command(name="bird")
     @commands.cooldown(1,5,commands.BucketType.user)
     async def _bird(self, ctx):
-        async with ctx.typing():
+        async with ctx.processing(ctx):
             res = await self.bot.session.get("https://some-random-api.ml/facts/bird")
         res = await res.json()
         fact = res["fact"]
@@ -272,7 +272,7 @@ class API(commands.Cog):
     @fact.command(name="koala")
     @commands.cooldown(1,5,commands.BucketType.user)
     async def _koala(self, ctx):
-        async with ctx.typing():
+        async with ctx.processing(ctx):
             res = await self.bot.session.get("https://some-random-api.ml/facts/koala")
         res = await res.json()
         fact = res["fact"]

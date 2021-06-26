@@ -1,3 +1,4 @@
+import re
 import discord, typing, io, inspect
 import twemoji_parser as twemoji
 from wand import image
@@ -58,7 +59,7 @@ class Miscellaneous(commands.Cog):
         else:
             emoji = emoji.url
         
-        async with ctx.typing():
+        async with ctx.processing(ctx):
             res = await (await self.bot.session.get(str(emoji))).read()
 
         await ctx.reply(file=discord.File(io.BytesIO(res), filename="".join(f"emoji.gif" if emoji_animated else f"emoji.png")), mention_author=False)
