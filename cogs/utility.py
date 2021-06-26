@@ -1087,7 +1087,6 @@ class Utility(commands.Cog):
     async def info(self, ctx):
         async with ctx.typing():
             process = psutil.Process()
-            p = pathlib.Path('./')
             version = sys.version_info
             em = discord.Embed(color=self.bot.color)
             # File Stats
