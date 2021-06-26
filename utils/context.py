@@ -1,7 +1,9 @@
 import discord, asyncio, typing
 from discord.ext import commands
+from discord.message import DeletedReferencedMessage
 
 class SusContext(commands.Context):
+
     async def send(self, content=None, *args, **kwargs):
 
         allowed_mentions = kwargs.pop("allowed_mentions", None)
@@ -12,11 +14,11 @@ class SusContext(commands.Context):
             return await self.reply(content=content, mention_author=False, *args, **kwargs)
 
     class processing:
-        __slots__ = ("ctx", "done", "m")
+        __slots__ = ("ctx", "delete_after", "m")
 
-        def __init__(self, ctx):
+        def __init__(self, ctx, delete_after: bool = True):
             self.ctx = ctx
-            self.done = False
+            self.delete_after = delete_after
             self.m = None
 
         async def __aenter__(self, *args: typing.List[typing.Any], **kwargs):
@@ -25,9 +27,8 @@ class SusContext(commands.Context):
             return self
 
         async def __aexit__(self, *args, **kwargs):
-            try:
-                await self.m.delete()
-            except discord.HTTPException:
-                return
-            self.done = True
-    
+            if self.delete_after:
+                try:
+                    await self.m.delete()
+                except discord.HTTPException:
+                    return

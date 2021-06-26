@@ -1,3 +1,4 @@
+from utils.context import SusContext
 import discord, os, datetime, json, aiohttp, pwd, asyncpg, logging, coloredlogs, discordTogether
 from discord.ext import commands, tasks
 from colorama import Fore

@@ -320,7 +320,7 @@ class Utility(commands.Cog):
                         self.bot.wait_for("reaction_add", check=lambda reaction, user: str(reaction.emoji) in reactions and user == ctx.author and reaction.message == msg, timeout=30),
                         self.bot.wait_for("reaction_remove", check=lambda reaction, user: str(reaction.emoji) in reactions and user == ctx.author and reaction.message == msg, timeout=30)
                     ], return_when=asyncio.FIRST_COMPLETED)
-            except asyncio.TimeoutError:
+            except (asyncio.TimeoutError, asyncio.CancelledError):
                 return
 
             try:
@@ -460,7 +460,7 @@ class Utility(commands.Cog):
             title = res["title"]
 
             try:
-                async with ctx.processing(ctx):
+                async with ctx.typing():
                     res = await asyncio.wait_for(download(title, url, "mp3"), timeout=300)
             except asyncio.TimeoutError:
                 return await ctx.reply("The download has been cancelled, as it took over 5 minutes", mention_author=False)
