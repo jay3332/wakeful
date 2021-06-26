@@ -4,7 +4,7 @@ from discord.ext import commands
 
 class Videos(commands.Cog):
 
-    """Commands for editing videos, remember, is can take a while for the processed video to be sent"""
+    """Commands for editing videos, remember, it can take a while for the processed video to be sent"""
 
     def __init__(self, bot):
         self.bot = bot
