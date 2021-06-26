@@ -248,9 +248,7 @@ class Utility(commands.Cog):
         em=discord.Embed(description=f"{self.bot.icons['loading']} Now recognizing song...", color=self.bot.color)
         await msg.edit(embed=em)
 
-        loop = asyncio.new_event_loop()
-        res = await loop.run_until_complete(client.recognize_song(res))
-        loop.close()
+        res = await client.recognize_song(res)
 
         try:
             track = res["track"]
