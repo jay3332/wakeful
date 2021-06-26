@@ -1091,22 +1091,27 @@ class Utility(commands.Cog):
             version = sys.version_info
             em = discord.Embed(color=self.bot.color)
             # File Stats
-            files = classes = funcs = comments = lines = letters = 0
-            for f in p.rglob("*.py"):
-                files += 1
-                with f.open() as of:
-                    letters = sum(len(f.open().read()) for f in p.rglob("*.py"))
-                    for line in of.readlines():
-                        line = line.strip()
-                        if line.startswith("class"):
-                            classes += 1
-                        if line.startswith("def"):
-                            funcs += 1
-                        if line.startswith("async def"):
-                            funcs += 1
-                        if "#" in line:
-                            comments += 1
-                        lines += 1
+            def line_count():
+                files = classes = funcs = comments = lines = letters = 0
+                p = pathlib.Path('./')
+                for f in p.rglob("*.py"):
+                    files += 1
+                    with f.open() as of:
+                        letters = sum(len(f.open().read()) for f in p.rglob("*.py"))
+                        for line in of.readlines():
+                            line = line.strip()
+                            if line.startswith("class"):
+                                classes += 1
+                            if line.startswith("def"):
+                                funcs += 1
+                            if line.startswith("async def"):
+                                funcs += 1
+                            if "#" in line:
+                                comments += 1
+                            lines += 1
+                return files, classes, funcs, comments, lines, letters
+            
+            files, classes, funcs, comments, lines, letters = await self.bot.loop.run_in_executor(None, line_count)
             # Embed
             owner = self.bot.get_user(self.bot.ownersid)
             em.add_field(name="Bot", value=f"""
