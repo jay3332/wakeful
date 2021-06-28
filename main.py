@@ -125,13 +125,15 @@ class Wakeful(commands.AutoShardedBot):
                     except ValueError:
                         command = msg.content
                     command = command[1]
+
                     res = await self.db.fetchrow("SELECT commands FROM commands WHERE guild = $1", msg.guild.id)
                     try:
                         commands = res["commands"]
-                    except KeyError:
+                    except (KeyError, TypeError):
                         success = False
                     else:
                         success = True
+
                     if success:
                         command_obj = self.get_command(command)
                         try:
