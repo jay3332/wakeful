@@ -9,6 +9,7 @@ class Chatbot(commands.Cog):
         self.bot = bot
 
     @commands.command()
+    @commands.max_concurrency(1, commands.BucketType.member)
     async def chatbot(self, ctx):
         em=discord.Embed(description="Alright! I've started the chatbot, you can now talk to him, to cancel use `chat stop`, `chat close` or `chat cancel`", color=self.bot.color)
         await ctx.reply(embed=em, mention_author=False)
