@@ -1,8 +1,34 @@
-import discord, datetime, async_cse, psutil, humanize, os, sys, inspect, mystbin, googletrans, asyncio, aiohttp, random, time, lyricsgenius
-import asyncdagpi, hashlib, asyncpg, io, typing, gdshortener, pathlib, textwrap, async_tio, zipfile, aiowiki
-import mathjspy, pytube, youtube_dl, re, tempfile
+import discord
+import datetime
+import async_cse
+import psutil
+import humanize
+import sys
+import inspect
+import mystbin
+import googletrans
+import asyncio
+import aiohttp
+import random
+import time
+import lyricsgenius
+import asyncdagpi
+import hashlib
+import asyncpg
+import io
+import typing
+import gdshortener
+import pathlib
+import textwrap
+import async_tio
+import zipfile
+import aiowiki
+import mathjspy
+import pytube
+import youtube_dl
+import re
+import tempfile
 from youtubesearchpython.__future__ import VideosSearch, ChannelsSearch
-
 from discord.ext import commands
 from utils.webhook import Webhook, AsyncWebhookAdapter
 from utils.get import *
@@ -10,7 +36,6 @@ from utils.paginator import Paginator
 from utils.checks import *
 from utils.errors import *
 from __main__ import get_prefix
-
 from utils.functions import * 
 from utils.paginator import *
 from jishaku.functools import executor_function
@@ -49,7 +74,7 @@ def get_song(song, artist = None):
     return genius.search_song(title=song, artist=artist)
 
 @executor_function
-def download_emojis(emojis : tuple):
+def download_emojis(emojis: tuple):
     file_ = io.BytesIO()
     with zipfile.ZipFile(file_, mode="w", compression=getattr(zipfile, "ZIP_DEFLATED"), compresslevel=9) as zipfile_:
         for a, b in emojis:
@@ -697,7 +722,7 @@ class Utility(commands.Cog):
 
     @commands.command(aliases=["trans", "tr"])
     @commands.cooldown(1, 5, commands.BucketType.user)
-    async def translate(self, ctx, output : str, *, text : str):
+    async def translate(self, ctx, output: str, *, text: str):
         async with ctx.processing(ctx):
             translation = await do_translate(output, text)
             em = discord.Embed(color=self.bot.color)
@@ -721,7 +746,7 @@ class Utility(commands.Cog):
     @commands.command(aliases=["guildav", "servericon", "serverav", "sav", "srvav"])
     @commands.guild_only()
     @commands.cooldown(1, 5, commands.BucketType.user)
-    async def serveravatar(self, ctx, member : discord.Member = None):
+    async def serveravatar(self, ctx, member: discord.Member = None):
         async with ctx.processing(ctx):
             avatar_png = ctx.guild.icon_url_as(format="png")
             avatar_jpg = ctx.guild.icon_url_as(format="jpg")
@@ -792,7 +817,7 @@ class Utility(commands.Cog):
     @commands.command(aliases=["ui", "whois"], description="A command to get information about the given member", usage="[@member]")
     @commands.guild_only()
     @commands.cooldown(1, 5, commands.BucketType.user)
-    async def userinfo(self, ctx, member : discord.Member = None):
+    async def userinfo(self, ctx, member: discord.Member = None):
         if member == None:
             member = ctx.author
             
@@ -864,7 +889,7 @@ class Utility(commands.Cog):
 
     @commands.command(aliases=["pronouns"])
     @commands.cooldown(1,5,commands.BucketType.user)
-    async def pronoun(self, ctx, member : discord.Member = None):
+    async def pronoun(self, ctx, member: discord.Member = None):
         if member is None:
             member = ctx.author
 
@@ -902,7 +927,7 @@ class Utility(commands.Cog):
 
     @commands.command(aliases=["firstmsg", "fmessage", "fmsg"])
     @commands.cooldown(1,5,commands.BucketType.user)
-    async def firstmessage(self, ctx, channel : discord.TextChannel = None):
+    async def firstmessage(self, ctx, channel: discord.TextChannel = None):
         if channel is None:
             channel = ctx.channel
         
@@ -934,7 +959,7 @@ class Utility(commands.Cog):
 
     @commands.command(aliases=["gif"])
     @commands.cooldown(1,5,commands.BucketType.user)
-    async def giphy(self, ctx, *, query : str):
+    async def giphy(self, ctx, *, query: str):
         query = query.replace(" ", "%20")
         res = await self.bot.session.get(f"https://api.giphy.com/v1/gifs/search?api_key={self.bot.config['GIPHY']}&q={query}&limit=50&offset=0&rating=g&lang=en")
         res = await res.json()
@@ -982,7 +1007,7 @@ class Utility(commands.Cog):
 
     @commands.command(aliases=["src"])
     @commands.cooldown(1,5,commands.BucketType.user)
-    async def source(self, ctx, *, command_name : str = None):
+    async def source(self, ctx, *, command_name: str = None):
         if command_name is None:
             em=discord.Embed(description=f"My source code can be found [here]({self.bot.github})", color=self.bot.color)
             return await ctx.send(embed=em)
@@ -1043,7 +1068,7 @@ class Utility(commands.Cog):
 
     @commands.command(name="avatar", aliases=["icon", "av"])
     @commands.cooldown(1, 5, commands.BucketType.user)
-    async def _avatar(self, ctx, member : discord.Member = None):
+    async def _avatar(self, ctx, member: discord.Member = None):
         async with ctx.processing(ctx):
             if not member:
                 member = ctx.author
@@ -1142,7 +1167,7 @@ class Utility(commands.Cog):
 
     @commands.command()
     @commands.cooldown(1,5,commands.BucketType.user)
-    async def unspoiler(self, ctx, *, msg : str = None):
+    async def unspoiler(self, ctx, *, msg: str = None):
         if msg is None:
             if ctx.message.reference:
                 text = ctx.message.reference.resolved.clean_content
@@ -1152,7 +1177,7 @@ class Utility(commands.Cog):
     
     @commands.command()
     @commands.cooldown(1,5,commands.BucketType.user)
-    async def spoiler(self, ctx, *, msg : str = None):
+    async def spoiler(self, ctx, *, msg: str = None):
         if msg is None:
             if ctx.message.reference:
                 text = ctx.message.reference.resolved.clean_content
@@ -1162,7 +1187,7 @@ class Utility(commands.Cog):
 
     @commands.command()
     @commands.cooldown(1,5,commands.BucketType.user)
-    async def spotify(self, ctx, member : discord.Member = None):
+    async def spotify(self, ctx, member: discord.Member = None):
         if member is None:
             member = ctx.author
         activity = None
@@ -1188,7 +1213,7 @@ class Utility(commands.Cog):
     
     @commands.command(aliases=["rp", "activity", "richpresence", "status"])
     @commands.cooldown(1,5,commands.BucketType.user)
-    async def presence(self, ctx, member : discord.Member = None):
+    async def presence(self, ctx, member: discord.Member = None):
         if member is None:
             member = ctx.author
         embeds = []
@@ -1264,7 +1289,7 @@ class Utility(commands.Cog):
 
     @_qr.command(name="read", aliases=["show"])
     @commands.cooldown(1,5,commands.BucketType.user)
-    async def _read(self, ctx, url : str = None):
+    async def _read(self, ctx, url: str = None):
         attachment = await getImage(ctx, url)
         res = await self.bot.session.get(f"http://api.qrserver.com/v1/read-qr-code/?fileurl={attachment}")
         res = await res.json()
@@ -1277,7 +1302,7 @@ class Utility(commands.Cog):
 
     @commands.command(aliases=["run", "tio"])
     @commands.cooldown(1,10,commands.BucketType.user)
-    async def execute(self, ctx, language, *, code : codeblock_converter):
+    async def execute(self, ctx, language, *, code: codeblock_converter):
         res = (code.content
             .replace("{author.name}", ''.join(ctx.author.name if ctx.author.name is not None else "None"))
             .replace("{author.id}", ''.join(str(ctx.guild.id) if str(ctx.guild.id) is not None else "None"))
@@ -1609,7 +1634,7 @@ class Utility(commands.Cog):
 
     @commands.command(aliases=["calculator", "calculater", "calc"])
     @commands.cooldown(1,5,commands.BucketType.user)
-    async def calculate(self, ctx, *, args : str):
+    async def calculate(self, ctx, *, args: str):
         em=discord.Embed(color=self.bot.color)
         try:
             res = mathjspy.MathJS().eval(args)
@@ -1624,7 +1649,7 @@ class Utility(commands.Cog):
 
     @commands.group(invoke_without_command=True)
     @commands.cooldown(1, 5, commands.BucketType.user)
-    async def help(self, ctx, *, command : str = None):
+    async def help(self, ctx, *, command: str = None):
         prefix = (await get_prefix(self.bot, ctx.message))[2]
         if command is None:
             if ctx.author.id == self.bot.ownersid:
@@ -1779,7 +1804,7 @@ class Utility(commands.Cog):
     
     @search.command(name="command", aliases=["cmd"])
     @commands.cooldown(1,5,commands.BucketType.user)
-    async def _command(self, ctx, *, name : str):
+    async def _command(self, ctx, *, name: str):
         commands = []
         for cmd in list(self.bot.walk_commands()):
             if cmd.hidden:
@@ -1818,7 +1843,7 @@ class Utility(commands.Cog):
 
     @search.command(name="cog")
     @commands.cooldown(1,5,commands.BucketType.user)
-    async def _cog(self, ctx, *, name : str):
+    async def _cog(self, ctx, *, name: str):
         cogs = []
         for cog in self.bot.cogs:
             cog = get_cog(self.bot, cog)
@@ -1871,7 +1896,7 @@ class Utility(commands.Cog):
 
     @commands.command(name="file", aliases=["makefile", "createfile"])
     @commands.cooldown(1,5,commands.BucketType.user)
-    async def _file_(self, ctx, *, content : str = None):
+    async def _file_(self, ctx, *, content: str = None):
         if content is None:
             if not ctx.message.reference:
                 raise commands.MissingRequiredArgument(inspect.Parameter("content", inspect.Parameter.KEYWORD_ONLY))
@@ -2025,7 +2050,7 @@ class Utility(commands.Cog):
         await msg.edit(embed=em)
 
     @commands.command()
-    async def afk(self, ctx, *, reason : str = None):
+    async def afk(self, ctx, *, reason: str = None):
         if reason is None:
             msg = f"Okay, I've marked you as afk"
         else:
@@ -2037,7 +2062,7 @@ class Utility(commands.Cog):
 
     @commands.command(aliases=["rawmsg"])
     @commands.cooldown(1, 10, commands.BucketType.user)
-    async def rawmessage(self, ctx, message : discord.Message = None):
+    async def rawmessage(self, ctx, message: discord.Message = None):
         if ctx.message.reference:
             msg = await self.bot.http.get_message(int(ctx.message.reference.channel_id), int(ctx.message.reference.message_id))
         elif message:
@@ -2058,7 +2083,7 @@ class Utility(commands.Cog):
 
     @commands.command()
     @commands.cooldown(1,10,commands.BucketType.user)
-    async def ocr(self, ctx, url : typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
+    async def ocr(self, ctx, url: typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
         url = await getImage(ctx, url)
 
         res = await self.bot.session.get(url)

@@ -1,11 +1,11 @@
-import re
-import discord, typing, io, inspect
+import discord
+import typing
+import io
+import inspect
 import twemoji_parser as twemoji
 from wand import image
-
 from discord.ext import commands
 from utils.get import *
-from __main__ import get_prefix
 
 
 class Miscellaneous(commands.Cog):
@@ -23,7 +23,7 @@ class Miscellaneous(commands.Cog):
 
     @commands.command(aliases=["svg2png"])
     @commands.cooldown(1,5,commands.BucketType.user)
-    async def svgtopng(self, ctx, attachment : str = None):
+    async def svgtopng(self, ctx, attachment: str = None):
         if attachment is None:
             if not ctx.message.attachments:
                 raise commands.MissingRequiredArgument(inspect.Parameter("attachment", inspect.Parameter.KEYWORD_ONLY))
@@ -44,7 +44,7 @@ class Miscellaneous(commands.Cog):
 
     @commands.command(aliases=["be"])
     @commands.cooldown(1,5,commands.BucketType.user)
-    async def bigemoji(self, ctx, emoji : typing.Union[discord.Emoji, discord.PartialEmoji, str]):
+    async def bigemoji(self, ctx, emoji: typing.Union[discord.Emoji, discord.PartialEmoji, str]):
 
         try:
             emoji_animated = emoji.animated

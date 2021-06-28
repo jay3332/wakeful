@@ -1,5 +1,8 @@
-from attr import has
-import discord, difflib, asyncio, traceback, aiohttp
+import discord
+import difflib
+import asyncio
+import traceback
+import aiohttp
 from jishaku.models import copy_context_with
 from discord.ext import commands
 from utils.webhook import Webhook, AsyncWebhookAdapter

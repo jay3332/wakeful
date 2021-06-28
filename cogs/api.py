@@ -1,4 +1,6 @@
-import discord, datetime, io
+import discord
+import datetime
+import io
 from jishaku.codeblocks import codeblock_converter
 from discord.ext import commands
 from utils.get import *
@@ -11,7 +13,7 @@ class API(commands.Cog):
         self.bot = bot
 
     @commands.command()
-    @commands.cooldown(1,5,commands.BucketType.user)
+    @commands.cooldown(1, 5, commands.BucketType.user)
     async def cat(self, ctx):
         async with ctx.processing(ctx):
             res = await self.bot.session.get("https://api.thecatapi.com/v1/images/search")
@@ -24,7 +26,7 @@ class API(commands.Cog):
 
     @commands.command()
     @commands.cooldown(1,5,commands.BucketType.user)
-    async def window(self, ctx, *, text : codeblock_converter):
+    async def window(self, ctx, *, text: codeblock_converter):
         url = self.bot.config["SECRET_API"]
         data = {
             "paddingVertical": "56px",
@@ -62,7 +64,7 @@ class API(commands.Cog):
 
     @commands.command()
     @commands.cooldown(1,5,commands.BucketType.user)
-    async def xkcd(self, ctx, number : int = None):
+    async def xkcd(self, ctx, number: int = None):
         async with ctx.processing(ctx):
             latest = await (await self.bot.session.get("https://xkcd.com/info.0.json")).json()
         res = None

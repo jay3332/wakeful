@@ -1,16 +1,24 @@
-import discord, os, datetime, json, aiohttp, pwd, asyncpg, logging, coloredlogs, discordTogether
+import discord
+import os
+import datetime
+import json
+import aiohttp
+import pwd
+import asyncpg
+import logging
+import coloredlogs
+import discordTogether
 from discord.ext import commands, tasks
 from colorama import Fore
 from utils import menus
 from utils.context import SusContext
 from utils.checks import is_blacklisted, is_mod
-from utils.get import *
 
 with open('config.json') as f:
     conf = json.load(f)
 
 
-async def get_prefix(bot, message):
+async def get_prefix(bot: "Wakeful", message: discord.Message):
     await bot.wait_until_ready()
 
     if message.author.id == bot.ownersid and bot.emptyPrefix is True:
@@ -157,7 +165,7 @@ bot.remove_command("help")
 
 token = conf["TOKEN"]
 os.environ["JISHAKU_NO_UNDERSCORE"] = "True"
-os.environ["JISHAKU_NO_DM_TRACEBACK"] = "True" 
+os.environ["JISHAKU_NO_DM_TRACEBACK"] = "True"
 os.environ["JISHAKU_HIDE"] = "True"
 
 coloredlogs.install()

@@ -1,5 +1,11 @@
-import json, discord, typing, functools, asyncio, aiohttp
+import json
+import discord
+import typing
+import functools
+import asyncio
+import aiohttp
 import youtube_dl as ydl
+
 
 def executor_function(sync_function: typing.Callable):
 
@@ -18,11 +24,11 @@ def executor_function(sync_function: typing.Callable):
 @executor_function
 def youtube(query, download = False):
     ytdl = ydl.YoutubeDL({"format": "bestaudio/best", "restrictfilenames": True, "noplaylist": True, "nocheckcertificate": True, "ignoreerrors": True, "logtostderr": False, "quiet": True, "no_warnings": True, "default_search": "auto", "source_address": "0.0.0.0"})
-    info =  ytdl.extract_info(query, download=download)
+    info = ytdl.extract_info(query, download=download)
     del ytdl
     return info
 
-async def get_config(string : str):
+async def get_config(string: str):
     with open("config.json", "r") as f:
         conf = json.load(f)
     return conf[string]
@@ -33,7 +39,7 @@ def get_cog(bot, name):
         if cog.qualified_name.lower() == name.lower():
             return cog
 
-async def get_pronoun(bot : typing.Union[discord.Client, discord.ext.commands.Bot], member : discord.Member):
+async def get_pronoun(bot: typing.Union[discord.Client, discord.ext.commands.Bot], member: discord.Member):
     pronouns={
         "hh": "he/him",
         "hi": "he/it",
@@ -53,7 +59,7 @@ async def get_pronoun(bot : typing.Union[discord.Client, discord.ext.commands.Bo
         "tt": "they/them",
         "any": "Any",
         "other": "Other",
-        "ask": f"Ask",
+        "ask": "Ask",
         "avoid": "No pronoun, use name",
         "None": "N/A"
     }

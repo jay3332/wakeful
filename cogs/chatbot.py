@@ -1,4 +1,5 @@
-import discord, asyncio
+import discord
+import asyncio
 import async_cleverbot as ac
 from discord.ext import commands
 from utils.get import *

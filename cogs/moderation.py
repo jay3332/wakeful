@@ -1,4 +1,7 @@
-import discord, string, random, asyncpg
+import discord
+import string
+import random
+import asyncpg
 from discord.ext import commands
 from utils.get import *
 from utils.paginator import *
@@ -92,7 +95,7 @@ class Moderation(commands.Cog):
     @commands.bot_has_guild_permissions(ban_members=True)
     @commands.has_guild_permissions(ban_members=True)
     @commands.cooldown(1,5,commands.BucketType.user)
-    async def ban(self, ctx, member : discord.Member, *, reason : str = None):
+    async def ban(self, ctx, member: discord.Member, *, reason: str = None):
         if ctx.author.top_role.position > member.top_role.position:
             if reason is not None:
                 reason = f"{reason} - Requested by {ctx.author} ({ctx.author.id})"
@@ -108,7 +111,7 @@ class Moderation(commands.Cog):
     @commands.bot_has_guild_permissions(kick_members=True)
     @commands.has_guild_permissions(kick_members=True)
     @commands.cooldown(1,5,commands.BucketType.user)
-    async def kick(self, ctx, member : discord.Member, *, reason : str = None):
+    async def kick(self, ctx, member: discord.Member, *, reason: str = None):
         if ctx.author.top_role.position > member.top_role.position:
             if reason is not None:
                 reason = reason + f"{reason} - Requested by {ctx.author} ({ctx.author.id})"
@@ -124,7 +127,7 @@ class Moderation(commands.Cog):
     @commands.has_guild_permissions(manage_messages=True)
     @commands.bot_has_guild_permissions(manage_messages=True)
     @commands.cooldown(1,5,commands.BucketType.user)
-    async def purge(self, ctx, amount : int = 10):
+    async def purge(self, ctx, amount: int = 10):
         if not amount > 100:
             e = await ctx.channel.purge(limit=amount)
             em=discord.Embed(description=f"I've successfully purged `{len(e)}` messages", color=self.bot.color)
@@ -139,7 +142,7 @@ class Moderation(commands.Cog):
     @commands.has_guild_permissions(manage_channels=True)
     @commands.bot_has_guild_permissions(manage_channels=True)
     @commands.cooldown(1,5,commands.BucketType.user)
-    async def nuke(self, ctx, channel : discord.TextChannel = None):
+    async def nuke(self, ctx, channel: discord.TextChannel = None):
         if channel is None:
             channel = ctx.channel
         em=discord.Embed(description="Are you sure you want to execute this command? This will delete all pins & messages", color=self.bot.color)
@@ -160,7 +163,7 @@ class Moderation(commands.Cog):
     @commands.has_guild_permissions(manage_nicknames=True)
     @commands.bot_has_guild_permissions(manage_nicknames=True)
     @commands.cooldown(1,5,commands.BucketType.user)
-    async def nickname(self, ctx, member : discord.Member, *, nickname : str = ""):
+    async def nickname(self, ctx, member: discord.Member, *, nickname: str = ""):
         if ctx.author.top_role.position > member.top_role.position:
             await member.edit(nick=nickname)
             await ctx.message.add_reaction(self.bot.icons["greentick"])
@@ -174,7 +177,7 @@ class Moderation(commands.Cog):
     @commands.has_guild_permissions(manage_nicknames=True)
     @commands.bot_has_guild_permissions(manage_nicknames=True)
     @commands.cooldown(1,5,commands.BucketType.user)
-    async def moderatenickname(self, ctx, member : discord.Member):
+    async def moderatenickname(self, ctx, member: discord.Member):
         if ctx.author.top_role.position > member.top_role.position:
             nicks = []
             for m in ctx.guild.members:
@@ -193,7 +196,7 @@ class Moderation(commands.Cog):
 
     @commands.command(aliases=["prefix"])
     @commands.guild_only()
-    async def setprefix(self, ctx, prefix : str = None):
+    async def setprefix(self, ctx, prefix: str = None):
         if prefix is None:
             prefix = await get_prefix(self.bot, ctx.message)
             if ctx.message.guild:

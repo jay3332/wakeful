@@ -1,7 +1,7 @@
-import discord, polaroid, io
-
+import discord
+import polaroid
+import io
 from discord.ext import commands
-
 from jishaku.functools import executor_function
 from utils.functions import *
 from utils.get import *
@@ -13,19 +13,19 @@ class Polaroid(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    def run_polaroid(self, image, method : str, args : list = [], kwargs : dict = {}):
+    def run_polaroid(self, image, method: str, args: list = [], kwargs: dict = {}):
         img = polaroid.Image(image)
         method = getattr(img, method)
         method(*args, **kwargs)
         bytes_ = io.BytesIO(img.save_bytes())
         return bytes_
 
-    async def do_polaroid(self, image, method : str, args : list = [], kwargs : dict = {}):
+    async def do_polaroid(self, image, method: str, args: list = [], kwargs: dict = {}):
         return await asyncio.get_running_loop().run_in_executor(None, self.run_polaroid, image, method, args, kwargs)
 
     @commands.command()
     @commands.cooldown(1,5,commands.BucketType.user)
-    async def rainbow(self, ctx, url : typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
+    async def rainbow(self, ctx, url: typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
         async with ctx.processing(ctx):
             image = str(await getImage(ctx, url))
             img = await (await self.bot.session.get(image)).read()
@@ -36,7 +36,7 @@ class Polaroid(commands.Cog):
 
     @commands.command()
     @commands.cooldown(1,5,commands.BucketType.user)
-    async def mirror(self, ctx, url : typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
+    async def mirror(self, ctx, url: typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
         async with ctx.processing(ctx):
             image = str(await getImage(ctx, url))
             img = await (await self.bot.session.get(image)).read()
@@ -47,7 +47,7 @@ class Polaroid(commands.Cog):
 
     @commands.command()
     @commands.cooldown(1,5,commands.BucketType.user)
-    async def flip(self, ctx, url : typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
+    async def flip(self, ctx, url: typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
         async with ctx.processing(ctx):
             image = str(await getImage(ctx, url))
             img = await (await self.bot.session.get(image)).read()
@@ -58,7 +58,7 @@ class Polaroid(commands.Cog):
 
     @commands.command()
     @commands.cooldown(1,5,commands.BucketType.user)
-    async def blur(self, ctx, url : typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
+    async def blur(self, ctx, url: typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
         async with ctx.processing(ctx):
             image = str(await getImage(ctx, url))
             img = await (await self.bot.session.get(image)).read()
@@ -69,7 +69,7 @@ class Polaroid(commands.Cog):
 
     @commands.command()
     @commands.cooldown(1,5,commands.BucketType.user)
-    async def resize(self, ctx, width : int, height : int, url : typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
+    async def resize(self, ctx, width: int, height: int, url: typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
         if width > 1000 or height > 1000:
             return await ctx.send("The dimensions can't be over 1000 pixels", mention_author=False)
 
@@ -83,7 +83,7 @@ class Polaroid(commands.Cog):
 
     @commands.command()
     @commands.cooldown(1,5,commands.BucketType.user)
-    async def wide(self, ctx, url : typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
+    async def wide(self, ctx, url: typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
         async with ctx.processing(ctx):
             image = str(await getImage(ctx, url))
             img = await (await self.bot.session.get(image)).read()
@@ -94,7 +94,7 @@ class Polaroid(commands.Cog):
 
     @commands.command()
     @commands.cooldown(1,5,commands.BucketType.user)
-    async def brighten(self, ctx, url : typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
+    async def brighten(self, ctx, url: typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
         async with ctx.processing(ctx):
             image = str(await getImage(ctx, url))
             img = await (await self.bot.session.get(image)).read()
@@ -105,7 +105,7 @@ class Polaroid(commands.Cog):
 
     @commands.command()
     @commands.cooldown(1,5,commands.BucketType.user)
-    async def solarize(self, ctx, url : typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
+    async def solarize(self, ctx, url: typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
         async with ctx.processing(ctx):
             image = str(await getImage(ctx, url))
             img = await (await self.bot.session.get(image)).read()
@@ -116,7 +116,7 @@ class Polaroid(commands.Cog):
 
     @commands.command()
     @commands.cooldown(1,5,commands.BucketType.user)
-    async def oil(self, ctx, url : typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
+    async def oil(self, ctx, url: typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
         async with ctx.processing(ctx):
             image = str(await getImage(ctx, url))
             img = await (await self.bot.session.get(image)).read()
@@ -132,7 +132,7 @@ class Polaroid(commands.Cog):
 
     @filter.command()
     @commands.cooldown(1,5,commands.BucketType.user)
-    async def cali(self, ctx, url : typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
+    async def cali(self, ctx, url: typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
         async with ctx.processing(ctx):
             image = str(await getImage(ctx, url))
             img = await (await self.bot.session.get(image)).read()
@@ -143,7 +143,7 @@ class Polaroid(commands.Cog):
 
     @filter.command()
     @commands.cooldown(1,5,commands.BucketType.user)
-    async def dramatic(self, ctx, url : typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
+    async def dramatic(self, ctx, url: typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
         async with ctx.processing(ctx):
             image = str(await getImage(ctx, url))
             img = await (await self.bot.session.get(image)).read()
@@ -154,7 +154,7 @@ class Polaroid(commands.Cog):
 
     @filter.command()
     @commands.cooldown(1,5,commands.BucketType.user)
-    async def firenze(self, ctx, url : typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
+    async def firenze(self, ctx, url: typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
         async with ctx.processing(ctx):
             image = str(await getImage(ctx, url))
             img = await (await self.bot.session.get(image)).read()
@@ -165,7 +165,7 @@ class Polaroid(commands.Cog):
 
     @filter.command()
     @commands.cooldown(1,5,commands.BucketType.user)
-    async def golden(self, ctx, url : typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
+    async def golden(self, ctx, url: typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
         async with ctx.processing(ctx):
             image = str(await getImage(ctx, url))
             img = await (await self.bot.session.get(image)).read()
@@ -176,7 +176,7 @@ class Polaroid(commands.Cog):
 
     @filter.command()
     @commands.cooldown(1,5,commands.BucketType.user)
-    async def lix(self, ctx, url : typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
+    async def lix(self, ctx, url: typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
         async with ctx.processing(ctx):
             image = str(await getImage(ctx, url))
             img = await (await self.bot.session.get(image)).read()
@@ -187,7 +187,7 @@ class Polaroid(commands.Cog):
 
     @filter.command()
     @commands.cooldown(1,5,commands.BucketType.user)
-    async def lofi(self, ctx, url : typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
+    async def lofi(self, ctx, url: typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
         async with ctx.processing(ctx):
             image = str(await getImage(ctx, url))
             img = await (await self.bot.session.get(image)).read()
@@ -198,7 +198,7 @@ class Polaroid(commands.Cog):
 
     @filter.command()
     @commands.cooldown(1,5,commands.BucketType.user)
-    async def neue(self, ctx, url : typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
+    async def neue(self, ctx, url: typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
         async with ctx.processing(ctx):
             image = str(await getImage(ctx, url))
             img = await (await self.bot.session.get(image)).read()
@@ -209,7 +209,7 @@ class Polaroid(commands.Cog):
 
     @filter.command()
     @commands.cooldown(1,5,commands.BucketType.user)
-    async def obsidian(self, ctx, url : typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
+    async def obsidian(self, ctx, url: typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
         async with ctx.processing(ctx):
             image = str(await getImage(ctx, url))
             img = await (await self.bot.session.get(image)).read()
@@ -220,7 +220,7 @@ class Polaroid(commands.Cog):
 
     @filter.command()
     @commands.cooldown(1,5,commands.BucketType.user)
-    async def pink(self, ctx, url : typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
+    async def pink(self, ctx, url: typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
         async with ctx.processing(ctx):
             image = str(await getImage(ctx, url))
             img = await (await self.bot.session.get(image)).read()
@@ -231,7 +231,7 @@ class Polaroid(commands.Cog):
 
     @filter.command()
     @commands.cooldown(1,5,commands.BucketType.user)
-    async def ryo(self, ctx, url : typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
+    async def ryo(self, ctx, url: typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
         async with ctx.processing(ctx):
             image = str(await getImage(ctx, url))
             img = await (await self.bot.session.get(image)).read()
@@ -242,7 +242,7 @@ class Polaroid(commands.Cog):
 
     @filter.command()
     @commands.cooldown(1,5,commands.BucketType.user)
-    async def oceanic(self, ctx, url : typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
+    async def oceanic(self, ctx, url: typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
         async with ctx.processing(ctx):
             image = str(await getImage(ctx, url))
             img = await (await self.bot.session.get(image)).read()
@@ -253,7 +253,7 @@ class Polaroid(commands.Cog):
 
     @filter.command()
     @commands.cooldown(1,5,commands.BucketType.user)
-    async def marine(self, ctx, url : typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
+    async def marine(self, ctx, url: typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
         async with ctx.processing(ctx):
             image = str(await getImage(ctx, url))
             img = await (await self.bot.session.get(image)).read()
@@ -264,7 +264,7 @@ class Polaroid(commands.Cog):
 
     @filter.command()
     @commands.cooldown(1,5,commands.BucketType.user)
-    async def seagreen(self, ctx, url : typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
+    async def seagreen(self, ctx, url: typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
         async with ctx.processing(ctx):
             image = str(await getImage(ctx, url))
             img = await (await self.bot.session.get(image)).read()
@@ -275,7 +275,7 @@ class Polaroid(commands.Cog):
 
     @filter.command()
     @commands.cooldown(1,5,commands.BucketType.user)
-    async def flagblue(self, ctx, url : typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
+    async def flagblue(self, ctx, url: typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
         async with ctx.processing(ctx):
             image = str(await getImage(ctx, url))
             img = await (await self.bot.session.get(image)).read()
@@ -286,7 +286,7 @@ class Polaroid(commands.Cog):
 
     @filter.command()
     @commands.cooldown(1,5,commands.BucketType.user)
-    async def liquid(self, ctx, url : typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
+    async def liquid(self, ctx, url: typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
         async with ctx.processing(ctx):
             image = str(await getImage(ctx, url))
             img = await (await self.bot.session.get(image)).read()
@@ -297,7 +297,7 @@ class Polaroid(commands.Cog):
 
     @filter.command()
     @commands.cooldown(1,5,commands.BucketType.user)
-    async def diamante(self, ctx, url : typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
+    async def diamante(self, ctx, url: typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
         async with ctx.processing(ctx):
             image = str(await getImage(ctx, url))
             img = await (await self.bot.session.get(image)).read()
@@ -308,7 +308,7 @@ class Polaroid(commands.Cog):
 
     @filter.command()
     @commands.cooldown(1,5,commands.BucketType.user)
-    async def radio(self, ctx, url : typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
+    async def radio(self, ctx, url: typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
         async with ctx.processing(ctx):
             image = str(await getImage(ctx, url))
             img = await (await self.bot.session.get(image)).read()
@@ -319,7 +319,7 @@ class Polaroid(commands.Cog):
 
     @filter.command()
     @commands.cooldown(1,5,commands.BucketType.user)
-    async def twenties(self, ctx, url : typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
+    async def twenties(self, ctx, url: typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
         async with ctx.processing(ctx):
             image = str(await getImage(ctx, url))
             img = await (await self.bot.session.get(image)).read()
@@ -330,7 +330,7 @@ class Polaroid(commands.Cog):
 
     @filter.command()
     @commands.cooldown(1,5,commands.BucketType.user)
-    async def rosetint(self, ctx, url : typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
+    async def rosetint(self, ctx, url: typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
         async with ctx.processing(ctx):
             image = str(await getImage(ctx, url))
             img = await (await self.bot.session.get(image)).read()
@@ -341,7 +341,7 @@ class Polaroid(commands.Cog):
 
     @filter.command()
     @commands.cooldown(1,5,commands.BucketType.user)
-    async def mauve(self, ctx, url : typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
+    async def mauve(self, ctx, url: typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
         async with ctx.processing(ctx):
             image = str(await getImage(ctx, url))
             img = await (await self.bot.session.get(image)).read()
@@ -352,7 +352,7 @@ class Polaroid(commands.Cog):
 
     @filter.command()
     @commands.cooldown(1,5,commands.BucketType.user)
-    async def bluechrome(self, ctx, url : typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
+    async def bluechrome(self, ctx, url: typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
         async with ctx.processing(ctx):
             image = str(await getImage(ctx, url))
             img = await (await self.bot.session.get(image)).read()
@@ -363,7 +363,7 @@ class Polaroid(commands.Cog):
 
     @filter.command()
     @commands.cooldown(1,5,commands.BucketType.user)
-    async def vintage(self, ctx, url : typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
+    async def vintage(self, ctx, url: typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
         async with ctx.processing(ctx):
             image = str(await getImage(ctx, url))
             img = await (await self.bot.session.get(image)).read()
@@ -374,7 +374,7 @@ class Polaroid(commands.Cog):
 
     @filter.command()
     @commands.cooldown(1,5,commands.BucketType.user)
-    async def serenity(self, ctx, url : typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
+    async def serenity(self, ctx, url: typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
         async with ctx.processing(ctx):
             image = str(await getImage(ctx, url))
             img = await (await self.bot.session.get(image)).read()

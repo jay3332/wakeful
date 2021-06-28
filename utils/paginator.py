@@ -1,10 +1,10 @@
-import discord, textwrap
+import discord
+import textwrap
 from utils import menus
-from discord.ext import commands
 from utils.get import *
 
 class Paginator(menus.ListPageSource):
-    async def format_page(self, menu, embed : discord.Embed):
+    async def format_page(self, menu, embed: discord.Embed):
         if len(menu.source.entries) != 1:
             em = embed.to_dict()
             if em.get("footer") is not None:
@@ -24,12 +24,12 @@ class TextPaginator(menus.ListPageSource):
     async def format_page(self, menu, text):
         return text
 
-def WrapText(text : str, length : int):
+def WrapText(text: str, length: int):
     wrapper = textwrap.TextWrapper(width=length)
     words = wrapper.wrap(text=text)
     return words
 
-def WrapList(list_ : list, length : int):
+def WrapList(list_: list, length: int):
     def chunks(seq, size):
         for i in range(0, len(seq), size):
             yield seq[i:i + size]

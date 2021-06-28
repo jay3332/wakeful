@@ -1,4 +1,15 @@
-import discord, io, asyncdagpi, asyncio, datetime, string, random, json, wonderwords, typing, aiogtts, base64
+import discord
+import io
+import asyncdagpi
+import asyncio
+import datetime
+import string
+import random
+import json
+import wonderwords
+import typing
+import aiogtts
+import base64
 from discord.ext import commands
 from fuzzywuzzy import fuzz
 from jishaku.functools import executor_function
@@ -52,7 +63,7 @@ class Fun(commands.Cog):
 
     @commands.command()
     @commands.cooldown(1,5,commands.BucketType.user)
-    async def faketoken(self, ctx, member : typing.Union[discord.Member, discord.User, int] = None):
+    async def faketoken(self, ctx, member: typing.Union[discord.Member, discord.User, int] = None):
         if member is None:
             member = ctx.author
         if isinstance(member, int):
@@ -64,7 +75,7 @@ class Fun(commands.Cog):
 
     @commands.command(aliases=["pt"])
     @commands.cooldown(1,5,commands.BucketType.user)
-    async def parsetoken(self, ctx, token : str):
+    async def parsetoken(self, ctx, token: str):
         if not re.search(r"([a-zA-Z0-9]{24}\.[a-zA-Z0-9]{6}\.[a-zA-Z0-9_\-]{27}|mfa\.[a-zA-Z0-9_\-]{84})", token):
             return await ctx.send("This is not a valid token")
 
@@ -187,7 +198,7 @@ class Fun(commands.Cog):
 
     @commands.command()
     @commands.cooldown(1,5,commands.BucketType.user)
-    async def age(self, ctx, name : typing.Union[discord.Member, str] = None):
+    async def age(self, ctx, name: typing.Union[discord.Member, str] = None):
         if name is None:
             name = ctx.author
         if isinstance(name, str):
@@ -282,7 +293,7 @@ class Fun(commands.Cog):
 
     @commands.command()
     @commands.cooldown(1,5,commands.BucketType.user)
-    async def gender(self, ctx, name : typing.Union[discord.Member, str] = None):
+    async def gender(self, ctx, name: typing.Union[discord.Member, str] = None):
         if name is None:
             name = ctx.author
         if isinstance(name, str):
@@ -302,7 +313,7 @@ class Fun(commands.Cog):
 
     @commands.command(aliases=["country"])
     @commands.cooldown(1,5,commands.BucketType.user)
-    async def nation(self, ctx, name : typing.Union[discord.Member, str] = None):
+    async def nation(self, ctx, name: typing.Union[discord.Member, str] = None):
         if name is None:
             name = ctx.author
         if isinstance(name, str):
@@ -342,7 +353,7 @@ class Fun(commands.Cog):
 
     @commands.command(aliases=["r"])
     @commands.cooldown(1, 5, commands.BucketType.user)
-    async def reddit(self, ctx, subreddit : str = None):
+    async def reddit(self, ctx, subreddit: str = None):
         if subreddit is None:
             subreddit = random.choice([
                             "memes",
@@ -459,7 +470,7 @@ class Fun(commands.Cog):
         
     @commands.command()
     @commands.cooldown(1, 5, commands.BucketType.user)
-    async def httpcat(self, ctx, code : int):
+    async def httpcat(self, ctx, code: int):
         res = await self.bot.session.get(f"https://http.cat/{code}")
         buf = io.BytesIO(await res.read())
         file=discord.File(buf, filename=f"{code}.png")
@@ -499,7 +510,7 @@ class Fun(commands.Cog):
 
     @commands.command(aliases=["ppsize"])
     @commands.cooldown(1,5,commands.BucketType.user)
-    async def pp(self, ctx, member : discord.Member = None):
+    async def pp(self, ctx, member: discord.Member = None):
         if member is None:
             member = ctx.author
         em=discord.Embed(title=f"{member.name}'s pp", description="8"+"".join("=" for x in range(random.randrange(0,10)))+"D", color=self.bot.color)
@@ -507,7 +518,7 @@ class Fun(commands.Cog):
 
     @commands.command()
     @commands.cooldown(1,5,commands.BucketType.user)
-    async def gayrate(self, ctx, member : discord.Member = None):
+    async def gayrate(self, ctx, member: discord.Member = None):
         if member is None:
             member = ctx.author
         em=discord.Embed(title=f"{member.name}'s gayrate", description=f"{member.name} is `{random.randrange(0,100)}`% gay", color=self.bot.color)
@@ -515,7 +526,7 @@ class Fun(commands.Cog):
 
     @commands.command()
     @commands.cooldown(1, 5, commands.BucketType.user)
-    async def caption(self, ctx, member : typing.Union[discord.Member, str] = None):
+    async def caption(self, ctx, member: typing.Union[discord.Member, str] = None):
         url = await getImage(ctx, member)
         async with ctx.processing(ctx):
             res = await self.bot.session.post("https://captionbot.azurewebsites.net/api/messages", json={"Content": url, "Type": "CaptionRequest"}, headers={"Content-Type": "application/json; charset=utf-8"})
@@ -555,7 +566,7 @@ class Fun(commands.Cog):
 
     @commands.command()
     @commands.cooldown(1,5,commands.BucketType.user)
-    async def eject(self, ctx, member : typing.Union[discord.Member, str], color : str = None, is_impostor : bool = None):
+    async def eject(self, ctx, member: typing.Union[discord.Member, str], color: str = None, is_impostor: bool = None):
         if color is None:
             color = random.choice(['black', 'blue', 'brown', 'cyan', 'darkgreen', 'lime', 'orange', 'pink', 'purple', 'red', 'white', 'yellow'])
 
@@ -581,7 +592,7 @@ class Fun(commands.Cog):
 
     @commands.command()
     @commands.cooldown(1,5,commands.BucketType.user)
-    async def mock(self, ctx, *, msg : str = None):
+    async def mock(self, ctx, *, msg: str = None):
         if msg is None:
             if ctx.message.reference:
                 text = ctx.message.reference.resolved.clean_content

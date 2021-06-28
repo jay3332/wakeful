@@ -626,7 +626,7 @@ class Webhook(Hashable):
 
     @property
     def url(self):
-        """:class:`str` : Returns the webhook's url."""
+        """:class:`str`: Returns the webhook's url."""
         return 'https://discord.com/api/webhooks/{}/{}'.format(self.id, self.token)
 
     @classmethod
