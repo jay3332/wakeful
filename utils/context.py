@@ -1,6 +1,7 @@
-import discord, asyncio, typing
+import discord
+import asyncio
+import typing
 from discord.ext import commands
-from discord.message import DeletedReferencedMessage
 
 class SusContext(commands.Context):
 
@@ -8,10 +9,12 @@ class SusContext(commands.Context):
 
         allowed_mentions = kwargs.pop("allowed_mentions", None)
 
-        if allowed_mentions is None:
-            return await self.reply(content=content, mention_author=False, allowed_mentions=discord.AllowedMentions.none(), *args, **kwargs)
-        else:
+        try:
+            if allowed_mentions is None:
+                return await self.reply(content=content, mention_author=False, allowed_mentions=discord.AllowedMentions.none(), *args, **kwargs)
             return await self.reply(content=content, mention_author=False, *args, **kwargs)
+        except discord.NotFound:
+            return await super().reply(content=content, *args, **kwargs)
 
     class processing:
         __slots__ = ("ctx", "delete_after", "m")

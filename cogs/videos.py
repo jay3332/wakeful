@@ -11,7 +11,7 @@ class Videos(commands.Cog):
 
     @commands.command(aliases=["vc"])
     @commands.cooldown(1,10,commands.BucketType.user)
-    async def videocaption(self, ctx, *, text : str):
+    async def videocaption(self, ctx, *, text: str):
         attachment = None
 
         if ctx.message.attachments:
@@ -47,7 +47,7 @@ class Videos(commands.Cog):
 
     @commands.command()
     @commands.cooldown(1,10,commands.BucketType.user)
-    async def muffle(self, ctx, amount : int):
+    async def muffle(self, ctx, amount: int):
 
         if amount > 100 or amount < 1:
             return await ctx.send("Please provide an amount that is over 1 and under 100")
@@ -80,7 +80,7 @@ class Videos(commands.Cog):
 
     @commands.command()
     @commands.cooldown(1,10,commands.BucketType.user)
-    async def reverb(self, ctx, amount : int):
+    async def reverb(self, ctx, amount: int):
 
         if amount > 100 or amount < 1:
             return await ctx.send("Please provide an amount that is over 1 and under 100")
@@ -120,7 +120,7 @@ class Videos(commands.Cog):
 
     @commands.command()
     @commands.cooldown(1,10,commands.BucketType.user)
-    async def disco(self, ctx, amount : int):
+    async def disco(self, ctx, amount: int):
 
         if amount > 100 or amount < 1:
             return await ctx.send("Please provide an amount that is over 1 and under 100")
@@ -160,7 +160,7 @@ class Videos(commands.Cog):
 
     @commands.command(aliases=["vv"])
     @commands.cooldown(1,10,commands.BucketType.user)
-    async def videovolume(self, ctx, amount : int):
+    async def videovolume(self, ctx, amount: int):
  
         attachment = None
 
@@ -197,7 +197,7 @@ class Videos(commands.Cog):
 
     @commands.command()
     @commands.cooldown(1,10,commands.BucketType.user)
-    async def shake(self, ctx, amount : int):
+    async def shake(self, ctx, amount: int):
 
         if amount > 100 or amount < 1:
             return await ctx.send("Please provide an amount that is over 1 and under 100")
@@ -237,7 +237,7 @@ class Videos(commands.Cog):
 
     @commands.command()
     @commands.cooldown(1,10,commands.BucketType.user)
-    async def sketch(self, ctx, amount : int):
+    async def sketch(self, ctx, amount: int):
 
         if amount > 100 or amount < 1:
             return await ctx.send("Please provide an amount that is over 1 and under 100")
@@ -314,7 +314,7 @@ class Videos(commands.Cog):
 
     @commands.command(aliases=["df"])
     @commands.cooldown(1,10,commands.BucketType.user)
-    async def deepfry(self, ctx, amount : int):
+    async def deepfry(self, ctx, amount: int):
 
         if amount > 10 or amount < 1:
             return await ctx.send("Please provide an amount that is over 1 and under 10")
@@ -354,7 +354,7 @@ class Videos(commands.Cog):
 
     @commands.group(invoke_without_command=True)
     @commands.cooldown(1,10,commands.BucketType.user)
-    async def speed(self, ctx, *, amount : float):
+    async def speed(self, ctx, *, amount: float):
 
         attachment = None
 
@@ -391,7 +391,7 @@ class Videos(commands.Cog):
 
     @speed.command(aliases=["v"])
     @commands.cooldown(1,10,commands.BucketType.user)
-    async def video(self, ctx, *, amount : float):
+    async def video(self, ctx, *, amount: float):
 
         attachment = None
 
@@ -428,7 +428,7 @@ class Videos(commands.Cog):
 
     @speed.command(aliases=["a"])
     @commands.cooldown(1,10,commands.BucketType.user)
-    async def audio(self, ctx, *, amount : float):
+    async def audio(self, ctx, *, amount: float):
 
         attachment = None
 
@@ -576,7 +576,7 @@ class Videos(commands.Cog):
 
     @commands.command()
     @commands.cooldown(1,10,commands.BucketType.user)
-    async def spin(self, ctx, amount : int):
+    async def spin(self, ctx, amount: int):
 
         if amount > 10 or amount < 1:
             return await ctx.send("Please provide an amount that is over 1 and under 10")

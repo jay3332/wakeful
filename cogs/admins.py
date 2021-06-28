@@ -1,4 +1,10 @@
-import discord, asyncio, os, pwd, sys, importlib, traceback
+import discord
+import asyncio
+import os
+import pwd
+import sys
+import importlib
+import traceback
 from discord.ext import commands
 from utils.checks import is_mod
 from utils.functions import *
@@ -49,7 +55,7 @@ class Admin(commands.Cog, command_attrs=dict(hidden=True)):
 
     @developer.command(aliases=["rl"])
     @commands.is_owner()
-    async def reload(self, ctx, module : str = "all"):
+    async def reload(self, ctx, module: str = "all"):
         if module == "all":
             errors = {}
             extensions = self.bot.extensions.copy()
@@ -102,21 +108,21 @@ class Admin(commands.Cog, command_attrs=dict(hidden=True)):
         pass
 
     @blacklist.command(hidden=True)
-    async def add(self, ctx, user : discord.User):
+    async def add(self, ctx, user: discord.User):
         if is_mod(self.bot, ctx.author):
             await self.bot.db.fetch("INSERT INTO blacklist (user_id) VALUES ($1)", user.id)
             em=discord.Embed(description=f"Successfully blacklisted {user.mention}", color=self.bot.color)
             await ctx.reply(embed=em, mention_author=False)
 
     @blacklist.command(hidden=True)
-    async def remove(self, ctx, user : discord.User):
+    async def remove(self, ctx, user: discord.User):
         if is_mod(self.bot, ctx.author):
             await self.bot.db.fetch("DELETE FROM blacklist WHERE user_id = $1", user.id)
             em=discord.Embed(description=f"Successfully unblacklisted {user.mention}", color=self.bot.color)
             await ctx.reply(embed=em, mention_author=False)
 
     @blacklist.command(hidden=True)
-    async def check(self, ctx, user : discord.User):
+    async def check(self, ctx, user: discord.User):
         if is_mod(self.bot, ctx.author):
             try:
                 thing = await self.bot.db.fetchrow("SELECT * FROM blacklist WHERE user_id = $1", user.id)
@@ -270,12 +276,12 @@ class Admin(commands.Cog, command_attrs=dict(hidden=True)):
 
     @developer.command(aliases=["eval", "e"])
     @commands.is_owner()
-    async def evaluate(self, ctx, *, code : codeblock_converter):
+    async def evaluate(self, ctx, *, code: codeblock_converter):
         await ctx.invoke(self.bot.get_command("jishaku python"), **{"argument": code})
 
     @developer.command(aliases=["clean", "purge"])
     @commands.is_owner()
-    async def cleanup(self, ctx, amount : int = 100):
+    async def cleanup(self, ctx, amount: int = 100):
         deleted = []
         messages = []
         async with ctx.typing():
@@ -312,7 +318,7 @@ WHERE schemaname != 'pg_catalog' AND
 
     @developer.command(aliases=["cmdus", "cmdusage", "commandus"])
     @commands.is_owner()
-    async def commandusage(self, ctx, *, command : str = None):
+    async def commandusage(self, ctx, *, command: str = None):
         if command is None:
 
             if len(list(self.bot.command_usage)) == 0 and list(self.bot.command_usage) == []:
@@ -359,7 +365,7 @@ WHERE schemaname != 'pg_catalog' AND
 
     @simulate.command(aliases=["msg"])
     @commands.is_owner()
-    async def message(self, ctx, member : discord.Member, *, message : str):
+    async def message(self, ctx, member: discord.Member, *, message: str):
         msg: discord.Message = copy.copy(ctx.message)
         msg.author = member
         msg.channel = ctx.channel
@@ -371,7 +377,7 @@ WHERE schemaname != 'pg_catalog' AND
 
     @simulate.command(name="delete", aliases=["del"])
     @commands.is_owner()
-    async def _delete(self, ctx, member : discord.Member, *, message : str):
+    async def _delete(self, ctx, member: discord.Member, *, message: str):
         msg: discord.Message = copy.copy(ctx.message)
         msg.author = member
         msg.channel = ctx.channel

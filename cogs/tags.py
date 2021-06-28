@@ -1,5 +1,8 @@
+import discord
+import datetime
+import time
+import humanize
 from utils.functions import getFile
-import discord, datetime, string, time, humanize
 from discord.ext import commands
 from utils.get import *
 from utils.paginator import *
@@ -39,7 +42,7 @@ class Tags(commands.Cog):
 
     @commands.group(invoke_without_command=True)
     @commands.cooldown(1,5,commands.BucketType.user)
-    async def tag(self, ctx, *, name : commands.clean_content):
+    async def tag(self, ctx, *, name: commands.clean_content):
         if not await exists(ctx, name):
             await ctx.message.add_reaction(self.bot.icons['redtick'])
             em=discord.Embed(description=f"There is no tag with the name `{name}` on this guild", color=self.bot.color)
@@ -52,7 +55,7 @@ class Tags(commands.Cog):
 
     @tag.command()
     @commands.cooldown(1,5,commands.BucketType.user)
-    async def raw(self, ctx, *, name : commands.clean_content):
+    async def raw(self, ctx, *, name: commands.clean_content):
         if not await exists(ctx, name):
             await ctx.message.add_reaction(self.bot.icons['redtick'])
             em=discord.Embed(description=f"There is no tag with the name `{name}` on this guild", color=self.bot.color)
@@ -65,7 +68,7 @@ class Tags(commands.Cog):
 
     @tag.command(aliases=["display", "view"])
     @commands.cooldown(1,5,commands.BucketType.user)
-    async def show(self, ctx, *, name : commands.clean_content):
+    async def show(self, ctx, *, name: commands.clean_content):
         if not await exists(ctx, name):
             await ctx.message.add_reaction(self.bot.icons['redtick'])
             em=discord.Embed(description=f"There is no tag with the name `{name}` on this guild", color=self.bot.color)
@@ -78,7 +81,7 @@ class Tags(commands.Cog):
 
     @tag.command(aliases=["info", "owner", "author"])
     @commands.cooldown(1,5,commands.BucketType.user)
-    async def information(self, ctx, *, name : commands.clean_content):
+    async def information(self, ctx, *, name: commands.clean_content):
         if not await exists(ctx, name):
             await ctx.message.add_reaction(self.bot.icons['redtick'])
             em=discord.Embed(description=f"There is no tag with the name `{name}` on this guild", color=self.bot.color)
@@ -107,7 +110,7 @@ class Tags(commands.Cog):
 
     @tag.command(aliases=["update"])
     @commands.cooldown(1,15,commands.BucketType.user)
-    async def edit(self, ctx, name : commands.clean_content, *, content):
+    async def edit(self, ctx, name: commands.clean_content, *, content):
         if len(content) > self.Limit:
             await ctx.message.add_reaction(self.bot.icons['redtick'])
             em=discord.Embed(description=f"The content can't be over {self.Limit} characters long", color=self.bot.color)
@@ -126,7 +129,7 @@ class Tags(commands.Cog):
 
     @tag.command(aliases=["delete", "del"])
     @commands.cooldown(1,15,commands.BucketType.user)
-    async def remove(self, ctx, *, name : commands.clean_content):
+    async def remove(self, ctx, *, name: commands.clean_content):
         if not await exists(ctx, name):
             await ctx.message.add_reaction(self.bot.icons['redtick'])
             em=discord.Embed(description=f"There is no tag with the name `{name}` on this guild", color=self.bot.color)
@@ -141,7 +144,7 @@ class Tags(commands.Cog):
 
     @tag.command()
     @commands.cooldown(1,15,commands.BucketType.user)
-    async def rename(self, ctx, name : commands.clean_content, *, new_name : commands.clean_content):
+    async def rename(self, ctx, name: commands.clean_content, *, new_name: commands.clean_content):
         commands = [cmd.name for cmd in self.bot.get_command("tag").commands]
         for command in self.bot.get_command("tag").commands:
             for alias in command.aliases:
@@ -172,7 +175,7 @@ class Tags(commands.Cog):
 
     @tag.command(aliases=["make", "add"])
     @commands.cooldown(1,15,commands.BucketType.user)
-    async def create(self, ctx, name : commands.clean_content, *, content):
+    async def create(self, ctx, name: commands.clean_content, *, content):
         commands = [cmd.name for cmd in self.bot.get_command("tag").commands]
         for command in self.bot.get_command("tag").commands:
             for alias in command.aliases:
@@ -199,7 +202,7 @@ class Tags(commands.Cog):
 
     @tag.command()
     @commands.cooldown(1,5,commands.BucketType.user)
-    async def claim(self, ctx, *, name : commands.clean_content):
+    async def claim(self, ctx, *, name: commands.clean_content):
         if not await exists(ctx, name):
             await ctx.message.add_reaction(self.bot.icons['redtick'])
             em=discord.Embed(description=f"There is no tag with the name `{name}` on this guild", color=self.bot.color)
@@ -219,7 +222,7 @@ class Tags(commands.Cog):
 
     @tag.command(aliases=["give"])
     @commands.cooldown(1,5,commands.BucketType.user)
-    async def transfer(self, ctx, name : commands.clean_content, member : discord.Member):
+    async def transfer(self, ctx, name: commands.clean_content, member: discord.Member):
         if not await exists(ctx, name):
             await ctx.message.add_reaction(self.bot.icons['redtick'])
             em=discord.Embed(description=f"There is no tag with the name `{name}` on this guild", color=self.bot.color)
@@ -237,7 +240,7 @@ class Tags(commands.Cog):
 
     @tag.command()
     @commands.cooldown(1,5,commands.BucketType.user)
-    async def search(self, ctx, *, query : commands.clean_content):
+    async def search(self, ctx, *, query: commands.clean_content):
         res = await self.bot.db.fetch("SELECT * FROM tags WHERE guild = $1", ctx.guild.id)
         records = []
         for record in res:
@@ -277,7 +280,7 @@ class Tags(commands.Cog):
 
     @tag.command(name="from", aliases=["by"])
     @commands.cooldown(1,5,commands.BucketType.user)
-    async def _from(self, ctx, member : discord.Member = None):
+    async def _from(self, ctx, member: discord.Member = None):
         if member is None:
             member = ctx.author
 

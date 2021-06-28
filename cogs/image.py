@@ -1,4 +1,6 @@
-import discord, asyncdagpi, datetime, io
+import discord
+import asyncdagpi
+import io
 from discord.ext import commands
 from utils.get import *
 from utils.functions import *
@@ -15,7 +17,7 @@ class Image(commands.Cog):
         self.bot = bot
 
     @executor_function
-    def rounden(self, img, ellipse : tuple):
+    def rounden(self, img, ellipse: tuple):
         from PIL import Image, ImageOps, ImageDraw
         size = (1024, 1024)
         mask = Image.new('L', size, 255)
@@ -32,7 +34,7 @@ class Image(commands.Cog):
 
     @commands.command(name="rounden", aliases=["circle", "round", "circular"])
     @commands.cooldown(1,15,commands.BucketType.user)
-    async def _rounden(self, ctx, member : typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
+    async def _rounden(self, ctx, member: typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
         url = await getImage(ctx, member)
         async with ctx.processing(ctx):
             img = await self.bot.session.get(str(url))
@@ -44,7 +46,7 @@ class Image(commands.Cog):
 
     @commands.command()
     @commands.cooldown(1,10,commands.BucketType.user)
-    async def pixel(self, ctx, member : typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
+    async def pixel(self, ctx, member: typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
         url = await getImage(ctx, member)
         async with ctx.processing(ctx):
             img = await dagpi.image_process(asyncdagpi.ImageFeatures.pixel(), url=str(url))
@@ -55,7 +57,7 @@ class Image(commands.Cog):
 
     @commands.command(aliases=["amhu"])
     @commands.cooldown(1,10,commands.BucketType.user)
-    async def allmyhomiesuse(self, ctx, bad : str, good : str):
+    async def allmyhomiesuse(self, ctx, bad: str, good: str):
         async with ctx.processing(ctx):
             img = await dagpi.image_process(
                 asyncdagpi.ImageFeatures.retro_meme(),
@@ -70,7 +72,7 @@ class Image(commands.Cog):
 
     @commands.command()
     @commands.cooldown(1,10,commands.BucketType.user)
-    async def retromeme(self, ctx, top: str, bottom : str, url : str = None):
+    async def retromeme(self, ctx, top: str, bottom: str, url: str = None):
         url = await getImage(ctx, url)
         async with ctx.processing(ctx):
             img = await dagpi.image_process(
@@ -86,7 +88,7 @@ class Image(commands.Cog):
 
     @commands.command()
     @commands.cooldown(1,10,commands.BucketType.user)
-    async def modernmeme(self, ctx, top: str, bottom : str, url : str = None):
+    async def modernmeme(self, ctx, top: str, bottom: str, url: str = None):
         url = await getImage(ctx, url)
         async with ctx.processing(ctx):
             img = await dagpi.image_process(
@@ -102,7 +104,7 @@ class Image(commands.Cog):
 
     @commands.command()
     @commands.cooldown(1,10,commands.BucketType.user)
-    async def america(self, ctx, member : typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
+    async def america(self, ctx, member: typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
         url = await getImage(ctx, member)
         async with ctx.processing(ctx):
             img = await dagpi.image_process(asyncdagpi.ImageFeatures.america(), url=str(url))
@@ -113,7 +115,7 @@ class Image(commands.Cog):
 
     @commands.command()
     @commands.cooldown(1,10,commands.BucketType.user)
-    async def triggered(self, ctx, member : typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
+    async def triggered(self, ctx, member: typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
         url = await getImage(ctx, member)
         async with ctx.processing(ctx):
             img = await dagpi.image_process(asyncdagpi.ImageFeatures.triggered(), url=str(url))
@@ -124,7 +126,7 @@ class Image(commands.Cog):
 
     @commands.command()
     @commands.cooldown(1,10,commands.BucketType.user)
-    async def wasted(self, ctx, member : typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
+    async def wasted(self, ctx, member: typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
         url = await getImage(ctx, member)
         async with ctx.processing(ctx):
             img = await dagpi.image_process(asyncdagpi.ImageFeatures.wasted(), url=str(url))
@@ -135,7 +137,7 @@ class Image(commands.Cog):
 
     @commands.command()
     @commands.cooldown(1,10,commands.BucketType.user)
-    async def invert(self, ctx, member : typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
+    async def invert(self, ctx, member: typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
         url = await getImage(ctx, member)
         async with ctx.processing(ctx):
             img = await dagpi.image_process(asyncdagpi.ImageFeatures.invert(), url=str(url))
@@ -146,7 +148,7 @@ class Image(commands.Cog):
 
     @commands.command()
     @commands.cooldown(1,10,commands.BucketType.user)
-    async def sobel(self, ctx, member : typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
+    async def sobel(self, ctx, member: typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
         url = await getImage(ctx, member)
         async with ctx.processing(ctx):
             img = await dagpi.image_process(asyncdagpi.ImageFeatures.sobel(), url=str(url))
@@ -157,7 +159,7 @@ class Image(commands.Cog):
 
     @commands.command()
     @commands.cooldown(1,10,commands.BucketType.user)
-    async def triangle(self, ctx, member : typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
+    async def triangle(self, ctx, member: typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
         url = await getImage(ctx, member)
         async with ctx.processing(ctx):
             img = await dagpi.image_process(asyncdagpi.ImageFeatures.triangle(), url=str(url))
@@ -168,7 +170,7 @@ class Image(commands.Cog):
 
     @commands.command()
     @commands.cooldown(1,10,commands.BucketType.user)
-    async def angel(self, ctx, member : typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
+    async def angel(self, ctx, member: typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
         url = await getImage(ctx, member)
         async with ctx.processing(ctx):
             img = await dagpi.image_process(asyncdagpi.ImageFeatures.angel(), url=str(url))
@@ -179,7 +181,7 @@ class Image(commands.Cog):
 
     @commands.command(aliases=["s8n"])
     @commands.cooldown(1,10,commands.BucketType.user)
-    async def satan(self, ctx, member : typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
+    async def satan(self, ctx, member: typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
         url = await getImage(ctx, member)
         async with ctx.processing(ctx):
             img = await dagpi.image_process(asyncdagpi.ImageFeatures.satan(), url=str(url))
@@ -190,7 +192,7 @@ class Image(commands.Cog):
 
     @commands.command()
     @commands.cooldown(1,10,commands.BucketType.user)
-    async def delete(self, ctx, member : typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
+    async def delete(self, ctx, member: typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
         url = await getImage(ctx, member)
         async with ctx.processing(ctx):
             img = await dagpi.image_process(asyncdagpi.ImageFeatures.delete(), url=str(url))
@@ -201,7 +203,7 @@ class Image(commands.Cog):
 
     @commands.command()
     @commands.cooldown(1,10,commands.BucketType.user)
-    async def fedora(self, ctx, member : typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
+    async def fedora(self, ctx, member: typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
         url = await getImage(ctx, member)
         async with ctx.processing(ctx):
             img = await dagpi.image_process(asyncdagpi.ImageFeatures.fedora(), url=str(url))
@@ -212,7 +214,7 @@ class Image(commands.Cog):
 
     @commands.command(aliases=["hitler", "wth"])
     @commands.cooldown(1,10,commands.BucketType.user)
-    async def worsethanhitler(self, ctx, member : typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
+    async def worsethanhitler(self, ctx, member: typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
         url = await getImage(ctx, member)
         async with ctx.processing(ctx):
             img = await dagpi.image_process(asyncdagpi.ImageFeatures.hitler(), url=str(url))
@@ -223,7 +225,7 @@ class Image(commands.Cog):
 
     @commands.command()
     @commands.cooldown(1,10,commands.BucketType.user)
-    async def wanted(self, ctx, member : typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
+    async def wanted(self, ctx, member: typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
         url = await getImage(ctx, member)
         async with ctx.processing(ctx):
             img = await dagpi.image_process(asyncdagpi.ImageFeatures.wanted(), url=str(url))
@@ -234,7 +236,7 @@ class Image(commands.Cog):
 
     @commands.command(aliases=["ytcomment"])
     @commands.cooldown(1,10,commands.BucketType.user)
-    async def youtubecomment(self, ctx, member : discord.Member, *, text):
+    async def youtubecomment(self, ctx, member: discord.Member, *, text):
         async with ctx.processing(ctx):
             img = await dagpi.image_process(asyncdagpi.ImageFeatures.youtube(), url=getImage(ctx, member), username=member.display_name, text=text)
             file=discord.File(img.image, f"{ctx.command.name}.png")
@@ -244,7 +246,7 @@ class Image(commands.Cog):
 
     @commands.command(name="discord")
     @commands.cooldown(1,10,commands.BucketType.user)
-    async def _discord(self, ctx, member : discord.Member, *, text):
+    async def _discord(self, ctx, member: discord.Member, *, text):
         async with ctx.processing(ctx):
             img = await dagpi.image_process(asyncdagpi.ImageFeatures.discord(), url=str(member.avatar_url_as(format="png")), username=member.display_name, text=text)
             file=discord.File(img.image, f"{ctx.command.name}.png")
@@ -254,7 +256,7 @@ class Image(commands.Cog):
 
     @commands.command()
     @commands.cooldown(1,10,commands.BucketType.user)
-    async def jail(self, ctx, member : typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
+    async def jail(self, ctx, member: typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
         if member is None:
             if ctx.message.attachments:
                 if ctx.message.attachments[0].url.endswith("png") or ctx.message.attachments[0].url.endswith("jpg") or ctx.message.attachments[0].url.endswith("jpeg") or ctx.message.attachments[0].url.endswith("webp"):
@@ -274,7 +276,7 @@ class Image(commands.Cog):
 
     @commands.command()
     @commands.cooldown(1,10,commands.BucketType.user)
-    async def pride(self, ctx, flag : str = "gay", member : typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
+    async def pride(self, ctx, flag: str = "gay", member: typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
         url = await getImage(ctx, member)
         async with ctx.processing(ctx):
             img = await dagpi.image_process(asyncdagpi.ImageFeatures.pride(), url=str(url), flag=flag)
@@ -285,7 +287,7 @@ class Image(commands.Cog):
 
     @commands.command()
     @commands.cooldown(1,10,commands.BucketType.user)
-    async def trash(self, ctx, member : typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
+    async def trash(self, ctx, member: typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
         url = await getImage(ctx, member)
         async with ctx.processing(ctx):
             img = await dagpi.image_process(asyncdagpi.ImageFeatures.trash(), url=str(url))
@@ -296,7 +298,7 @@ class Image(commands.Cog):
 
     @commands.command()
     @commands.cooldown(1,10,commands.BucketType.user)
-    async def magik(self, ctx, member : typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
+    async def magik(self, ctx, member: typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
         url = await getImage(ctx, member)
         async with ctx.processing(ctx):
             img = await dagpi.image_process(asyncdagpi.ImageFeatures.magik(), url=str(url))
@@ -307,7 +309,7 @@ class Image(commands.Cog):
 
     @commands.command()
     @commands.cooldown(1,10,commands.BucketType.user)
-    async def paint(self, ctx, member : typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
+    async def paint(self, ctx, member: typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
         url = await getImage(ctx, member)
         async with ctx.processing(ctx):
             img = await dagpi.image_process(asyncdagpi.ImageFeatures.paint(), url=str(url))
@@ -318,7 +320,7 @@ class Image(commands.Cog):
 
     @commands.command()
     @commands.cooldown(1,10,commands.BucketType.user)
-    async def captcha(self, ctx, text : str, member : typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
+    async def captcha(self, ctx, text: str, member: typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
         url = await getImage(ctx, member)
         async with ctx.processing(ctx):
             img = await dagpi.image_process(asyncdagpi.ImageFeatures.captcha(), url=str(url), text=text)
@@ -341,7 +343,7 @@ class Image(commands.Cog):
 
     @commands.command()
     @commands.cooldown(1,15,commands.BucketType.user)
-    async def stickbug(self, ctx, member : typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
+    async def stickbug(self, ctx, member: typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
         url = await getImage(ctx, member)
         async with ctx.processing(ctx):
             res = await self.bot.session.get(f"https://nekobot.xyz/api/imagegen?type=stickbug&url={url}")
@@ -365,7 +367,7 @@ class Image(commands.Cog):
 
     @commands.command(aliases=["phc", "pornhubcomment"])
     @commands.cooldown(1,5,commands.BucketType.user)
-    async def phcomment(self, ctx, member : discord.Member, *, message):
+    async def phcomment(self, ctx, member: discord.Member, *, message):
         message = message.replace(" ", "%20")
         async with ctx.processing(ctx):
             res = await self.bot.session.get(f"https://nekobot.xyz/api/imagegen?type=phcomment&image={member.avatar_url_as(format='png')}&username={member.display_name}&text={message}")
@@ -377,7 +379,7 @@ class Image(commands.Cog):
 
     @commands.command(aliases=["iphonex"])
     @commands.cooldown(1,5,commands.BucketType.user)
-    async def iphone(self, ctx, member : typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
+    async def iphone(self, ctx, member: typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
         url = await getImage(ctx, member)
         async with ctx.processing(ctx):
             res = await self.bot.session.get(f"https://nekobot.xyz/api/imagegen?type=iphonex&url={url}")
@@ -389,7 +391,7 @@ class Image(commands.Cog):
 
     @commands.command()
     @commands.cooldown(1,5,commands.BucketType.user)
-    async def jpeg(self, ctx, member : typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
+    async def jpeg(self, ctx, member: typing.Union[discord.Emoji, discord.PartialEmoji, discord.Member, str] = None):
         url = await getImage(ctx, member)
         async with ctx.processing(ctx):
             res = await self.bot.session.get(f"https://nekobot.xyz/api/imagegen?type=jpeg&url={url}")

@@ -1,4 +1,7 @@
-import discord, io, typing, re
+import discord
+import io
+import typing
+import re
 from discord.ext import commands
 from jishaku.functools import executor_function
 import twemoji_parser as twemoji
@@ -10,7 +13,7 @@ def getFile(text, end = "txt", filename="message"):
     f.seek(0)
     return discord.File(f, filename=f"{filename}.{end}")
 
-async def makeEmbed(context : commands.Context, embed : discord.Embed, mention : bool = False):
+async def makeEmbed(context: commands.Context, embed: discord.Embed, mention: bool = False):
     embed = embed.to_dict()
     file_ = None
     if len(embed["description"]) > 1024:
@@ -27,7 +30,7 @@ def isImage(url):
         return True
     return False
 
-async def getImage(ctx : commands.Context, url : typing.Union[discord.Member, discord.Emoji, discord.PartialEmoji, None, str] = None):
+async def getImage(ctx: commands.Context, url: typing.Union[discord.Member, discord.Emoji, discord.PartialEmoji, None, str] = None):
 
     if isinstance(url, str):
         url = await twemoji.emoji_to_url(url)
