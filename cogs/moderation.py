@@ -22,10 +22,10 @@ class Moderation(commands.Cog):
         if not command in ["help"]:
             command = self.bot.get_command(command)
             if command is None:
-                em=discord.Embed(description=f"This command hasn't been found", color=self.bot.color)
+                em=discord.Embed(description="This command hasn't been found", color=self.bot.color)
                 await ctx.reply(embed=em, mention_author=False)
             elif command.hidden:
-                em=discord.Embed(description=f"This command hasn't been found", color=self.bot.color)
+                em=discord.Embed(description="This command hasn't been found", color=self.bot.color)
                 await ctx.reply(embed=em, mention_author=False)
             else:
                 command_name = "".join(command.name if command.parent is None else f"{command.parent.name} {command.name}")
@@ -42,7 +42,7 @@ class Moderation(commands.Cog):
                         em=discord.Embed(description=f"I've successfully disabled the `{command_name}` command", color=self.bot.color)
                         await ctx.reply(embed=em, mention_author=False)
                     else:
-                        em=discord.Embed(description=f"That command is already disabled", color=self.bot.color)
+                        em=discord.Embed(description="That command is already disabled", color=self.bot.color)
                         await ctx.reply(embed=em, mention_author=False)
                 else:
                     em=discord.Embed(description=f"I've successfully disabled the `{command_name}` command", color=self.bot.color)
@@ -58,17 +58,17 @@ class Moderation(commands.Cog):
     async def enable(self, ctx, *, command):
         command = self.bot.get_command(command)
         if command is None:
-            em=discord.Embed(description=f"This command hasn't been found", color=self.bot.color)
+            em=discord.Embed(description="This command hasn't been found", color=self.bot.color)
             await ctx.reply(embed=em, mention_author=False)
         elif command.hidden:
-            em=discord.Embed(description=f"This command hasn't been found", color=self.bot.color)
+            em=discord.Embed(description="This command hasn't been found", color=self.bot.color)
             await ctx.reply(embed=em, mention_author=False)
         else:
             res = await self.bot.db.fetchrow("SELECT commands FROM commands WHERE guild = $1", ctx.guild.id)
             try:
                 res["commands"]
             except TypeError:
-                em=discord.Embed(description=f"That command isn't disabled", color=self.bot.color)
+                em=discord.Embed(description="That command isn't disabled", color=self.bot.color)
                 await ctx.reply(embed=em, mention_author=False)
             else:
                 commands = await self.bot.db.fetchrow("SELECT commands FROM commands WHERE guild = $1", ctx.guild.id)
@@ -87,7 +87,7 @@ class Moderation(commands.Cog):
                         em=discord.Embed(description=f"I've successfully enabled the `{command_name}` command", color=self.bot.color)
                         await ctx.reply(embed=em, mention_author=False)
                 else:
-                    em=discord.Embed(description=f"That command isn't disabled", color=self.bot.color)
+                    em=discord.Embed(description="That command isn't disabled", color=self.bot.color)
                     await ctx.reply(embed=em, mention_author=False)
 
     @commands.command()
@@ -103,7 +103,7 @@ class Moderation(commands.Cog):
             await ctx.message.add_reaction(self.bot.icons["greentick"])
         else:
             await ctx.message.add_reaction(self.bot.icons["redtick"])
-            em=discord.Embed(description=f"You can't moderate people that have a higher role position than you", color=self.bot.color)
+            em=discord.Embed(description="You can't moderate people that have a higher role position than you", color=self.bot.color)
             await ctx.reply(embed=em, mention_author=False)
 
     @commands.command()
@@ -119,7 +119,7 @@ class Moderation(commands.Cog):
             await ctx.message.add_reaction(self.bot.icons["greentick"])
         else:
             await ctx.message.add_reaction(self.bot.icons["redtick"])
-            em=discord.Embed(description=f"You can't moderate people that have a higher role position than you", color=self.bot.color)
+            em=discord.Embed(description="You can't moderate people that have a higher role position than you", color=self.bot.color)
             await ctx.reply(embed=em, mention_author=False)
 
     @commands.command(aliases=["clear"])
@@ -134,7 +134,7 @@ class Moderation(commands.Cog):
             await ctx.reply(embed=em, mention_author=False, delete_after=2)
         else:
             await ctx.message.add_reaction(self.bot.icons["redtick"])
-            em=discord.Embed(description=f"The maximum amount you can purge is `100`", color=self.bot.color)
+            em=discord.Embed(description="The maximum amount you can purge is `100`", color=self.bot.color)
             await ctx.reply(embed=em, mention_author=False)
 
     @commands.command()
@@ -169,7 +169,7 @@ class Moderation(commands.Cog):
             await ctx.message.add_reaction(self.bot.icons["greentick"])
         else:
             await ctx.message.add_reaction(self.bot.icons["redtick"])
-            em=discord.Embed(description=f"You can't moderate people that have a higher role position than you", color=self.bot.color)
+            em=discord.Embed(description="You can't moderate people that have a higher role position than you", color=self.bot.color)
             await ctx.reply(embed=em, mention_author=False)
 
     @commands.command(aliases=["modnick", "moderatenick", "modnickname"])
@@ -191,7 +191,7 @@ class Moderation(commands.Cog):
             await ctx.message.add_reaction(self.bot.icons["greentick"])
         else:
             await ctx.message.add_reaction(self.bot.icons["redtick"])
-            em=discord.Embed(description=f"You can't moderate people that have a higher role position than you", color=self.bot.color)
+            em=discord.Embed(description="You can't moderate people that have a higher role position than you", color=self.bot.color)
             await ctx.reply(embed=em, mention_author=False)
 
     @commands.command(aliases=["prefix"])

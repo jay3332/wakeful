@@ -62,9 +62,9 @@ class Miscellaneous(commands.Cog):
         async with ctx.processing(ctx):
             res = await (await self.bot.session.get(str(emoji))).read()
 
-        await ctx.reply(file=discord.File(io.BytesIO(res), filename="".join(f"emoji.gif" if emoji_animated else f"emoji.png")), mention_author=False)
+        await ctx.reply(file=discord.File(io.BytesIO(res), filename="".join("emoji.gif" if emoji_animated else "emoji.png")), mention_author=False)
 
-    @commands.command(description=f'''
+    @commands.command(description='''
 Example: `poll "Am I cool?" Yes=✅,No=❌`
 ''')
     @commands.cooldown(1,5,commands.BucketType.user)
