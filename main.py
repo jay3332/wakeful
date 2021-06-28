@@ -1,4 +1,3 @@
-from utils.context import SusContext
 import discord, os, datetime, json, aiohttp, pwd, asyncpg, logging, coloredlogs, discordTogether
 from discord.ext import commands, tasks
 from colorama import Fore
@@ -14,7 +13,7 @@ with open('config.json') as f:
 async def get_prefix(bot, message):
     await bot.wait_until_ready()
 
-    if message.author.id == bot.ownersid and bot.emptyPrefix == True:
+    if message.author.id == bot.ownersid and bot.emptyPrefix is True:
         return commands.when_mentioned_or("")(bot, message)
 
     if message.guild is None:
@@ -23,7 +22,7 @@ async def get_prefix(bot, message):
         try:
             prefix = await bot.db.fetchrow("SELECT prefix FROM prefixes WHERE guild = $1", message.guild.id)
             return commands.when_mentioned_or(prefix["prefix"])(bot, message)
-        except:
+        except Exception:
             if pwd.getpwuid(os.getuid())[0] != "pi":
                 await bot.db.execute("INSERT INTO prefixes(guild, prefix) VALUES($1, $2)", message.guild.id, ',w')
             else:
@@ -31,11 +30,12 @@ async def get_prefix(bot, message):
             prefix = await bot.db.fetchrow("SELECT prefix FROM prefixes WHERE guild = $1", message.guild.id)
             return commands.when_mentioned_or(prefix["prefix"])(bot, message)
 
-class wakeful(commands.AutoShardedBot):
+
+class Wakeful(commands.AutoShardedBot):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.uptime = datetime.datetime.utcnow()
-        self.github = "https://github.com/jottew/wakeful" # the github the bot is hosted on
+        self.github = "https://github.com/jottew/wakeful"  # the github the bot is hosted on
         self.invite = "https://discord.gg/RkCqvMJsDY"
         self.icons = conf["ICONS"]
         with open('config.json') as f:
@@ -55,7 +55,7 @@ class wakeful(commands.AutoShardedBot):
         self.cmdsSinceRestart = 0
         self.ownersid = 797044260196319282
         self.afks = {}
-        #self.banner = "https://media.discordapp.net/attachments/832746281335783426/849721738987307008/banner.png"
+        # self.banner = "https://media.discordapp.net/attachments/832746281335783426/849721738987307008/banner.png"
         self.session = aiohttp.ClientSession()
         self.status = None
         self.guild = int(conf["GUILD"])
@@ -66,12 +66,13 @@ class wakeful(commands.AutoShardedBot):
 
     async def get_context(self, message, *, cls=SusContext):
         return await super().get_context(message, cls=cls)
+
     class roo():
 
         def __init__(self, bot):
             self.bot = bot
 
-        def getEmoji(self, name : str):
+        def getEmoji(self, name: str):
             try:
                 return self.bot.roos[name.lower()]
             except KeyError:
@@ -81,7 +82,7 @@ class wakeful(commands.AutoShardedBot):
             async def predicate():
                 return self.getEmoji(attr)
             return predicate
-        
+
     async def on_ready(self):
         logger.info(f"Logged in as: {bot.user} ({bot.user.id})")
 
@@ -92,15 +93,13 @@ class wakeful(commands.AutoShardedBot):
             await self.process_commands(msg)
             return
 
-        if pwd.getpwuid(os.getuid())[0] != "pi":
-            if not is_mod(self, msg.author):
-                return
-        
+        if pwd.getpwuid(os.getuid())[0] != "pi" and not is_mod(self, msg.author):
+            return
+
         prefix = await get_prefix(self, msg)
-        
-        if msg.guild is None:
-            if msg.content.startswith(prefix):
-                return await msg.channel.send(f"DM commands are disabled, please invite me to a guild\nInvite: https://discord.com/api/oauth2/authorize?client_id={self.user.id}&permissions=8&scope=self\nSupport Server: {self.invite}")
+
+        if msg.guild is None and msg.content.startswith(prefix):
+            return await msg.channel.send(f"DM commands are disabled, please invite me to a guild\nInvite: https://discord.com/api/oauth2/authorize?client_id={self.user.id}&permissions=8&scope=self\nSupport Server: {self.invite}")
 
         if msg.author.bot:
             return
@@ -110,12 +109,8 @@ class wakeful(commands.AutoShardedBot):
 
         for i in prefix:
             if msg.content.startswith(i):
-                if self.maintainance == True:
-                    if not is_mod(self, msg.author):
-                        return await msg.reply("This bot is currently under maintainance, please wait", mention_author=False)
-                    else:
-                        pass
-                    
+                if self.maintainance is True and not is_mod(self, msg.author):
+                    return await msg.reply("This bot is currently under maintainance, please wait", mention_author=False)
                 if msg.guild is not None:
                     try:
                         command = msg.content.split(i)
@@ -125,7 +120,7 @@ class wakeful(commands.AutoShardedBot):
                     res = await self.db.fetchrow("SELECT commands FROM commands WHERE guild = $1", msg.guild.id)
                     try:
                         commands = res["commands"]
-                    except:
+                    except KeyError:
                         success = False
                     else:
                         success = True
@@ -133,33 +128,31 @@ class wakeful(commands.AutoShardedBot):
                         command_obj = self.get_command(command)
                         try:
                             self.get_command(command).parent
-                        except:
+                        except AttributeError:
                             command_name = None
                         else:
                             command_name = "".join(command_obj.name if command_obj.parent is None else f"{command_obj.parent.name} {command_obj.name}")
                         commands = commands.split(",")
-                        if command_name in commands and command != "":
-                            if is_mod(self, msg.author):
-                                pass
-                            else:
-                                em=discord.Embed(description=f"This command has been disabled by the server administrators", color=self.color)
-                                return await msg.channel.send(embed=em)
-                        else:
-                            pass
-                    else:
-                        pass
+                        if (
+                            command_name in commands
+                            and command != ""
+                            and not is_mod(self, msg.author)
+                        ):
+                            em = discord.Embed(description="This command has been disabled by the server administrators", color=self.color)
+                            return await msg.channel.send(embed=em)
                 await self.process_commands(msg)
                 return
-            
-            if msg.content == f"<@!{self.user.id}>" or msg.content == f"<@{self.user.id}>":
-                if msg.guild:
-                    em=discord.Embed(description=f"The prefix for `{msg.guild.name}` is `{prefix[2]}`", color=self.color)
-                    return await msg.channel.send(embed=em)
-                else:
-                    em=discord.Embed(description=f"The prefix for dms is `{prefix[2]}`", color=self.color)
-                    return await msg.channel.send(embed=em)
 
-bot = wakeful(command_prefix=get_prefix, case_insensitive=True, ShardCount=10, intents=discord.Intents.all())
+            if msg.content in [f"<@!{self.user.id}>", f"<@{self.user.id}>"]:
+                if msg.guild:
+                    em = discord.Embed(description=f"The prefix for `{msg.guild.name}` is `{prefix[2]}`", color=self.color)
+                else:
+                    em = discord.Embed(description=f"The prefix for dms is `{prefix[2]}`", color=self.color)
+
+                return await msg.channel.send(embed=em)
+
+
+bot = Wakeful(command_prefix=get_prefix, case_insensitive=True, ShardCount=10, intents=discord.Intents.all())
 bot.remove_command("help")
 
 token = conf["TOKEN"]
@@ -170,17 +163,15 @@ os.environ["JISHAKU_HIDE"] = "True"
 coloredlogs.install()
 logger = logging.getLogger('discord')
 logger.setLevel(logging.INFO)
-handler = logging.FileHandler(filename=f"data/logs/discord.log", encoding='utf-8', mode='w')
+handler = logging.FileHandler(filename="data/logs/discord.log", encoding='utf-8', mode='w')
 handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
 logger.addHandler(handler)
 
 @tasks.loop(seconds=10)
 async def presence():
     await bot.wait_until_ready()
-    if bot.status == None:
+    if bot.status is None:
         await bot.change_presence(activity=discord.Game(f"@wakeful for prefix | {len(bot.guilds)} guilds & {len(bot.users)} users"))
-    else:
-        pass
 
 @tasks.loop(seconds=10)
 async def update_config():
@@ -201,5 +192,7 @@ bot.config = conf
 bot.load_extension("jishaku")
 presence.start()
 update_config.start()
-bot.db=bot.loop.run_until_complete(asyncpg.create_pool(host="localhost", port="5432", user=conf["dbuser"], password=conf["dbpw"], database="wakeful"))
-bot.run(token) # run stable
+bot.db = bot.loop.run_until_complete(asyncpg.create_pool(host="localhost", port="5432", user=conf["dbuser"], password=conf["dbpw"], database="wakeful"))
+
+if __name__ == "__main__":
+    bot.run(token)  # run stable
