@@ -12,8 +12,7 @@ class SusContext(commands.Context):
         try:
             if allowed_mentions is None:
                 return await self.reply(content=content, mention_author=False, allowed_mentions=discord.AllowedMentions.none(), *args, **kwargs)
-            else:
-                return await self.reply(content=content, mention_author=False, *args, **kwargs)
+            return await self.reply(content=content, mention_author=False, *args, **kwargs)
         except discord.NotFound:
             return await super().reply(content=content, *args, **kwargs)
 
