@@ -15,8 +15,7 @@ async def exists(ctx, name):
             tag = tag_
     if tag is not None:
         return True
-    else:
-        return False
+    return False
 
 async def get_tag(ctx, name):
     res = await ctx.bot.db.fetch("SELECT * FROM tags WHERE guild = $1", ctx.guild.id)
@@ -31,8 +30,7 @@ async def is_owner(ctx, name):
         return True
     elif ctx.author.guild_permissions.manage_guild:
         return True
-    else:
-        return False
+    return False
 
 class Tags(commands.Cog):
     def __init__(self, bot):
