@@ -58,6 +58,9 @@ class Errors(commands.Cog):
 
         if isinstance(error, NotFound):
             await ctx.reply(f"{self.bot.icons['redtick']} {error}", mention_author=False, allowed_mentions=discord.AllowedMentions.none())
+
+        elif isinstance(error, (commands.CheckAnyFailure, commands.CheckFailure)):
+            pass
             
         elif isinstance(error, commands.CommandOnCooldown):
             if not is_mod(self.bot, ctx.author):

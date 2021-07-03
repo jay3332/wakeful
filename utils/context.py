@@ -1,11 +1,18 @@
+from os import replace
 import discord
 import asyncio
 import typing
+import os
+from __main__ import __file__ as file_location
 from discord.ext import commands
 
 class SusContext(commands.Context):
 
     async def send(self, content=None, *args, **kwargs):
+        content = (content
+        .replace(os.path.dirname(os.path.realpath(file_location)), "[path]")
+        .replace(self.bot.http.token, "[token]")
+        )
 
         allowed_mentions = kwargs.pop("allowed_mentions", None)
 

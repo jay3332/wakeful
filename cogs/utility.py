@@ -15,6 +15,7 @@ import lyricsgenius
 import asyncdagpi
 import hashlib
 import asyncpg
+import expr
 import io
 import typing
 import gdshortener
@@ -23,7 +24,6 @@ import textwrap
 import async_tio
 import zipfile
 import aiowiki
-import mathjspy
 import pytube
 import youtube_dl
 import re
@@ -1634,16 +1634,16 @@ class Utility(commands.Cog):
 
     @commands.command(aliases=["calculator", "calculater", "calc"])
     @commands.cooldown(1,5,commands.BucketType.user)
-    async def calculate(self, ctx, *, args: str):
+    async def calculate(self, ctx, *, expression: str):
         em=discord.Embed(color=self.bot.color)
         try:
-            res = mathjspy.MathJS().eval(args)
+            res = expr.evaluate(expression)
         except Exception as exc:
-            em.add_field(name="Input", value=args, inline=True)
-            em.add_field(name="Error", value=f"`{str(exc)}`", inline=True)
+            em.add_field(name="Input", value=f"```mathematica\n{expression}```", inline=False)
+            em.add_field(name="Error", value=f"`{str(exc)}`", inline=False)
         else:
-            em.add_field(name="Input", value=args, inline=True)
-            em.add_field(name="Output", value=res, inline=True)
+            em.add_field(name="Input", value=f"```mathematica\n{expression}```", inline=False)
+            em.add_field(name="Output", value=f"```mathematica\n{res}```", inline=False)
         em.set_thumbnail(url="https://upload.wikimedia.org/wikipedia/commons/thumb/3/35/Calculator_Flat_Icon_Vector.svg/512px-Calculator_Flat_Icon_Vector.svg.png")
         await ctx.reply(embed=em, mention_author=False, allowed_mentions=discord.AllowedMentions.none())
 

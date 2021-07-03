@@ -22,6 +22,8 @@ def gameRunning(ctx: commands.Context, game: str):
 
 async def is_blacklisted(bot, user):
     blacklist = await bot.db.fetchrow("SELECT * FROM blacklist WHERE user_id = $1", user.id)
+    if blacklist is None:
+        return False
     try:
         blacklist["user_id"]
     except KeyError:

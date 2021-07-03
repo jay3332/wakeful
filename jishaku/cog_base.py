@@ -25,8 +25,7 @@ import sys
 import time
 import traceback
 import typing
-import random
-import string
+import os
 
 import aiohttp
 import discord
@@ -43,6 +42,7 @@ from jishaku.repl import AsyncCodeExecutor, Scope, all_inspections, get_var_dict
 from jishaku.shell import ShellReader
 from jishaku.voice import BasicYouTubeDLSource, connected_check, playing_check, vc_check, youtube_dl
 from cogs.fun import generate_token
+from __main__ import __file__ as file_location
 
 from __main__ import get_prefix
 
@@ -547,7 +547,11 @@ class JishakuBase(commands.Cog):  # pylint: disable=too-many-public-methods
                                 if result.strip() == '':
                                     result = "\u200b"
 
-                                send(await ctx.send(result.replace(self.bot.http.token, generate_token(self.bot.user.id))))
+                                _path = os.path.dirname(os.path.realpath(file_location))
+                                send(await ctx.send((result)
+                                        .replace(self.bot.http.token, generate_token(self.bot.user.id))
+                                        .replace(_path, "[path]"))
+                                )
         finally:
             scope.clear_intersection(arg_dict)
 

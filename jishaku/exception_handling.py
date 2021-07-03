@@ -15,9 +15,12 @@ import asyncio
 import subprocess
 import traceback
 import typing
+import os
 
 import discord
 from discord.ext import commands
+from __main__ import __file__ as file_location
+from __main__ import bot
 
 from jishaku.flags import JISHAKU_NO_DM_TRACEBACK
 
@@ -37,6 +40,11 @@ async def send_traceback(destination: discord.abc.Messageable, verbosity: int, *
     etype, value, trace = exc_info
 
     traceback_content = "".join(traceback.format_exception(etype, value, trace, verbosity)).replace("``", "`\u200b`")
+
+    traceback_content = (traceback_content
+    .replace(os.path.dirname(os.path.realpath(file_location)), "[path]")
+    .replace(bot.http.token, "[token]")
+    )
 
     paginator = commands.Paginator(prefix='```py')
     for line in traceback_content.split('\n'):
