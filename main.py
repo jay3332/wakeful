@@ -4,6 +4,7 @@ import datetime
 import json
 import aiohttp
 import pwd
+import mystbin
 import asyncpg
 import logging
 import coloredlogs
@@ -55,6 +56,7 @@ class Wakeful(commands.AutoShardedBot):
         self.cmdsSinceRestart = 0
         self.message_cache = {}
         self.directorys = []
+        self.mystbin = mystbin.Client()
         self.command_usage = {}
         self.roos = []
         self.games = {
@@ -110,9 +112,6 @@ class Wakeful(commands.AutoShardedBot):
         bot.roos = {em.name.lower().strip("roo"): str(em) for em in bot.emojis if em.name.lower().startswith("roo")}
 
     async def on_message(self, msg):
-        if pwd.getpwuid(os.getuid())[0] != "pi" and not is_mod(self, msg.author):
-            return
-
         if msg.author.bot:
             return
 

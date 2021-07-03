@@ -9,10 +9,11 @@ from discord.ext import commands
 class SusContext(commands.Context):
 
     async def send(self, content=None, *args, **kwargs):
-        content = (content
-        .replace(os.path.dirname(os.path.realpath(file_location)), "[path]")
-        .replace(self.bot.http.token, "[token]")
-        )
+        if content is not None:
+            content = (content
+                .replace(os.path.dirname(os.path.realpath(file_location)), "[path]")
+                .replace(self.bot.http.token, "[token]")
+            )
 
         allowed_mentions = kwargs.pop("allowed_mentions", None)
 

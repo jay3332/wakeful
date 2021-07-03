@@ -52,7 +52,7 @@ class Checks(commands.Cog):
             success = True
 
         if success:
-            command_name = ctx.command.qualfied_name
+            command_name = ctx.command.qualfied_name if not isinstance(ctx.command, commands.Group) else ctx.command.name
             commands = commands.split(",")
             if (
                 command_name in commands
