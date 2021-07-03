@@ -119,7 +119,7 @@ class Tags(commands.Cog):
             await ctx.reply(embed=em, mention_author=False)
         elif not await is_owner(ctx, name):
             await ctx.message.add_reaction(self.bot.icons['redtick'])
-            em=discord.Embed(description=f"You don't own this tag", color=self.bot.color)
+            em=discord.Embed(description="You don't own this tag", color=self.bot.color)
             await ctx.reply(embed=em, mention_author=False)
         else:
             await self.bot.db.execute("UPDATE tags SET content = $1 WHERE guild = $2 AND name = $3", content, ctx.guild.id, name)
@@ -134,7 +134,7 @@ class Tags(commands.Cog):
             await ctx.reply(embed=em, mention_author=False)
         elif not await is_owner(ctx, name):
             await ctx.message.add_reaction(self.bot.icons['redtick'])
-            em=discord.Embed(description=f"You don't own this tag", color=self.bot.color)
+            em=discord.Embed(description="You don't own this tag", color=self.bot.color)
             await ctx.reply(embed=em, mention_author=False)
         else:
             await self.bot.db.execute("DELETE FROM tags WHERE guild = $1 AND name = $2", ctx.guild.id, name)
@@ -149,7 +149,7 @@ class Tags(commands.Cog):
                 commands.append(alias)
         if new_name in [cmd for cmd in commands]:
             await ctx.message.add_reaction(self.bot.icons['redtick'])
-            em=discord.Embed(description=f"The tag name cannot be a tag subcommand", color=self.bot.color)
+            em=discord.Embed(description="The tag name cannot be a tag subcommand", color=self.bot.color)
             await ctx.reply(embed=em, mention_author=False)
         elif await exists(ctx, new_name):
             await ctx.message.add_reaction(self.bot.icons['redtick'])
@@ -157,7 +157,7 @@ class Tags(commands.Cog):
             await ctx.reply(embed=em, mention_author=False)
         elif len(new_name) < 1:
             await ctx.message.add_reaction(self.bot.icons['redtick'])
-            em=discord.Embed(description=f"The new name has to be at least 1 characters long", color=self.bot.color)
+            em=discord.Embed(description="The new name has to be at least 1 characters long", color=self.bot.color)
             await ctx.reply(embed=em, mention_author=False)
         elif not await exists(ctx, name):
             await ctx.message.add_reaction(self.bot.icons['redtick'])
@@ -165,7 +165,7 @@ class Tags(commands.Cog):
             await ctx.reply(embed=em, mention_author=False)
         elif not await is_owner(ctx, name):
             await ctx.message.add_reaction(self.bot.icons['redtick'])
-            em=discord.Embed(description=f"You don't own this tag", color=self.bot.color)
+            em=discord.Embed(description="You don't own this tag", color=self.bot.color)
             await ctx.reply(embed=em, mention_author=False)
         else:
             await self.bot.db.execute("UPDATE tags SET name = $1 WHERE guild = $2 AND name = $3", new_name, ctx.guild.id, name)
@@ -180,7 +180,7 @@ class Tags(commands.Cog):
                 commands.append(alias)
         if name in [cmd for cmd in commands]:
             await ctx.message.add_reaction(self.bot.icons['redtick'])
-            em=discord.Embed(description=f"The tag name cannot be a tag subcommand", color=self.bot.color)
+            em=discord.Embed(description="The tag name cannot be a tag subcommand", color=self.bot.color)
             await ctx.reply(embed=em, mention_author=False)
         elif await exists(ctx, name):
             await ctx.message.add_reaction(self.bot.icons['redtick'])
@@ -188,7 +188,7 @@ class Tags(commands.Cog):
             await ctx.reply(embed=em, mention_author=False)
         elif len(name) < 1:
             await ctx.message.add_reaction(self.bot.icons['redtick'])
-            em=discord.Embed(description=f"The name has to be at least 1 characters long", color=self.bot.color)
+            em=discord.Embed(description="The name has to be at least 1 characters long", color=self.bot.color)
             await ctx.reply(embed=em, mention_author=False)
         elif len(content) > self.Limit:
             await ctx.message.add_reaction(self.bot.icons['redtick'])
@@ -212,7 +212,7 @@ class Tags(commands.Cog):
             member = ctx.guild.get_member(int(author))
             if member is not None:
                 await ctx.message.add_reaction(self.bot.icons['redtick'])
-                em=discord.Embed(description=f"The tag owner is still on the server", color=self.bot.color)
+                em=discord.Embed(description="The tag owner is still on the server", color=self.bot.color)
                 await ctx.reply(embed=em, mention_author=False)
             else:
                 await self.bot.db.execute("UPDATE tags SET author = $1 WHERE guild = $2 AND name = $3", ctx.author.id, ctx.guild.id, name_)
@@ -227,7 +227,7 @@ class Tags(commands.Cog):
             await ctx.reply(embed=em, mention_author=False)
         elif not await is_owner(ctx, name):
             await ctx.message.add_reaction(self.bot.icons['redtick'])
-            em=discord.Embed(description=f"You don't own this tag", color=self.bot.color)
+            em=discord.Embed(description="You don't own this tag", color=self.bot.color)
             await ctx.reply(embed=em, mention_author=False)
         else:
             tag = await get_tag(ctx, name)
@@ -273,7 +273,7 @@ class Tags(commands.Cog):
             pag = self.bot.paginate(Paginator(embeds, per_page=1))
             await pag.start(ctx)
         else:
-            em=discord.Embed(description=f"There are no tags on this guild", color=self.bot.color)
+            em=discord.Embed(description="There are no tags on this guild", color=self.bot.color)
             await ctx.reply(embed=em, mention_author=False)
 
     @tag.command(name="from", aliases=["by"])
