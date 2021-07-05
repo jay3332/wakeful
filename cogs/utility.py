@@ -412,7 +412,7 @@ class Utility(commands.Cog):
             else:
                 thumbnail = channel['thumbnails'][0]['url']
             if channel["descriptionSnippet"] is not None:
-                em=discord.Embed(title=channel["title"], descritpion=" ".join(text["text"] for text in channel["descriptionSnippet"]), url=url, color=self.bot.color)
+                em=discord.Embed(title=channel["title"], description=" ".join(text["text"] for text in channel["descriptionSnippet"]), url=url, color=self.bot.color)
             else:
                 em=discord.Embed(title=channel["title"], url=url, color=self.bot.color)
             em.add_field(name="Videos", value="".join(channel['videoCount'] if channel['videoCount'] is not None else "0"), inline=True)
