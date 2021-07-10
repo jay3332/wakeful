@@ -95,7 +95,7 @@ class Wakeful(commands.AutoShardedBot):
         def __init__(self, bot):
             self.bot = bot
 
-        def getEmoji(self, name: str):
+        def get_emoji(self, name: str):
             try:
                 return self.bot.roos[name.lower()]
             except KeyError:
